@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='rpa_suite',
-    version='0.3.0',
+    version='0.3.1',
     packages=find_packages(),
     description='Conjunto de ferramentas essenciais para RPA com Python, que facilitam o dia a dia de desenvolvimento.',
     long_description=open('README.md').read(),
@@ -18,5 +18,5 @@ setup(
         'Programming Language :: Python :: 3.9',
     ],
     keywords='basic-tools, email-tools, email-validation, file-tools, simple-functions, rpa-tools, rpa-functions',
-    install_requires=['loguru', 'colorama'],
+    install_requires=['loguru', 'colorama', 'email_validator'],
 )
