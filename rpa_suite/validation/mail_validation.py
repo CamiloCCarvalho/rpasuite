@@ -1,7 +1,7 @@
-from rpa_suite.logs.loggin import logging_decorator
+# from rpa_suite.logs.loggin import logging_decorator
 from email_validator import validate_email, EmailNotValidError
 
-@logging_decorator
+# @logging_decorator
 def valid_emails(
                 email_list: list
                 ) -> dict:
@@ -63,4 +63,4 @@ def valid_emails(
 
 
 if __name__ == '__main__':
-    valid_emails(['camilo.carvalho@triasoftware.com.br', 'asfaltorodas@gmail.com'])
+    dictio = valid_emails(['camilo.carvalho@triasoftware.com.br', 'asfaltorodas@gmail.com', '@gmail.com.camio'])

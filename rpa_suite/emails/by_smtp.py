@@ -92,7 +92,6 @@ def enviar_email(
         print("Erro ao tentar enviar email(s):", str(e))
     
     # Pós Tratamento
+    ...
     
     return mail_result
-
-
