@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='rpa_suite',
-    version='0.4.0',
+    version='0.4.1',
     packages=find_packages(),
     description='Conjunto de ferramentas essenciais para RPA com Python, que facilitam o dia a dia de desenvolvimento.',
     long_description=open('README.md').read(),

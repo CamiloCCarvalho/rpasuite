@@ -45,7 +45,7 @@ def send_email(
     
     
     # Pré Tratamentos
-    ...
+    by_smtp_result['success'] = False
 
 
     # Configuração inicial basica.
@@ -85,11 +85,13 @@ def send_email(
             server_by_smtp.sendmail(email_from, email, email_content)
             by_smtp_result['quantidade_enviada'] += 1
         server_by_smtp.quit()
+        by_smtp_result['success'] = True
         print("Email(s) enviado(s) com sucesso!")
         
 
     except smtplib.SMTPException as e:
-        print("Erro ao tentar enviar email(s):", str(e))
+        by_smtp_result['success'] = False
+        print("Erro ao enviar email(s):", str(e))
     
     # Pós Tratamento
     ...

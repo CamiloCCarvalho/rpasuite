@@ -23,30 +23,34 @@ def search_in(
     """
     
     # Variaveis locais
-    string_validation_result: dict = {
-        'is_found': False,
-        'number_occurrences': 0,
+    string_validator_result: dict = {
+        'is_found': bool,
+        'number_occurrences': int,
         'positions_in_text': list[set]
     }
     
     # Pré tratamento
+    string_validator_result['is_found'] = False
+    string_validator_result['number_occurrences'] = 0
+    
+    # Processo
     if search_by == 'word':
         origin_words = origin_text.split()
         if case_sensitivy:
-            string_validation_result['is_found'] = searched_word in origin_words
+            string_validator_result['is_found'] = searched_word in origin_words
 
         else:
             words_lowercase = [word.lower() for word in origin_words]
             searched_word = searched_word.lower()
-            string_validation_result['is_found'] = searched_word in words_lowercase
+            string_validator_result['is_found'] = searched_word in words_lowercase
             
     elif search_by == 'string':
         if case_sensitivy:
-            string_validation_result['is_found'] = origin_text.__contains__(searched_word)
+            string_validator_result['is_found'] = origin_text.__contains__(searched_word)
         else:
             origin_text_lower: str = origin_text.lower()
             searched_word_lower: str = searched_word.lower()
-            string_validation_result['is_found'] = origin_text_lower.__contains__(searched_word_lower)
+            string_validator_result['is_found'] = origin_text_lower.__contains__(searched_word_lower)
     
     """elif search_by == 'regex':
         # regex search
@@ -55,9 +59,10 @@ def search_in(
         print(f'por favor digite alguma forma de busca valida para a função, a função aceita: string, word e regex, como padrões de busca para fazer a pesquisa no texto original.')"""    
     
     # Pós tratamento
+    ...
     
     # Retorno
-    return string_validation_result
+    return string_validator_result
 
 if __name__ == '__main__':
     print(search_in('Camilo Costa de Carvalho', 'costa', True, 'word'))

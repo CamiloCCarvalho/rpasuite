@@ -28,11 +28,14 @@ def valid_emails(
         'quantidade_emails_invalidos': int,
         'mapa_do_validador': list[dict]
     }
+
+    
+    # Pré Tratamento
     valid_emails: list = []
     invalid_emails: list = []
     map_validation: list[dict] = []
     
-    # Pré Tratamento
+    # Processo
     try:
         for email in email_list:
             try:
@@ -43,8 +46,8 @@ def valid_emails(
             except email_validator.EmailNotValidError:
                 invalid_emails.append(email)
                 
-    except Exception as exc:
-        print(f'Erro ao tentar validar lista de emails: {str(exc)}')
+    except Exception as e:
+        print(f'Erro ao tentar validar lista de emails: {str(e)}')
 
     
     # Pós Tratamento

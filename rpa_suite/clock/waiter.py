@@ -8,7 +8,7 @@ def wait_for_exec(
                 fn_to_exec: Callable[..., Any],
                 *args,
                 **kwargs
-                ) -> bool:
+                ) -> dict:
     
     """
     Função temporizadora, aguarda um valor em segundos para executar a função que é passada como argumento. \n
