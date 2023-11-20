@@ -1,7 +1,7 @@
-# from rpa_suite.logs.loggin import logging_decorator
 from email_validator import validate_email, EmailNotValidError
+from rpa_suite.log.loggin import logging_decorator
 
-# @logging_decorator
+@logging_decorator
 def valid_emails(
                 email_list: list
                 ) -> dict:
@@ -20,7 +20,7 @@ def valid_emails(
     """
     
     # Variaveis locais
-    validation_result: dict = {
+    mail_validation_result: dict = {
         'emails_validos': list,
         'emails_invalidos': list,
         'todos_validaram_sucesso': bool,
@@ -49,7 +49,7 @@ def valid_emails(
 
     
     # Pós Tratamento
-    validation_result = {
+    mail_validation_result = {
         'emails_validos': valid_emails,
         'emails_invalidos': invalid_emails,
         'todos_validaram_sucesso': len(invalid_emails) == 0,
@@ -59,7 +59,7 @@ def valid_emails(
     }
     
     # Retorno
-    return validation_result
+    return mail_validation_result
 
 
 if __name__ == '__main__':
