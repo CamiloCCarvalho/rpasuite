@@ -4,14 +4,16 @@ from rpa_suite.log.loggin import logging_decorator
 
 @logging_decorator
 def wait_for_exec(
+                wait_time: int,
                 fn_to_exec: Callable[..., Any],
-                wait_time: int = 30,
                 *args,
                 **kwargs
                 ) -> bool:
     
     """
     Função temporizadora, aguarda um valor em segundos para executar a função que é passada como argumento. \n
+    
+    use no formato wait_for_exec(time_seconds, my_function_execute, args_function)
     
     Retorno sendo (dicionário):
         - 'success': bool

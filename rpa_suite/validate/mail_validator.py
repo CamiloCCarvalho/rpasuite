@@ -1,9 +1,9 @@
-from email_validator import validate_email, EmailNotValidError
+import email_validator
 from rpa_suite.log.loggin import logging_decorator
 
 @logging_decorator
 def valid_emails(
-                email_list: list
+                email_list: list[str]
                 ) -> dict:
     
     """
@@ -34,14 +34,13 @@ def valid_emails(
     
     # Pré Tratamento
     try:
-        
         for email in email_list:
             try:
-                v = validate_email(email)
+                v = email_validator.validate_email(email)
                 valid_emails.append(email)
                 map_validation.append(v)
                 
-            except EmailNotValidError as e:
+            except email_validator.EmailNotValidError:
                 invalid_emails.append(email)
                 
     except Exception as exc:

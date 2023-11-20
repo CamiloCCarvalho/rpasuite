@@ -22,6 +22,7 @@ def count_files(
     }
     
     # Pré tratamento
+    ...
     
     # Processo
     counter_result['qt'] = 0
@@ -32,6 +33,7 @@ def count_files(
                     counter_result['qt'] += 1
                     
     # Pós tratamento
+    ...
     
     # Retorno
     return counter_result

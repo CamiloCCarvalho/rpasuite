@@ -12,7 +12,7 @@ def send_email(
                 email_to: list[str],
                 subject_title: str,
                 body_message: str,
-                attachments: list = None,
+                attachments: list[str] = None,
                 smtp_server: str = 'smtp.office365.com',
                 smtp_port: int = 587
                 ) -> dict:
