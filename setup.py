@@ -2,10 +2,11 @@ from setuptools import setup, find_packages
 
 setup(
     name='rpa_suite',
-    version='0.4.3',
+    version='0.4.6',
     packages=find_packages(),
     description='Conjunto de ferramentas essenciais para RPA com Python, que facilitam o dia a dia de desenvolvimento.',
-    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
+    long_description=open('README.md', 'r', encoding='utf-8').read(),
     author='Camilo Costa de Carvalho',
     author_email='camilo.carvalho@triasoftware.com.br',
     license='MIT',

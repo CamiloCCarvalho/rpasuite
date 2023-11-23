@@ -44,7 +44,7 @@ O modulo principal do rpa-suite é dividido em categorias, onde por sua vez tem 
         - **string_validator** - modulo com funções para validação e varredura de strings / substrings / palavras
 
 ### Versão do projeto:
-Ultima versão release: **Alpha 0.4.3**
+Ultima versão release: **Alpha 0.4.6**
 Data da ultima versão: 23/11/2023
 Status: Em Desenvolvimento
 
