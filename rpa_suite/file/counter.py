@@ -1,7 +1,5 @@
 import os
-from rpa_suite.log.loggin import logging_decorator
 
-@logging_decorator
 def count_files(
                 dir_to_count: list[str], 
                 type_extension: str = '*'
@@ -10,9 +8,17 @@ def count_files(
     """
     Função responsavel por fazer a contagem de arquivos dentro de uma pasta, considera subpastas para fazer a contagem, busca por tipo de arquivo, sendo todos arquivos por default. \n
     
-    Retorno sendo (dicionário):
-        - 'success': bool \n
-        - 'qt': int \n
+    Parametros:
+    ----------
+    ``dir_to_count: list`` - deve ser uma lista, aceita mais de um caminho para contar arquivos.
+    ``type_extension: str`` - deve ser uma string com o formato/extensão do tipo de arquivo que deseja ser buscado para contagem, se vazio por default sera usado ``*`` que contará todos arquivos.
+
+    
+    Retorno:
+    ----------
+    >>> type:dict
+        * 'success': bool - representa se ação foi realizada com sucesso
+        * 'qt': int - numero que representa a quantidade de arquivos que foram contados
     """
     
     # Variaveis locais

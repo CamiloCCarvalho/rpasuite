@@ -1,7 +1,5 @@
 import email_validator
-from rpa_suite.log.loggin import logging_decorator
 
-@logging_decorator
 def valid_emails(
                 email_list: list[str]
                 ) -> dict:
@@ -9,24 +7,30 @@ def valid_emails(
     """
     Função responsavel por validar de forma rigorosa lista de emails usando a biblioteca email_validator. \n
     
-    o Retorno será um dicionário. \n
-    Sendo respectivamente: \n
-        - lista de emails validos
-        - lista de emails invalidos
-        - boleano contendo falso pois nem todos emails são validos
-        - quantidade de emails validos
-        - quantidade de emails invalidos
-        - mapa da validação de cada email (dicionário)
+    Paramentros:
+    ------------
+    ``email_list: list`` uma lista de strings contendo os emails a serem validados
+    
+    Retorno:
+    ------------
+    >>> type: dict
+    Retorna um dicionário com os respectivos dados:
+        * 'success': bool - representa se a lista é 100% valida
+        * 'valid_emails': list - lista de emails validos
+        * 'invalid_emails': list - lista de emails invalidos
+        * 'qt_valids': int - quantidade de emails validos
+        * 'qt_invalids': int - quantidade de emails invalidos
+        * 'map_validation' - mapa da validação de cada email (dicionário)
     """
     
     # Variaveis locais
     mail_validation_result: dict = {
-        'emails_validos': list,
-        'emails_invalidos': list,
-        'todos_validaram_sucesso': bool,
-        'quantidade_emails_validos': int,
-        'quantidade_emails_invalidos': int,
-        'mapa_do_validador': list[dict]
+        'success': bool,
+        'valid_emails': list,
+        'invalid_emails': list,
+        'qt_valids': int,
+        'qt_invalids': int,
+        'map_validation': list[dict]
     }
 
     
@@ -52,12 +56,12 @@ def valid_emails(
     
     # Pós Tratamento
     mail_validation_result = {
-        'emails_validos': valid_emails,
-        'emails_invalidos': invalid_emails,
-        'todos_validaram_sucesso': len(invalid_emails) == 0,
-        'quantidade_emails_validos': len(valid_emails),
-        'quantidade_emails_invalidos': len(invalid_emails),
-        'mapa_do_validador': map_validation
+        'valid_emails': valid_emails,
+        'invalid_emails': invalid_emails,
+        'success': len(invalid_emails) == 0,
+        'qt_valids': len(valid_emails),
+        'qt_invalids': len(invalid_emails),
+        'map_validation': map_validation
     }
     
     # Retorno

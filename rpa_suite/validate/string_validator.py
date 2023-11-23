@@ -1,32 +1,47 @@
-from rpa_suite.log.loggin import logging_decorator
 
-@logging_decorator
 def search_in(
-                origin_text: str,
-                searched_word: str,
-                case_sensitivy: bool = True,
-                search_by: str = 'string',
-                ) -> dict:
+            origin_text: str,
+            searched_word: str,
+            case_sensitivy: bool = True,
+            search_by: str = 'string',
+            ) -> dict:
     
     """
     Função responsavel por fazer busca de uma string, sbustring ou palavra dentro de um texto fornecido. \n
     
-    o parametro search_by aceita os valores: \n
+    Parametros:
+    -----------
+    ``origin_text: str`` \n
         
-        - 'string' -> consegue encontrar um trecho de escrita solicitado. (default) \n
-        - 'word' -> encontra apenas a palavra escrita por extenso exclusivamente. \n
+        * É o texto onde deve ser feita a busca, no formato string. \n
+        
+    ``search_by: str`` aceita os valores: \n
+        
+        * 'string' - consegue encontrar um trecho de escrita solicitado. (default) \n
+        * 'word' - encontra apenas a palavra escrita por extenso exclusivamente. \n
+        * 'regex' - encontrar padrões de regex, [ EM DESENVOLVIMENTO ...] \n
     
-    Retorno é um dicionário da seguinte forma:
-        - encontrou: bool 
-        - numero de ocorrencias: int
-        - posição inicial e final de cada ocorrencia: list[set(start; end), ...]
+    Retorno:
+    -----------
+    >>> type:dict
+    um dicionário com todas informações que podem ser necessarias sobre a validação.
+    Sendo respectivamente:
+        * 'is_found': bool -  se o pattern foi encontrado em pelo menos um caso
+        * 'number_occurrences': int - representa o numero de vezes que esse pattern foi econtrado
+        * 'positions': list[set(int, int), ...] - representa todas posições onde apareceu o pattern no texto original
+        
+    Sobre o `Position`:
+    -----------
+    >>> type: list[set(int, int), ...]
+        * no ``index = 0`` encontramos a primeira ocorrencia do texto, e a ocorrencia é composta por um PAR de numeros em um set, os demais indexes representam outras posições onde foram encontradas ocorrencias caso hajam. 
+    
     """
     
     # Variaveis locais
     string_validator_result: dict = {
         'is_found': bool,
         'number_occurrences': int,
-        'positions_in_text': list[set]
+        'positions': list[set]
     }
     
     # Pré tratamento
@@ -52,11 +67,13 @@ def search_in(
             searched_word_lower: str = searched_word.lower()
             string_validator_result['is_found'] = origin_text_lower.__contains__(searched_word_lower)
     
-    """elif search_by == 'regex':
+    """
+    elif search_by == 'regex':
         # regex search
         pass
     else:
-        print(f'por favor digite alguma forma de busca valida para a função, a função aceita: string, word e regex, como padrões de busca para fazer a pesquisa no texto original.')"""    
+        print(f'por favor digite alguma forma de busca valida para a função, a função aceita: string, word e regex, como padrões de busca para fazer a pesquisa no texto original.')
+    """    
     
     # Pós tratamento
     ...

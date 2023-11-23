@@ -3,9 +3,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from rpa_suite.log.loggin import logging_decorator
 
-@logging_decorator
 def send_email(
                 email_from: str,
                 pass_from: str,
@@ -18,18 +16,21 @@ def send_email(
                 ) -> dict:
 
     """
-    Função responsavel por enviar emails (SMTP), aceita lista de destinatários e possibilidade
-    de anexar arquivos. \n
+    Função responsavel por enviar emails ``(SMTP)``, aceita ``lista de destinatários`` e possibilidade
+    de ``anexar arquivos``. \n
     
-    Retorna um dicionário com todas informações que podem ser necessarias sobre os emails.\n
-    Sendo respectivamente: \n
-        - se houve pelo menos um envio com sucesso
-        - lista de todos emails parametrizados para envio
-        - lista de todos emails validos para envio
-        - lista de todos emails invalidos para envio
-        - quantidade efetiva que foi realizado envio
-        - se há anexos
-        - quantos anexos foram inseridos
+    Retorno:
+    ----------
+    >>> type:dict
+    um dicionário com todas informações que podem ser necessarias sobre os emails.
+    Sendo respectivamente:
+        * 'success': bool -  se houve pelo menos um envio com sucesso
+        * 'all_mails': list - lista de todos emails parametrizados para envio
+        * 'valid_mails': list - lista de todos emails validos para envio
+        * 'invalid_mails': list - lista de todos emails invalidos para envio
+        * 'qt_mails_sent': int - quantidade efetiva que foi realizado envio
+        * 'attchament': bool - se há anexos
+        * 'qt_attach': int - quantos anexos foram inseridos
     """
 
     # Variaveis locais

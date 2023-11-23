@@ -1,16 +1,20 @@
 import os, shutil
 import time
-from rpa_suite.log.loggin import logging_decorator
 
-@logging_decorator
 def create_temp_dir(path_to_create: str = 'default') -> dict:
     
     """
     Função responsavel por criar diretório temporário para trabalhar com arquivos e etc. \n
     
-    retorno sendo (dicionário):
-        - 'success': bool
-        - 'path_created': str
+    Parametros:
+    ----------
+    ``path_to_create: str`` - deve ser uma string com o path completo apontando para a pasta onde deve ser criada a pasta temporaria, se estiver vazio sera usado valor ``default`` que criará pasta no diretório atual onde o arquivo contendo esta função foi chamada.
+    
+    Retorno:
+    ----------
+    >>> type:dict
+        * 'success': bool - representa se ação foi realizada com sucesso
+        * 'path_deleted': str - path do diretório que foi criado no processo
     
     """
     
@@ -56,17 +60,20 @@ def create_temp_dir(path_to_create: str = 'default') -> dict:
     return temp_dir_result
 
 
-@logging_decorator
 def delete_temp_dir(path_to_delete: str = 'default') -> dict:
     
     """
     Função responsavel por deletar diretório temporário no caminho especificado. \n
     
-    Caminho default sendo o caminho do arquivo onde esta sendo executado. \n
+    Parametros:
+    ----------
+    ``path_to_delete: str`` - deve ser uma string com o path completo apontando para a pasta onde deve ser deletada a pasta temporaria, se estiver vazio sera usado valor ``default`` que buscará pasta no diretório atual onde o arquivo contendo esta função foi chamada.
     
-    retorno sendo (dicionário):
-        - 'success': bool
-        - 'path_deleted': str
+    Retorno:
+    ----------
+    >>> type:dict
+        * 'success': bool - representa se ação foi realizada com sucesso
+        * 'path_deleted': str - path do diretório que foi excluido no processo
     
     """
     

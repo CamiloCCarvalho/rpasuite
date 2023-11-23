@@ -1,8 +1,6 @@
 from typing import Callable, Any
 import time
-from rpa_suite.log.loggin import logging_decorator
 
-@logging_decorator
 def wait_for_exec(
                 wait_time: int,
                 fn_to_exec: Callable[..., Any],
@@ -11,13 +9,20 @@ def wait_for_exec(
                 ) -> dict:
     
     """
-    Função temporizadora, aguarda um valor em segundos para executar a função que é passada como argumento. \n
+    Função temporizadora, aguardar um valor em ``segundos`` para executar a função do argumento.
     
-    use no formato wait_for_exec(time_seconds, my_function_execute, args_function)
+    Parametros:
+    ----------
+        `wait_time: int` - (segundos) representa o tempo que deve aguardar antes de executar a função passada como argumento.
     
-    Retorno sendo (dicionário):
-        - 'success': bool
+        ``fn_to_exec: function`` - (função) a ser chamada depois do tempo aguardado, se houver parametros nessa função podem ser passados como próximos argumentos desta função em ``*args`` e ``**kwargs``
+    
+    Retorno:
+    ----------
+    >>> type:dict
+        * 'success': bool - representa se ação foi realizada com sucesso
     """
+    
     # Variaveis locais
     waiter_result: dict = {
         'success': bool
