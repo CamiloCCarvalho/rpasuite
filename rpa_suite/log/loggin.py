@@ -21,15 +21,5 @@ def logging_decorator(
         result = fn(*args, **kwargs)
         logger.info('Função {} retornou: {}', fn.__name__, result)
         return result
+    
     return wrapper
-
-
-'''
-Exemplo de uso com teste
-
-@logging_decorator
-def add(x, y):
-    return x + y
-
-add(1, 2)
-'''

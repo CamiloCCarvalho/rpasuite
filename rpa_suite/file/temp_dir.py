@@ -1,5 +1,5 @@
 import os, shutil
-import time
+from rpa_suite.log.printer import error_print, alert_print
 
 def create_temp_dir(path_to_create: str = 'default') -> dict:
     
@@ -33,7 +33,7 @@ def create_temp_dir(path_to_create: str = 'default') -> dict:
             default_dir = path_to_create
     except Exception as e:
         temp_dir_result['success'] = False
-        print(f'Erro ao capturar caminho atual para criar pasta temporária! Erro: {str(e)}')
+        error_print(f'Erro ao capturar caminho atual para criar pasta temporária! Erro: {str(e)}')
         
     # Processo
     try:
@@ -46,12 +46,12 @@ def create_temp_dir(path_to_create: str = 'default') -> dict:
                     raise Exception
             except Exception as e:
                 temp_dir_result['success'] = False
-                print(f'Não foi possivel criar diretório temporario! {str(e)}')
+                error_print(f'Não foi possivel criar diretório temporario! {str(e)}')
         else:
             temp_dir_result['success'] = True
-            print(fr'Diretório já criado em: {default_dir}\temp ')
+            alert_print(fr'AVISO! Diretório já criado em: {default_dir}\temp ')
     except Exception as e:
-        print(f'Erro ao tentar criar pasta temporaria em: {default_dir} - Erro: {str(e)}')
+        error_print(f'Erro ao tentar criar pasta temporaria em: {default_dir} - Erro: {str(e)}')
         
     # Pós tratamento
     temp_dir_result['path_created'] = fr'{default_dir}\temp'
@@ -92,7 +92,7 @@ def delete_temp_dir(path_to_delete: str = 'default') -> dict:
             default_dir = path_to_delete
     except Exception as e:
         temp_dir_result['success'] = False
-        print(f'Erro ao capturar caminho atual para deletar pasta temporária! Erro: {str(e)}')
+        error_print(f'Erro ao capturar caminho atual para deletar pasta temporária! Erro: {str(e)}')
         
     # Processo
     try:
@@ -105,20 +105,15 @@ def delete_temp_dir(path_to_delete: str = 'default') -> dict:
                     raise Exception
             except Exception as e:
                 temp_dir_result['success'] = False
-                print(f'Não foi possivel excluir diretório temporario! {str(e)}')
+                error_print(f'Não foi possivel excluir diretório temporario! {str(e)}')
         else:
             temp_dir_result['success'] = True
-            print(fr'Diretório já excluido: {default_dir}\temp. ')
+            alert_print(fr'Diretório já excluido: {default_dir}\temp. ')
             
     except Exception as e:
-        print(fr'Erro ao tentar deletar pasta temporaria de arquivos em: {default_dir}\temp - Erro: {str(e)}')
+        error_print(fr'Erro ao tentar deletar pasta temporaria de arquivos em: {default_dir}\temp - Erro: {str(e)}')
         
     # Pós tratamento
     temp_dir_result['path_deleted'] = fr'{default_dir}\temp'
     
-    # Retorno
     return temp_dir_result
-        
-create_temp_dir()
-time.sleep(30)
-delete_temp_dir()

@@ -1,5 +1,6 @@
 from typing import Callable, Any
 import time
+from rpa_suite.log.printer import error_print
 
 def wait_for_exec(
                 wait_time: int,
@@ -21,6 +22,12 @@ def wait_for_exec(
     ----------
     >>> type:dict
         * 'success': bool - representa se ação foi realizada com sucesso
+        
+    Exemplo:
+    ---------
+    Temos uma função de soma no seguinte formato ``soma(a, b) -> return x``, onde ``x`` é o resultado da soma. Queremos aguardar `30 segundos` para executar essa função, logo:
+    >>> wait_for_exec(30, soma, a, b) -> x \n
+        * OBS.:  `wait_for_exec` recebe como primeiro argumento o tempo a aguardar (seg), depois a função `soma` e por fim os argumentos que a função ira usar.
     """
     
     # Variaveis locais
@@ -35,7 +42,7 @@ def wait_for_exec(
         fn_to_exec(*args, **kwargs)
         waiter_result['success'] = True
     except Exception as e:
-        print(f'Erro ao tentar aguardar para executar a função! Mensagem: {str(e)}')
+        error_print(f'Erro ao tentar aguardar para executar a função! Mensagem: {str(e)}')
         waiter_result['success'] = False
     
     # Pós Tratamento

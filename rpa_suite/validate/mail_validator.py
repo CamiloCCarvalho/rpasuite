@@ -1,4 +1,5 @@
 import email_validator
+from rpa_suite.log.printer import error_print
 
 def valid_emails(
                 email_list: list[str]
@@ -51,7 +52,7 @@ def valid_emails(
                 invalid_emails.append(email)
                 
     except Exception as e:
-        print(f'Erro ao tentar validar lista de emails: {str(e)}')
+        error_print(f'Erro ao tentar validar lista de emails: {str(e)}')
 
     
     # Pós Tratamento
@@ -64,9 +65,4 @@ def valid_emails(
         'map_validation': map_validation
     }
     
-    # Retorno
     return mail_validation_result
-
-
-if __name__ == '__main__':
-    dictio = valid_emails(['camilo.carvalho@triasoftware.com.br', 'asfaltorodas@gmail.com', '@gmail.com.camio'])

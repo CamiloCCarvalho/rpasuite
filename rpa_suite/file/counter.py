@@ -1,4 +1,5 @@
 import os
+from rpa_suite.log.printer import error_print
 
 def count_files(
                 dir_to_count: list[str], 
@@ -41,7 +42,7 @@ def count_files(
         counter_result['success'] = True
     except Exception as e:
         counter_result['success'] = False
-        print(f'Erro ao tentar fazer contagem de arquivos! Erro: {str(e)}')
+        error_print(f'Erro ao tentar fazer contagem de arquivos! Erro: {str(e)}')
         
     # Pós tratamento
     ...

@@ -78,8 +78,4 @@ def search_in(
     # Pós tratamento
     ...
     
-    # Retorno
     return string_validator_result
-
-if __name__ == '__main__':
-    print(search_in('Camilo Costa de Carvalho', 'costa', True, 'word'))

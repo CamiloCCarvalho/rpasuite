@@ -1,5 +1,4 @@
 from colorama import Fore, Back, Style
-from typing import Any
 
 # Windows bash colors
 class Colors():
@@ -12,6 +11,8 @@ class Colors():
     yellow    = f'{Fore.YELLOW}'
     white     = f'{Fore.WHITE}'
     default   = f'{Fore.WHITE}'
+    call_fn   = f'{Fore.LIGHTMAGENTA_EX}'
+    retur_fn  = f'{Fore.LIGHTYELLOW_EX}'
 
 
 def success_print(string_text: str, color=Colors.green) -> None:
@@ -67,4 +68,24 @@ def blue_print(string_text: str, color=Colors.blue) -> None:
     ----------
         >>> type:None
     """
-    return print(f'{color} {string_text} {Colors.default}') 
+    return print(f'{color} {string_text} {Colors.default}')
+
+def print_call_fn(string_text: str, color=Colors.call_fn) -> None:
+    """
+    Print personalizado para log de chamada de função. \n
+    Cor: Magenta Light
+    Retorno:
+    ----------
+        >>> type:None
+    """
+    return print(f'{color} {string_text} {Colors.default}')
+
+def print_retur_fn(string_text: str, color=Colors.retur_fn) -> None:
+    """
+    Print personalizado para log de chamada de função. \n
+    Cor: Yellow Light
+    Retorno:
+    ----------
+        >>> type:None
+    """
+    return print(f'{color} {string_text} {Colors.default}')
