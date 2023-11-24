@@ -1,4 +1,7 @@
 
+from rpa_suite.log.printer import success_print
+
+
 def search_in(
             origin_text: str,
             searched_word: str,
@@ -76,6 +79,9 @@ def search_in(
     """    
     
     # Pós tratamento
-    ...
+    if string_validator_result['is_found']:
+        success_print(f'Função: {search_in.__name__} encontrou: {string_validator_result["number_occurrences"]} ocorrências para "{searched_word}".')
+    else:
+        success_print(f'Função: {search_in.__name__} não encontrou ocorrências de "{searched_word}" durante a busca.')
     
     return string_validator_result

@@ -1,6 +1,6 @@
 from typing import Callable, Any
 import time
-from rpa_suite.log.printer import error_print
+from rpa_suite.log.printer import error_print, success_print
 
 def wait_for_exec(
                 wait_time: int,
@@ -41,11 +41,14 @@ def wait_for_exec(
         time.sleep(wait_time)
         fn_to_exec(*args, **kwargs)
         waiter_result['success'] = True
+        success_print(f'A função:: {wait_for_exec.__name__} executou a função: {fn_to_exec.__name__}.')
+        
     except Exception as e:
-        error_print(f'Erro ao tentar aguardar para executar a função! Mensagem: {str(e)}')
         waiter_result['success'] = False
+        error_print(f'Erro ao tentar aguardar para executar a função: {fn_to_exec.__name__} \nMensagem: {str(e)}')
+        
     
     # Pós Tratamento
+    ...
     
-    # Retorno
     return waiter_result

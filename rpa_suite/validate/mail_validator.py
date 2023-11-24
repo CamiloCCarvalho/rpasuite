@@ -1,5 +1,5 @@
 import email_validator
-from rpa_suite.log.printer import error_print
+from rpa_suite.log.printer import error_print, success_print
 
 def valid_emails(
                 email_list: list[str]
@@ -21,7 +21,7 @@ def valid_emails(
         * 'invalid_emails': list - lista de emails invalidos
         * 'qt_valids': int - quantidade de emails validos
         * 'qt_invalids': int - quantidade de emails invalidos
-        * 'map_validation' - mapa da validação de cada email (dicionário)
+        * 'map_validation' - mapa da validação de cada email
     """
     
     # Variaveis locais
@@ -36,7 +36,7 @@ def valid_emails(
 
     
     # Pré Tratamento
-    valid_emails: list = []
+    validated_emails: list = []
     invalid_emails: list = []
     map_validation: list[dict] = []
     
@@ -45,22 +45,22 @@ def valid_emails(
         for email in email_list:
             try:
                 v = email_validator.validate_email(email)
-                valid_emails.append(email)
+                validated_emails.append(email)
                 map_validation.append(v)
                 
             except email_validator.EmailNotValidError:
                 invalid_emails.append(email)
-                
+        success_print(f'Função: {valid_emails.__name__} executada.')
     except Exception as e:
         error_print(f'Erro ao tentar validar lista de emails: {str(e)}')
 
     
     # Pós Tratamento
     mail_validation_result = {
-        'valid_emails': valid_emails,
+        'valid_emails': validated_emails,
         'invalid_emails': invalid_emails,
         'success': len(invalid_emails) == 0,
-        'qt_valids': len(valid_emails),
+        'qt_valids': len(validated_emails),
         'qt_invalids': len(invalid_emails),
         'map_validation': map_validation
     }

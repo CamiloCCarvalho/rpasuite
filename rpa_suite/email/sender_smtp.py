@@ -3,7 +3,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from rpa_suite.log.printer import error_print
+from rpa_suite.log.printer import error_print, success_print
 from rpa_suite.validate.mail_validator import email_validator
 
 def send_email(
@@ -108,6 +108,7 @@ def send_email(
 
         server_by_smtp.quit()
         by_smtp_result['success'] = True
+        success_print(f'Email(s) enviado(s) com sucesso!')
         
 
     except smtplib.SMTPException as e:
