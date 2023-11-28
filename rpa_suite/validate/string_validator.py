@@ -53,21 +53,28 @@ def search_in(
     try:
         if search_by == 'word':
             origin_words = origin_text.split()
-            if case_sensitivy:
-                result['is_found'] = searched_word in origin_words
+            try:
+                if case_sensitivy:
+                    result['is_found'] = searched_word in origin_words
 
-            else:
-                words_lowercase = [word.lower() for word in origin_words]
-                searched_word = searched_word.lower()
-                result['is_found'] = searched_word in words_lowercase
+                else:
+                    words_lowercase = [word.lower() for word in origin_words]
+                    searched_word = searched_word.lower()
+                    result['is_found'] = searched_word in words_lowercase
+            except Exception as e:
+                return error_print(f'Não foi possivel concluir a busca de: {searched_word}. Erro: {str(e)}')
                 
         elif search_by == 'string':
-            if case_sensitivy:
-                result['is_found'] = origin_text.__contains__(searched_word)
-            else:
-                origin_text_lower: str = origin_text.lower()
-                searched_word_lower: str = searched_word.lower()
-                result['is_found'] = origin_text_lower.__contains__(searched_word_lower)
+            try:
+                if case_sensitivy:
+                    result['is_found'] = origin_text.__contains__(searched_word)
+                else:
+                    origin_text_lower: str = origin_text.lower()
+                    searched_word_lower: str = searched_word.lower()
+                    result['is_found'] = origin_text_lower.__contains__(searched_word_lower)
+            except Exception as e:
+                return error_print(f'Não foi possivel concluir a busca de: {searched_word}. Erro: {str(e)}')
+            
     except Exception as e:
         return error_print(f'Não foi possivel realizar a busca por: {searched_word}. Erro: {str(e)}')
     

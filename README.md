@@ -1,15 +1,17 @@
-<div style="text-align:center">
-    <img src='./logo-rpa-suite.png' alt='Logo - RPA Suite' width='56px'>
+<div align="center">
+    <a href='https://pypi.org/project/rpa-suite/' target='_blank'>
+        <img src='./logo-rpa-suite.png' alt='Logo - RPA Suite' width='56px'>
+    </a>
 </div>
-<h1 style="text-align:center">
+<h1 align="center">
     Suite RPA
 </h1> 
 
 ## Kit de ferramentas para o desenvolvimento do seu bot, automação ou projeto.
 
-**Versátil**: Embora tenha sido criado com foco no desenvolvimento de BOTs em RPA, as ferramentas são de uso geral e podem ser aplicadas em outros tipos de projetos, *além do RPA*.
+:handshake: **Versátil**: Embora tenha sido criado com foco no desenvolvimento de BOTs em RPA, as ferramentas são de uso geral e podem ser aplicadas em outros tipos de projetos, *além do RPA*.
 
-**Simples**: Construímos as ferramentas de maneira mais direta e assertiva possível, utilizando apenas bibliotecas conhecidas no mercado para garantir o melhor aproveitamento e desempenho possível.
+:seedling: **Simples**: Construímos as ferramentas de maneira mais direta e assertiva possível, utilizando apenas bibliotecas conhecidas no mercado para garantir o melhor aproveitamento e desempenho possível.
 
 ## Objetivo:
 
@@ -59,6 +61,7 @@ Para mais informações, visite nosso projeto no Github ou PyPi:
 <a href='https://github.com/CamiloCCarvalho/rpa_suite' target='_blank'>
     Ver no GitHub.
 </a>
+</br>
 <a href='https://pypi.org/project/rpa-suite/' target='_blank'>
-    Ver projeto publicado no PyPi.
+    Ver projeto publicado no PyPI.
 </a>
