@@ -17,10 +17,10 @@
 
 Nosso objetivo é tornar o desenvolvimento de RPAs mais produtivo, oferecendo funções prontas para usos comuns, como:
 
-- envio de emails (configurações já pré-montadas)
-- validação de emails (limpeza e tratamento de listas)
-- busca por palavras ou patterns em textos ou cadeias de string
-- criação de pastas e arquivos temporarios e deleta-los com apenas um comando
+- envio de emails (já configurado / personalizavel)
+- validação de emails (limpeza e tratamento)
+- busca por palavras, strings ou substrings (patterns) em textos.
+- criação de pastas e arquivos temporários e deleta-los com apenas um comando
 - console com mensagens de melhor visualização com cores definidas para alerta, erro, informativo e sucesso.
 - e muitas outras facilidades
 
@@ -40,6 +40,8 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
 - **rpa_suite**
     - **clock**
         - **waiter** - módulo com funções para aguardar execução
+    - **date**
+        - **date** - módulo com funções para capturar data, mes, ano, hora, minutos de forma individual em apenas uma linha
     - **email**
         - **sender_smtp** - módulo com funções para envio de email SMPT 
     - **file**
@@ -53,7 +55,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - módulo com funções para validação e varredura de strings / substrings / palavras
 
 ### Versão do projeto:
-A versão mais recente é a **Alpha 0.4.6**, lançada em *23/11/2023*. O projeto está atualmente em desenvolvimento.
+A versão mais recente é a **Alpha 0.5.1**, lançada em *28/11/2023*. O projeto está atualmente em desenvolvimento.
 
 ### Mais Sobre:
 
