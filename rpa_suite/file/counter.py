@@ -23,14 +23,14 @@ def count_files(
     """
     
     # Variaveis locais
-    counter_result: dict = {
+    result: dict = {
         'success': bool,
         'qt': int
     }
     
     # Pré tratamento
-    counter_result['qt'] = 0
-    counter_result['success'] = False
+    result['qt'] = 0
+    result['success'] = False
     
     # Processo
     try:
@@ -38,16 +38,16 @@ def count_files(
             for current_dir, sub_dir, files in os.walk(dir):
                 for file in files:
                     if file.endswith(f'.{type_extension}'):
-                        counter_result['qt'] += 1
-        counter_result['success'] = True
-        success_print(f'Função: {count_files.__name__} encontrou {counter_result['qt']} arquivos.')
+                        result['qt'] += 1
+        result['success'] = True
+        success_print(f'Função: {count_files.__name__} encontrou {result['qt']} arquivos.')
         
     except Exception as e:
-        counter_result['success'] = False
+        result['success'] = False
         error_print(f'Erro ao tentar fazer contagem de arquivos! Erro: {str(e)}')
         
     # Pós tratamento
     ...
     
     # Retorno
-    return counter_result
+    return result

@@ -14,12 +14,12 @@ def create_temp_dir(path_to_create: str = 'default') -> dict:
     ----------
     >>> type:dict
         * 'success': bool - representa se ação foi realizada com sucesso
-        * 'path_deleted': str - path do diretório que foi criado no processo
+        * 'path_created': str - path do diretório que foi criado no processo
     
     """
     
     # Variaveis Locais
-    temp_dir_result: dict = {
+    result: dict = {
         'success': bool,
         'path_created': str
     }
@@ -32,7 +32,7 @@ def create_temp_dir(path_to_create: str = 'default') -> dict:
         else:
             default_dir = path_to_create
     except Exception as e:
-        temp_dir_result['success'] = False
+        result['success'] = False
         error_print(f'Erro ao capturar caminho atual para criar diretório temporária! Erro: {str(e)}')
         
     # Processo
@@ -41,24 +41,24 @@ def create_temp_dir(path_to_create: str = 'default') -> dict:
             try:
                 os.mkdir(fr'{default_dir}\temp')
                 if os.path.exists(fr'{default_dir}\temp'):
-                    temp_dir_result['success'] = True
+                    result['success'] = True
                     success_print(fr'Diretório criado em: {default_dir}\temp')
                 else:
-                    temp_dir_result['success'] = False
+                    result['success'] = False
                     raise Exception
             except Exception as e:
                 error_print(f'Não foi possivel criar diretório temporario! Erro: {str(e)}')
         else:
-            temp_dir_result['success'] = True
+            result['success'] = True
             alert_print(fr'AVISO! diretório já existe em: {default_dir}\temp ')
     except Exception as e:
         error_print(f'Erro ao tentar criar diretório temporaria em: {default_dir} - Erro: {str(e)}')
         
     # Pós tratamento
-    temp_dir_result['path_created'] = fr'{default_dir}\temp'
+    result['path_created'] = fr'{default_dir}\temp'
     
     # Retorno
-    return temp_dir_result
+    return result
 
 
 def delete_temp_dir(path_to_delete: str = 'default') -> dict:

@@ -1,14 +1,19 @@
-# Suite RPA: 
+<div style="text-align:center">
+    <img src='./logo-rpa-suite.png' alt='Logo - RPA Suite' width='56px'>
+</div>
+<h1 style="text-align:center">
+    Suite RPA
+</h1> 
 
 ## Kit de ferramentas para o desenvolvimento do seu bot, automação ou projeto.
 
-**Versatil**: Embora criado com foco no desenvolvimento de BOTs em RPA, as ferramentas são de uso geral, podem ser *aplicadas também em outros modelos de projetos além do RPA*.
+**Versátil**: Embora tenha sido criado com foco no desenvolvimento de BOTs em RPA, as ferramentas são de uso geral e podem ser aplicadas em outros tipos de projetos, *além do RPA*.
 
-**Simples**: Contruimos as ferramentas de maneira mais direta e acertiva possivel e usando apenas libs conhecidas no mercado, para melhor aproveitamento e performance possivel.
+**Simples**: Construímos as ferramentas de maneira mais direta e assertiva possível, utilizando apenas bibliotecas conhecidas no mercado para garantir o melhor aproveitamento e desempenho possível.
 
 ## Objetivo:
 
-Estamos tornando mais produtivo o desenvolvimento de *RPAs*, proporcionando funções prontas para usos comuns como:
+Nosso objetivo é tornar o desenvolvimento de RPAs mais produtivo, oferecendo funções prontas para usos comuns, como:
 
 - envio de emails (configurações já pré-montadas)
 - validação de emails (limpeza e tratamento de listas)
@@ -18,6 +23,8 @@ Estamos tornando mais produtivo o desenvolvimento de *RPAs*, proporcionando fun�
 - e muitas outras facilidades
 
 ### Instalação:
+Para instalar o projeto, utilize o comando
+
     >>> python -m pip install rpa-suite
 
 ### Dependencias:
@@ -26,29 +33,32 @@ No setup do nosso projeto já estão inclusas as dependencias, só será necessa
 - loguru
 - email-validator
   
-### Estrutura do modulo:
-O modulo principal do rpa-suite é dividido em categorias, onde por sua vez tem os modulos com funções destinadas a cada tipo de tarefa.
+### Estrutura do módulo:
+O módulo principal do rpa-suite é dividido em categorias. Cada categoria contém módulos com funções destinadas a cada tipo de tarefa
 - **rpa_suite**
     - **clock**
-        - **waiter** - modulo com funções responsaveis por aguardar
+        - **waiter** - módulo com funções para aguardar execução
     - **email**
-        - **sender_smtp** - modulo com funções para envio de email SMPT 
+        - **sender_smtp** - módulo com funções para envio de email SMPT 
     - **file**
-        - **counter** - modulo com funções responsaveis por contagens
-        - **temp_dir** - modulo com funções responsaveis por diretórios temporarios
+        - **counter** - módulo com funções para contagens
+        - **temp_dir** - módulo com funções para diretórios temporarios
     - **log**
-        - **loggin** - modulo com funções responsaveis por gerar decoradores de de print para logs de execução
-        - **printer** - modulo com funções de print personalizados para notificações em prompt
+        - **loggin** - módulo com funções responsaveis por gerar decoradores de de print para logs de execução
+        - **printer** - módulo com funções de print personalizados para notificações em prompt
     - **validate**
-        - **mail_validator** - modulo com funções para validação de emails
-        - **string_validator** - modulo com funções para validação e varredura de strings / substrings / palavras
+        - **mail_validator** - módulo com funções para validação de emails
+        - **string_validator** - módulo com funções para validação e varredura de strings / substrings / palavras
 
 ### Versão do projeto:
-Ultima versão release: **Alpha 0.4.6**
-Data da ultima versão: 23/11/2023
-Status: Em Desenvolvimento
+A versão mais recente é a **Alpha 0.4.6**, lançada em *23/11/2023*. O projeto está atualmente em desenvolvimento.
 
 ### Mais Sobre:
 
-Você pode ver mais com mais detalhes no **Github**.
-https://github.com/CamiloCCarvalho/rpa_suite
+Para mais informações, visite nosso projeto no Github ou PyPi:
+<a href='https://github.com/CamiloCCarvalho/rpa_suite' target='_blank'>
+    Ver no GitHub.
+</a>
+<a href='https://pypi.org/project/rpa-suite/' target='_blank'>
+    Ver projeto publicado no PyPi.
+</a>

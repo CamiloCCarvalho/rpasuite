@@ -25,7 +25,7 @@ def valid_emails(
     """
     
     # Variaveis locais
-    mail_validation_result: dict = {
+    result: dict = {
         'success': bool,
         'valid_emails': list,
         'invalid_emails': list,
@@ -56,7 +56,7 @@ def valid_emails(
 
     
     # Pós Tratamento
-    mail_validation_result = {
+    result = {
         'valid_emails': validated_emails,
         'invalid_emails': invalid_emails,
         'success': len(invalid_emails) == 0,
@@ -65,4 +65,4 @@ def valid_emails(
         'map_validation': map_validation
     }
     
-    return mail_validation_result
+    return result

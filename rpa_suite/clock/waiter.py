@@ -31,7 +31,7 @@ def wait_for_exec(
     """
     
     # Variaveis locais
-    waiter_result: dict = {
+    result: dict = {
         'success': bool
     }
     # Pré Tratamento
@@ -40,15 +40,15 @@ def wait_for_exec(
     try:
         time.sleep(wait_time)
         fn_to_exec(*args, **kwargs)
-        waiter_result['success'] = True
+        result['success'] = True
         success_print(f'A função:: {wait_for_exec.__name__} executou a função: {fn_to_exec.__name__}.')
         
     except Exception as e:
-        waiter_result['success'] = False
+        result['success'] = False
         error_print(f'Erro ao tentar aguardar para executar a função: {fn_to_exec.__name__} \nMensagem: {str(e)}')
         
     
     # Pós Tratamento
     ...
     
-    return waiter_result
+    return result
