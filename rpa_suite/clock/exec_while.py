@@ -1,6 +1,7 @@
+import re
 from typing import Callable, Any
-import time
-from rpa_suite.log.printer import alert_print, error_print, success_print
+from rpa_suite.date.date import get_hms
+from rpa_suite.log.printer import error_print, success_print
 
 def exec_wtime(
                 while_time: int,
@@ -16,7 +17,7 @@ def exec_wtime(
     ----------
         `while_time: int` - (segundos) representa o tempo que deve persistir a execução da função passada no argumento ``fn_to_exec``
     
-        ``fn_to_exec: function`` - (função) a ser chamada durante o temporizador, se houver parametros nessa função podem ser passados como próximos argumentos desta função em ``*args`` e ``**kwargs``
+        ``fn_to_exec: function`` - (função) a ser chamada (repetidas vezes) durante o temporizador, se houver parametros nessa função podem ser passados como próximos argumentos desta função em ``*args`` e ``**kwargs``
     
     Retorno:
     ----------
@@ -34,14 +35,30 @@ def exec_wtime(
     result: dict = {
         'success': bool
     }
+    run: bool
+    timmer: int
+    
     # Pré Tratamento
-    ...
+    timmer = while_time
     
     # Processo
-    alert_print(f'Função ainda não implementada!')
-    
-    
-    # Pós Tratamento
-    ...
-    
+    try:
+        run = True
+        hour, minute, second = get_hms()
+        while run and timmer > 0:
+            fn_to_exec(*args, **kwargs)
+            hour_now, minute_now, second_now = get_hms()
+            if second_now != second:
+                second = second_now
+                timmer =- 1
+                if timmer <= 0:
+                    run = False
+                    break
+        result['success'] = True
+        success_print(f'Função {fn_to_exec.__name__} foi executada durante: {while_time} seg(s).')
+        
+    except Exception as e:
+        result['success'] = False
+        error_print(f'Ocorreu algum erro que impediu a execução da função: {exec_wtime.__name__} corretamente. Erro: {str(e)}')
+        
     return result

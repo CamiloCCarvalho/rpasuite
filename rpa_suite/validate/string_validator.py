@@ -56,7 +56,6 @@ def search_in(
             try:
                 if case_sensitivy:
                     result['is_found'] = searched_word in origin_words
-
                 else:
                     words_lowercase = [word.lower() for word in origin_words]
                     searched_word = searched_word.lower()
@@ -75,16 +74,18 @@ def search_in(
             except Exception as e:
                 return error_print(f'Não foi possivel concluir a busca de: {searched_word}. Erro: {str(e)}')
             
+        elif search_by == 'regex':
+            pass
+            """try:
+                if case_sensitivy:
+                    print(f'metodo para buscar com sensitivy...')
+                else:
+                    print(f'metodo para buscar sem sensitive...')
+            except Exception as e:
+                return print(f'Não foi possivel concluir a busca de: {searched_word}. Erro: {str(e)}')"""
+            
     except Exception as e:
         return error_print(f'Não foi possivel realizar a busca por: {searched_word}. Erro: {str(e)}')
-    
-    """
-    elif search_by == 'regex':
-        # regex search
-        pass
-    else:
-        error_print(f'por favor digite alguma forma de busca válida para a função, a função aceita: 'string', 'word' e 'regex', como padrões de busca para fazer a pesquisa no texto original.')
-    """    
     
     # Pós tratamento
     if result['is_found']:
