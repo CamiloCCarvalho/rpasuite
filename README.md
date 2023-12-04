@@ -1,4 +1,4 @@
-![Logo do R](http://developer.r-project.org/Logo/Rlogo-5.png)
+![RPA Suite](https://raw.githubusercontent.com/CamiloCCarvalho/rpa_suite/139e458ffb2f51d8ce20e9d98bc9aba63dd8557c/logo-rpa-suite.svg)
 
 
 <h1 align="center">
