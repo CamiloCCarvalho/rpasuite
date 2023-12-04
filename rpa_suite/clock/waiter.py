@@ -34,7 +34,6 @@ def wait_for_exec(
     result: dict = {
         'success': bool
     }
-    # Pré Tratamento
     
     # Processo
     try:
@@ -46,9 +45,5 @@ def wait_for_exec(
     except Exception as e:
         result['success'] = False
         error_print(f'Erro ao tentar aguardar para executar a função: {fn_to_exec.__name__} \nMensagem: {str(e)}')
-        
-    
-    # Pós Tratamento
-    ...
     
     return result
