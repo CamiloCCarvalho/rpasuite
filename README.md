@@ -29,7 +29,7 @@
 
 **Versátil**: Embora tenha sido criado com foco no desenvolvimento de BOTs em RPA, as ferramentas são de uso geral e podem ser aplicadas em outros tipos de projetos, *além do RPA*.
 
-**Simples**: Construímos as ferramentas de maneira mais direta e assertiva possível, utilizando apenas bibliotecas conhecidas no mercado para garantir o melhor aproveitamento e desempenho possível.
+**Simples**: Construímos as ferramentas de maneira mais direta e assertiva possível, utilizando apenas bibliotecas conhecidas no mercado para garantir o melhor desempenho possível.
 
 ## Objetivo
 
@@ -114,7 +114,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - Funções para validação/varredura (strings, substrings, palavras)
 
 ## Release
-Versão: **Alpha 0.7.9**
+Versão: **Alpha 0.8.0**
 
 Lançamento: *04/12/2023*
 

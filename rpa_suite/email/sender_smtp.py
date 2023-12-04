@@ -48,7 +48,7 @@ def send_email(
         * 'qt_attach': int - quantos anexos foram inseridos
     """
 
-    # Variaveis locais
+    # Variáveis locais
     result: dict = {
         'success': bool,
         'all_mails': list,

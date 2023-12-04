@@ -22,7 +22,7 @@ def get_hms() -> tuple:
         * OBS.:  Note que é possivel desestruturar o retorno para armazenar de forma simultânea.
     """
     
-    # Variaiveis locais
+    # Variáiveis locais
     hours: str
     minutes: str
     seconds: str
@@ -62,7 +62,7 @@ def get_dma() -> tuple:
         * OBS.:  Note que é possivel desestruturar o retorno para armazenar de forma simultânea.
     """
     
-    # Variaiveis locais
+    # Variáiveis locais
     day_got: str
     month_got: str
     year_got: str

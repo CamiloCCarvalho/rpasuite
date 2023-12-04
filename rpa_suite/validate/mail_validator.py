@@ -24,7 +24,7 @@ def valid_emails(
         * 'map_validation' - mapa da validação de cada email
     """
     
-    # Variaveis locais
+    # Variáveis locais
     result: dict = {
         'success': bool,
         'valid_emails': list,

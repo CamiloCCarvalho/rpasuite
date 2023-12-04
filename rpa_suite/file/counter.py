@@ -22,7 +22,7 @@ def count_files(
         * 'qt': int - numero que representa a quantidade de arquivos que foram contados
     """
     
-    # Variaveis locais
+    # Variáveis locais
     result: dict = {
         'success': bool,
         'qt': int
@@ -46,8 +46,4 @@ def count_files(
         result['success'] = False
         error_print(f'Erro ao tentar fazer contagem de arquivos! Erro: {str(e)}')
         
-    # Pós tratamento
-    ...
-    
-    # Retorno
     return result

@@ -31,7 +31,7 @@ def exec_wtime(
         * OBS.:  `exec_wtime` recebe como primeiro argumento o tempo a aguardar (seg), depois a função `soma` e por fim os argumentos que a função ira usar.
     """
     
-    # Variaveis locais
+    # Variáveis locais
     result: dict = {
         'success': bool
     }

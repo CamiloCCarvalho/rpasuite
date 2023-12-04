@@ -18,7 +18,7 @@ def create_temp_dir(path_to_create: str = 'default') -> dict:
     
     """
     
-    # Variaveis Locais
+    # Variáveis Locais
     result: dict = {
         'success': bool,
         'path_created': str
@@ -78,7 +78,7 @@ def delete_temp_dir(path_to_delete: str = 'default') -> dict:
     
     """
     
-    # Variaveis Locais
+    # Variáveis Locais
     temp_dir_result: dict = {
         'success': bool,
         'path_deleted': str

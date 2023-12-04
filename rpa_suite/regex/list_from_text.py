@@ -1,5 +1,6 @@
 import re
 from typing import Any
+from rpa_suite.log.printer import error_print, success_print
 
 def create_list_using_regex(origin_text: str, division_pattern: str) -> list[str] | Any:
     """
@@ -27,7 +28,8 @@ def create_list_using_regex(origin_text: str, division_pattern: str) -> list[str
         
         # Retira o delimitador que tenha sido colocado entre pontuações dentro de um mesmo pattern
         messages_final = [msg.replace('\n', ' ') for msg in messages_lstriped]
+        success_print(f'Lista gerada com sucesso!')
         return messages_final
             
     except Exception as e:
-        return print(f"Erro ao tentar criar lista usando pattern-match (regex). Erro: {str(e)}")
+        return error_print(f"Erro ao tentar criar lista usando pattern-match (regex). Erro: {str(e)}")
