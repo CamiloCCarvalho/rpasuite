@@ -1,7 +1,7 @@
 ![RPA Suite](https://raw.githubusercontent.com/CamiloCCarvalho/rpa_suite/ca3820365ae7658ea8a2e801070f4f3b955b3ea6/logo-rpa-suite.svg)
 
 
-<h1 align="center">
+<h1 align="left">
     RPA Suite
 </h1>
 <br>
@@ -114,7 +114,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - Funções para validação/varredura (strings, substrings, palavras)
 
 ## Release
-Versão: **Alpha 0.8.0**
+Versão: **Alpha 0.8.1**
 
 Lançamento: *04/12/2023*
 
