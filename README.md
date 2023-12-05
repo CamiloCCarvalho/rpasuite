@@ -12,7 +12,7 @@
 -----------------
 
 ## O que é?
-**RPA Suite:** um conjunto abrangente de ferramentas projetadas para simplificar e otimizar o desenvolvimento de projetos de automação RPA. Embora nossa suíte seja especializada em RPA, sua versatilidade a torna igualmente útil para uma ampla gama de projetos de desenvolvimento. Experimente a RPA Suite e descubra como podemos facilitar seu próximo projeto.
+**RPA Suite:** um conjunto abrangente de ferramentas projetadas para simplificar e otimizar o desenvolvimento de projetos de automação RPA com Python. Embora nossa suíte seja um conjunto de Ferramentas de RPA especializado, sua versatilidade a torna igualmente útil para uma ampla gama de projetos de desenvolvimento. Esta desenvolvendo com Selenium, Botcity ou Playwright? Experimente a RPA Suite e descubra como podemos facilitar seu projeto, ou qualquer projeto de Robôs de Software.
 
 ## Sumário do conteudo
 
@@ -27,13 +27,13 @@
 
 ## Destaque
 
-**Versátil**: Embora tenha sido criado com foco no desenvolvimento de BOTs em RPA, as ferramentas são de uso geral e podem ser aplicadas em outros tipos de projetos, *além do RPA*.
+**Versátil**: Além da Automação de Processos e criação de BOT em RPA, mas também para uso geral podendo  ser aplicadas em outros modelos de projeto, *além do RPA*.
 
 **Simples**: Construímos as ferramentas de maneira mais direta e assertiva possível, utilizando apenas bibliotecas conhecidas no mercado para garantir o melhor desempenho possível.
 
 ## Objetivo
 
-Nosso objetivo é tornar o desenvolvimento de RPAs mais produtivo, oferecendo funções prontas para usos comuns, como:
+Nosso objetivo é se tornar a Biblioteca Python para RPA referência. Tornando o desenvolvimento de RPAs mais produtivo, oferecendo uma gama de funções para tal:
 
 - Envio de emails (já configurado e personalizavel)
 - Validação de emails (limpeza e tratamento)

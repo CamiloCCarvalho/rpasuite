@@ -18,6 +18,6 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],
-    keywords='basic-tools, email-tools, email-validation, file-tools, simple-functions, rpa-tools, rpa-functions',
+    keywords='basic-tools, email-tools, email-validation, file-tools, simple-functions, rpa-tools, rpa-functions, RPA, Automação, Python, Ferramentas de RPA, Automação de Processos, Biblioteca Python para RPA',
     install_requires=['loguru', 'colorama', 'email_validator'],
 )
