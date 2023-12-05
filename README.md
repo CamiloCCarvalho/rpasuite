@@ -1,4 +1,4 @@
-![RPA Suite](https://raw.githubusercontent.com/CamiloCCarvalho/rpa_suite/ca3820365ae7658ea8a2e801070f4f3b955b3ea6/logo-rpa-suite.svg)
+![RPA Suite](https://raw.githubusercontent.com/CamiloCCarvalho/rpa_suite/3e1ccd0acad654916466f03c2b8f166dc8d360d4/logo-rpa-suite.svg)
 
 
 <h1 align="left">
