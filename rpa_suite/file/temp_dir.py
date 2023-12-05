@@ -4,6 +4,20 @@ from rpa_suite.log.printer import error_print, alert_print, success_print
 def create_temp_dir(path_to_create: str = 'default') -> dict:
     
     """
+    Function responsible for creating a temporary directory to work with files and etc. \n
+    
+    Parameters:
+    ----------
+    ``path_to_create: str`` - should be a string with the full path pointing to the folder where the temporary folder should be created, if it is empty the ``default`` value will be used which will create a folder in the current directory where the file containing this function was called.
+    
+    Return:
+    ----------
+    >>> type:dict
+        * 'success': bool - represents if the action was performed successfully
+        * 'path_created': str - path of the directory that was created in the process
+        
+    Description: pt-br
+    ----------
     Função responsavel por criar diretório temporário para trabalhar com arquivos e etc. \n
     
     Parametros:
@@ -15,16 +29,15 @@ def create_temp_dir(path_to_create: str = 'default') -> dict:
     >>> type:dict
         * 'success': bool - representa se ação foi realizada com sucesso
         * 'path_created': str - path do diretório que foi criado no processo
-    
     """
     
-    # Variáveis Locais
+    # Local Variables
     result: dict = {
         'success': bool,
         'path_created': str
     }
     
-    # Pré tratamento
+    # Preprocessing
     default_dir: str
     try:
         if path_to_create == 'default':
@@ -33,37 +46,50 @@ def create_temp_dir(path_to_create: str = 'default') -> dict:
             default_dir = path_to_create
     except Exception as e:
         result['success'] = False
-        error_print(f'Erro ao capturar caminho atual para criar diretório temporária! Erro: {str(e)}')
+        error_print(f'Error capturing current path to create temporary directory! Error: {str(e)}')
         
-    # Processo
+    # Process
     try:
         if not os.path.exists(fr'{default_dir}\temp'):
             try:
                 os.mkdir(fr'{default_dir}\temp')
                 if os.path.exists(fr'{default_dir}\temp'):
                     result['success'] = True
-                    success_print(fr'Diretório criado em: {default_dir}\temp')
+                    success_print(fr'Directory created in: {default_dir}\temp')
                 else:
                     result['success'] = False
                     raise Exception
             except Exception as e:
-                error_print(f'Não foi possivel criar diretório temporario! Erro: {str(e)}')
+                error_print(f'Unable to create temporary directory! Error: {str(e)}')
         else:
             result['success'] = True
-            alert_print(fr'AVISO! diretório já existe em: {default_dir}\temp ')
+            alert_print(fr'NOTICE! directory already exists in: {default_dir}\temp ')
     except Exception as e:
-        error_print(f'Erro ao tentar criar diretório temporaria em: {default_dir} - Erro: {str(e)}')
+        error_print(f'Error when trying to create temporary directory in: {default_dir} - Error: {str(e)}')
         
-    # Pós tratamento
+    # Postprocessing
     result['path_created'] = fr'{default_dir}\temp'
     
-    # Retorno
     return result
 
 
 def delete_temp_dir(path_to_delete: str = 'default') -> dict:
     
     """
+    Function responsible for deleting temporary directory at the specified path. \n
+    
+    Parameters:
+    ----------
+    ``path_to_delete: str`` - should be a string with the full path pointing to the folder where the temporary folder should be deleted, if it is empty the ``default`` value will be used which will search for a folder in the current directory where the file containing this function was called.
+    
+    Return:
+    ----------
+    >>> type:dict
+        * 'success': bool - represents if the action was performed successfully
+        * 'path_deleted': str - path of the directory that was deleted in the process
+        
+    Description: pt-br
+    ----------
     Função responsavel por deletar diretório temporário no caminho especificado. \n
     
     Parametros:
@@ -75,16 +101,15 @@ def delete_temp_dir(path_to_delete: str = 'default') -> dict:
     >>> type:dict
         * 'success': bool - representa se ação foi realizada com sucesso
         * 'path_deleted': str - path do diretório que foi excluido no processo
-    
     """
     
-    # Variáveis Locais
+    # Local Variables
     temp_dir_result: dict = {
         'success': bool,
         'path_deleted': str
     }
     
-    # Pré tratamento
+    # Preprocessing
     default_dir: str
     try:
         if path_to_delete == 'default':
@@ -93,29 +118,29 @@ def delete_temp_dir(path_to_delete: str = 'default') -> dict:
             default_dir = path_to_delete
     except Exception as e:
         temp_dir_result['success'] = False
-        error_print(f'Não foi possivel capturar caminho atual para deletar pasta temporária! Erro: {str(e)}')
+        error_print(f'Unable to capture current path to delete temporary folder! Error: {str(e)}')
         
-    # Processo
+    # Process
     try:
         if os.path.exists(fr'{default_dir}\temp'):
             try:
                 shutil.rmtree(fr'{default_dir}\temp')
                 if not os.path.exists(fr'{default_dir}\temp'):
                     temp_dir_result['success'] = True
-                    success_print(fr'Diretório excluido em: {default_dir}\temp')
+                    success_print(fr'Directory deleted in: {default_dir}\temp')
                 else:
                     temp_dir_result['success'] = False
                     raise Exception
             except Exception as e:
-                error_print(f'Não foi possivel excluir diretório temporario! Erro {str(e)}')
+                error_print(f'Unable to delete temporary directory! Error: {str(e)}')
         else:
             temp_dir_result['success'] = True
-            alert_print(fr'Diretório não existe em: {default_dir}\temp. ')
+            alert_print(fr'Directory does not exist in: {default_dir}\temp. ')
             
     except Exception as e:
-        error_print(fr'Erro ao tentar deletar diretório temporária em: {default_dir}\temp - Erro: {str(e)}')
+        error_print(fr'Error when trying to delete temporary directory in: {default_dir}\temp - Error: {str(e)}')
         
-    # Pós tratamento
+    # Postprocessing
     temp_dir_result['path_deleted'] = fr'{default_dir}\temp'
     
     return temp_dir_result

@@ -96,7 +96,8 @@ No setup do nosso projeto já estão inclusas as dependências, só será necess
 O módulo principal do rpa-suite é dividido em categorias. Cada categoria contém módulos com funções destinadas a cada tipo de tarefa
 - **rpa_suite**
     - **clock**
-        - **waiter** - Funções para aguardar execução
+        - **waiter** - Funções para aguardar em relação a execução de uma função, podendo ser antes ou depois
+        - **exec_at** - Funções para executar em momentos pré determinados
     - **date**
         - **date** - Funções para capturar data, mes, ano, hora, minutos de forma individual em apenas uma linha
     - **email**
@@ -114,9 +115,9 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - Funções para validação/varredura (strings, substrings, palavras)
 
 ## Release
-Versão: **Alpha 0.8.1**
+Versão: **Alpha 0.8.2**
 
-Lançamento: *04/12/2023*
+Lançamento: *05/12/2023*
 
 Status: Em desenvolvimento.
 

@@ -6,6 +6,25 @@ def valid_emails(
                 ) -> dict:
     
     """
+    Function responsible for rigorously validating a list of emails using the email_validator library. \n
+    
+    Parameters:
+    ------------
+    ``email_list: list`` a list of strings containing the emails to be validated
+    
+    Return:
+    ------------
+    >>> type: dict
+    Returns a dictionary with the respective data:
+        * 'success': bool - represents if the list is 100% valid
+        * 'valid_emails': list - list of valid emails
+        * 'invalid_emails': list - list of invalid emails
+        * 'qt_valids': int - number of valid emails
+        * 'qt_invalids': int - number of invalid emails
+        * 'map_validation' - map of the validation of each email
+        
+    Description: pt-br
+    ----------
     Função responsavel por validar de forma rigorosa lista de emails usando a biblioteca email_validator. \n
     
     Paramentros:
@@ -24,7 +43,7 @@ def valid_emails(
         * 'map_validation' - mapa da validação de cada email
     """
     
-    # Variáveis locais
+    # Local Variables
     result: dict = {
         'success': bool,
         'valid_emails': list,
@@ -35,12 +54,12 @@ def valid_emails(
     }
 
     
-    # Pré Tratamento
+    # Preprocessing
     validated_emails: list = []
     invalid_emails: list = []
     map_validation: list[dict] = []
     
-    # Processo
+    # Process
     try:
         for email in email_list:
             try:
@@ -50,12 +69,12 @@ def valid_emails(
                 
             except email_validator.EmailNotValidError:
                 invalid_emails.append(email)
-        success_print(f'Função: {valid_emails.__name__} executada.')
+        success_print(f'Function: {valid_emails.__name__} executed.')
     except Exception as e:
-        error_print(f'Erro ao tentar validar lista de emails: {str(e)}')
+        error_print(f'Error when trying to validate email list: {str(e)}')
 
     
-    # Pós Tratamento
+    # Postprocessing
     result = {
         'valid_emails': validated_emails,
         'invalid_emails': invalid_emails,

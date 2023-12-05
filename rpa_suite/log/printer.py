@@ -17,6 +17,14 @@ class Colors():
 
 def success_print(string_text: str, color=Colors.green, ending="\n") -> None:
     """
+    Print that indicates ``SUCCESS``. Customized with the color Green \n
+    
+    Return:
+    ----------
+        >>> type:None
+        
+    pt-br
+    ----------
     Print  que indica ``SUCESSO``. Personalizado com a cor Verde \n
     
     Retorno:
@@ -27,6 +35,14 @@ def success_print(string_text: str, color=Colors.green, ending="\n") -> None:
 
 def alert_print(string_text: str, color=Colors.yellow, ending="\n") -> None:
     """
+    Print that indicates ``ALERT``. Customized with the color Yellow \n
+    
+    Return:
+    ----------
+        >>> type:None
+    
+    pt-br
+    ----------
     Print que indica ``ALERTA``. Personalizado com a cor Amarelo \n
     Retorno:
     ----------
@@ -36,6 +52,14 @@ def alert_print(string_text: str, color=Colors.yellow, ending="\n") -> None:
 
 def info_print(string_text: str, color=Colors.cyan, ending="\n") -> None:
     """
+    Print that indicates ``INFORMATION``. Customized with the color Cyan \n
+    
+    Return:
+    ----------
+        >>> type:None
+        
+    pt-br
+    ----------
     Print que indica ``INFORMATIVO``. Personalizado com a cor Ciano \n
     Retorno:
     ----------
@@ -45,6 +69,14 @@ def info_print(string_text: str, color=Colors.cyan, ending="\n") -> None:
 
 def error_print(string_text: str, color=Colors.red, ending="\n") -> None:
     """
+    Print that indicates ``ERROR``. Customized with the color Red \n
+    
+    Return:
+    ----------
+        >>> type:None
+        
+    pt-br
+    ----------
     Print que indica ``ERRO``. Personalizado com a cor Vermelho \n
     Retorno:
     ----------
@@ -54,6 +86,14 @@ def error_print(string_text: str, color=Colors.red, ending="\n") -> None:
 
 def magenta_print(string_text: str, color=Colors.magenta, ending="\n") -> None:
     """
+    Print customized with the color Magenta \n
+    
+    Return:
+    ----------
+        >>> type:None
+    
+    pt-br
+    ----------
     Print personalizado com a cor Magenta \n
     Retorno:
     ----------
@@ -63,6 +103,14 @@ def magenta_print(string_text: str, color=Colors.magenta, ending="\n") -> None:
 
 def blue_print(string_text: str, color=Colors.blue, ending="\n") -> None:
     """
+    Print customized with the color Blue \n
+    
+    Return:
+    ----------
+        >>> type:None
+    
+    pt-br
+    ----------
     Print personalizado com a cor Azul \n
     Retorno:
     ----------
@@ -72,6 +120,14 @@ def blue_print(string_text: str, color=Colors.blue, ending="\n") -> None:
 
 def print_call_fn(string_text: str, color=Colors.call_fn, ending="\n") -> None:
     """
+    Print customized for function called (log) \n
+    Color: Magenta Light
+    Return:
+    ----------
+        >>> type:None
+    
+    pt-br
+    ----------
     Print personalizado para log de chamada de função. \n
     Cor: Magenta Light
     Retorno:
@@ -82,6 +138,14 @@ def print_call_fn(string_text: str, color=Colors.call_fn, ending="\n") -> None:
 
 def print_retur_fn(string_text: str, color=Colors.retur_fn, ending="\n") -> None:
     """
+    Print customized for function return (log) \n
+    Color: Yellow Light
+    Return:
+    ----------
+        >>> type:None
+    
+    pt-br
+    ----------
     Print personalizado para log de chamada de função. \n
     Cor: Yellow Light
     Retorno:

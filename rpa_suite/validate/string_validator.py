@@ -8,6 +8,36 @@ def search_in(
             ) -> dict:
     
     """
+    Function responsible for searching for a string, substring or word within a provided text. \n
+    
+    Parameters:
+    -----------
+    ``origin_text: str`` \n
+        
+        * It is the text where the search should be made, in string format. \n
+        
+    ``search_by: str`` accepts the values: \n
+        
+        * 'string' - can find a requested writing excerpt. (default) \n
+        * 'word' - finds only the word written out exclusively. \n
+        * 'regex' - find regex patterns, [ UNDER DEVELOPMENT ...] \n
+    
+    Return:
+    -----------
+    >>> type:dict
+    a dictionary with all information that may be necessary about the validation.
+    Respectively being:
+        * 'is_found': bool -  if the pattern was found in at least one case
+        * 'number_occurrences': int - represents the number of times this pattern was found
+        * 'positions': list[set(int, int), ...] - represents all positions where the pattern appeared in the original text
+        
+    About `Positions`:
+    -----------
+    >>> type: list[set(int, int), ...]
+        * at `index = 0` we find the first occurrence of the text, and the occurrence is composed of a PAIR of numbers in a set, the other indexes represent other positions where occurrences were found if any.
+        
+    Description: pt-br
+    ----------
     Função responsavel por fazer busca de uma string, sbustring ou palavra dentro de um texto fornecido. \n
     
     Parametros:
@@ -34,22 +64,21 @@ def search_in(
     Sobre o `Positions`:
     -----------
     >>> type: list[set(int, int), ...]
-        * no `index = 0` encontramos a primeira ocorrência do texto, e a ocorrência é composta por um PAR de números em um set, os demais indexes representam outras posições onde foram encontradas ocorrências caso hajam. 
-    
+        * no `index = 0` encontramos a primeira ocorrência do texto, e a ocorrência é composta por um PAR de números em um set, os demais indexes representam outras posições onde foram encontradas ocorrências caso hajam.
     """
     
-    # Variaveis locais
+    # Local Variables
     result: dict = {
         'is_found': bool,
         'number_occurrences': int,
         'positions': list[set]
     }
     
-    # Pré tratamento
+    # Preprocessing
     result['is_found'] = False
     result['number_occurrences'] = 0
     
-    # Processo
+    # Process
     try:
         if search_by == 'word':
             origin_words = origin_text.split()
@@ -61,7 +90,7 @@ def search_in(
                     searched_word = searched_word.lower()
                     result['is_found'] = searched_word in words_lowercase
             except Exception as e:
-                return error_print(f'Não foi possivel concluir a busca de: {searched_word}. Erro: {str(e)}')
+                return error_print(f'Unable to complete the search: {searched_word}. Error: {str(e)}')
                 
         elif search_by == 'string':
             try:
@@ -72,7 +101,7 @@ def search_in(
                     searched_word_lower: str = searched_word.lower()
                     result['is_found'] = origin_text_lower.__contains__(searched_word_lower)
             except Exception as e:
-                return error_print(f'Não foi possivel concluir a busca de: {searched_word}. Erro: {str(e)}')
+                return error_print(f'Unable to complete the search: {searched_word}. Error: {str(e)}')
             
         elif search_by == 'regex':
             pass
@@ -82,15 +111,15 @@ def search_in(
                 else:
                     print(f'metodo para buscar sem sensitive...')
             except Exception as e:
-                return print(f'Não foi possivel concluir a busca de: {searched_word}. Erro: {str(e)}')"""
+                return print(f'Não foi possivel concluir a busca de: {searched_word}. Error: {str(e)}')"""
             
     except Exception as e:
-        return error_print(f'Não foi possivel realizar a busca por: {searched_word}. Erro: {str(e)}')
+        return error_print(f'Unable to search for: {searched_word}. Error: {str(e)}')
     
-    # Pós tratamento
+    # Postprocessing
     if result['is_found']:
-        success_print(f'Função: {search_in.__name__} encontrou: {result["number_occurrences"]} ocorrências para "{searched_word}".')
+        success_print(f'Function: {search_in.__name__} found: {result["number_occurrences"]} occurrences for "{searched_word}".')
     else:
-        success_print(f'Função: {search_in.__name__} não encontrou ocorrências de "{searched_word}" durante a busca.')
+        success_print(f'Function: {search_in.__name__} found no occurrences of "{searched_word}" during the search.')
     
     return result

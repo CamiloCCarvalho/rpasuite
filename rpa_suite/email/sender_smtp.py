@@ -19,6 +19,36 @@ def send_email(
                 ) -> dict:
 
     """
+    Function responsible for sending emails ``(SMTP)``, accepts ``list of recipients`` and possibility
+    of ``attaching files``. \n
+    
+    Parameters:
+    ----------
+    ``email_from: str`` - email from who will send the email.
+    ``pass_from: str`` - password of the account used, advised to isolate the password elsewhere.
+    ``email_to: list[str]`` - list of emails to which the emails will be sent.
+    ``subject_title: str`` - email title.
+    ``body_message: str``- body message of the email.
+    ``attachments: list[str]`` - list with path of attachments if any. (default None).
+    ``type_content: str`` - type of message content can be 'plain' or 'html' (default 'html').
+    ``smtp_server: str`` - server to be used to connect with the email account (default 'smtp.office365.com')
+    ``smtp_port: int`` - port to be used on this server (default 587) 
+    
+    Return:
+    ----------
+    >>> type:dict
+    a dictionary with all information that may be necessary about the emails.
+    Respectively being:
+        * 'success': bool -  if there was at least one successful shipment
+        * 'all_mails': list - list of all emails parameterized for sending
+        * 'valid_mails': list - list of all valid emails for sending
+        * 'invalid_mails': list - list of all invalid emails for sending
+        * 'qt_mails_sent': int - effective quantity that was sent
+        * 'attchament': bool - if there are attachments
+        * 'qt_attach': int - how many attachments were inserted
+        
+    Description: pt-br
+    ----------
     Função responsavel por enviar emails ``(SMTP)``, aceita ``lista de destinatários`` e possibilidade
     de ``anexar arquivos``. \n
     
@@ -48,7 +78,7 @@ def send_email(
         * 'qt_attach': int - quantos anexos foram inseridos
     """
 
-    # Variáveis locais
+    # Local Variables
     result: dict = {
         'success': bool,
         'all_mails': list,
@@ -61,20 +91,19 @@ def send_email(
     email_valido = []
     email_invalido = []
     
-    # Pré Tratamentos
+    # Preprocessing
     result['success'] = False
     result['qt_mails_sent'] = 0
     result['attchament'] = False
 
-    # Configuração inicial basica.
     msg = MIMEMultipart()
     msg['From'] = email_from
     msg['Subject'] = subject_title
 
-    # Adicionar corpo da mensagem
+    # Email Body Content
     msg.attach(MIMEText(body_message, type_content))
 
-    # Adicionar anexos, se houver
+    # Add Attachment
     if attachments:
         result['attchament'] = True
         for path_to_attach in attachments:
@@ -90,14 +119,14 @@ def send_email(
         result['attchament'] = False
         result['qt_attach'] = 0
 
-    # Conectar ao servidor SMTP e enviar email
+    # SMTP server config
     try:
         server_by_smtp = smtplib.SMTP(smtp_server, smtp_port)
         server_by_smtp.starttls()
         server_by_smtp.login(email_from, pass_from)
         email_content = msg.as_string()
 
-        # Trata a lista de emails antes de tentar realizar o envio, mantendo apenas emails validos
+        # Treats the email list before trying to send, keeping only valid emails
         try:  
             for emails in email_to:
                 try:
@@ -108,9 +137,9 @@ def send_email(
                     email_invalido.append(emails)
 
         except Exception as e:
-            error_print(f'Erro ao tentar validar lista de emails: {str(e)}')
+            error_print(f'Error while trying to validate email list: {str(e)}')
 
-        # anexa a lista de emails tratada para realizar o envio
+        # Attaches the treated email list to perform the sending
         msg['To'] = ', '.join(email_valido)
         for email in email_valido:
             try:
@@ -119,18 +148,18 @@ def send_email(
                 result['all_mails'] = email_to
 
             except smtplib.SMTPException as e:
-                error_print(f'O email: {email} não foi enviado, por causa do erro: {str(e)}')
+                error_print(f"The email: {email} don't sent, caused by error: {str(e)}")
 
         server_by_smtp.quit()
         result['success'] = True
-        success_print(f'Email(s) enviado(s) com sucesso!')
+        success_print(f'Email(s) Sent!')
         
 
     except smtplib.SMTPException as e:
         result['success'] = False
-        error_print(f'Erro ao enviar email(s): {str(e)}')
+        error_print(f'Error while trying sent Email: {str(e)}')
 
-    # Pós Tratamento
+    # Postprocessing
     result['valid_mails'] = email_valido
     result['invalid_mails'] = email_invalido
 
