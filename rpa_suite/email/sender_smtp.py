@@ -1,9 +1,10 @@
+from email.mime.image import MIMEImage
 import smtplib, os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from rpa_suite.log.printer import error_print, success_print
+from rpa_suite.log.printer import alert_print, error_print, success_print
 from rpa_suite.validate.mail_validator import email_validator
 
 def send_email(
@@ -12,6 +13,7 @@ def send_email(
                 email_to: list[str],
                 subject_title: str,
                 body_message: str,
+                image_footer: str = None,
                 attachments: list[str] = None,
                 type_content: str = 'html',
                 smtp_server: str = 'smtp.office365.com',
@@ -29,6 +31,7 @@ def send_email(
     ``email_to: list[str]`` - list of emails to which the emails will be sent.
     ``subject_title: str`` - email title.
     ``body_message: str``- body message of the email.
+    ``image_footer: str`` - image footer of body message of the email.
     ``attachments: list[str]`` - list with path of attachments if any. (default None).
     ``type_content: str`` - type of message content can be 'plain' or 'html' (default 'html').
     ``smtp_server: str`` - server to be used to connect with the email account (default 'smtp.office365.com')
@@ -59,6 +62,7 @@ def send_email(
     ``email_to: list[str]`` - lista de emails para os quais serão enviados os emails.
     ``subject_title: str`` - titulo do email.
     ``body_message: str``- mensagem do corpo do email.
+    ``image_footer: str`` - imagem de rodapé do corpo do email.
     ``attachments: list[str]`` - lista com caminho de anexos se houver. (default None).
     ``type_content: str`` - tipo de conteudo da mensagem pode ser 'plain' ou 'html' (default 'html').
     ``smtp_server: str`` - servidor a ser utilizado para conectar com a conta de email (default 'smtp.office365.com')
@@ -102,7 +106,20 @@ def send_email(
 
     # Email Body Content
     msg.attach(MIMEText(body_message, type_content))
-
+    
+    # Add image Footer 
+    if image_footer:
+        try:
+            with open(image_footer, 'rb') as img:
+                msg_image = MIMEImage(img.read())
+                msg_image.add_header('Content-ID', '<logo>')
+                # Notice: Content-ID correlact at "cid" on tag <img> at body mail
+                msg.attach(msg_image)
+        except FileNotFoundError as e:
+            alert_print(f'File Not Found! Error: {str(e)}')
+        except Exception as e:
+            error_print(f'An Error ocurred, during set image: <{image_footer}> as MIMEImage! Error: {str(e)}')
+            
     # Add Attachment
     if attachments:
         result['attchament'] = True
