@@ -43,23 +43,33 @@ Nosso objetivo é se tornar a Biblioteca Python para RPA referência. Tornando o
 - E muito mais
 
 ## Instalação
-Para **instalar** o projeto, utilize o comando
+Para **instalar** o projeto, utilize o comando:
 
-~~~pip
+~~~python
 >>> python -m pip install rpa-suite
 ~~~
-
-~~~conda
+ou no conda:
+~~~python
 conda install -c conda-forge rpa-suite
 ~~~
 
+Após instalação basta fazer a importação do modulo e instanciar o Objeto ``suite``:
+~~~~python
+from rpa_suite import suite as rpa
+~~~~
+
+Feito isso já estará pronto para o uso:
+~~~~python
+# function send mail by SMTP 
+rpa.send_mail(...)
+~~~~
 
 >[!NOTE]
 >
 >Para **desinstalar** o projeto, utilize o comando abaixo.
 >**Obs.:** como usamos algumas libs no projeto, lembre-se de desinstar elas caso necessário.
 
-~~~~pip
+~~~~python
 >>> python -m pip uninstall rpa-suite
 ~~~~
 
@@ -67,7 +77,7 @@ conda install -c conda-forge rpa-suite
 >
 >Opcionalmente você pode querer desinstalar as libs que foram inclusas no projeto, sendo assim:
 
-~~~~pip
+~~~~python
 >>> python -m pip uninstall loguru mail_validator colorama
 ~~~~
 
@@ -86,13 +96,13 @@ Do módulo principal, importe a suite. Ela retorna uma instância do Objeto de c
     rpa.wait_for_exec(time, my_function, param1, param2)
 
 
-## Dependências:
+## Dependências
 No setup do nosso projeto já estão inclusas as dependências, só será necessário instalar nossa **Lib**, mas segue a lista das libs usadas:
 - colorama
 - loguru
 - email-validator
   
-## Estrutura do módulo:
+## Estrutura do módulo
 O módulo principal do rpa-suite é dividido em categorias. Cada categoria contém módulos com funções destinadas a cada tipo de tarefa
 - **rpa_suite**
     - **clock**
@@ -115,14 +125,14 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - Funções para validação/varredura (strings, substrings, palavras)
 
 ## Release
-Versão: **Alpha 0.8.2**
+Versão: **Alpha 0.8.5**
 
-Lançamento: *05/12/2023*
+Lançamento: *22/12/2023*
 
 Status: Em desenvolvimento.
 
 
-## Mais Sobre:
+## Mais Sobre
 
 Para mais informações, visite nosso projeto no Github ou PyPi:
 <br>

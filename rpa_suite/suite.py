@@ -82,9 +82,12 @@ class Rpa_suite():
     valid_emails = valid_emails
     search_in = search_in
     
+# Create a instance of Rpa_suite
 rpa = Rpa_suite()
 
+# Define function to return this instance
 def invoke(Rpa_instance):
     return Rpa_instance
 
+# call to invoke to return a instace to your code in import suite
 invoke(rpa)

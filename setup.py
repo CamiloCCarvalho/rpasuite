@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='rpa_suite',
-    version='0.8.2',
+    version='0.8.5',
     packages=find_packages(),
-    description='Conjunto de ferramentas essenciais para RPA com Python, que facilitam o dia a dia de desenvolvimento.',
+    description='Conjunto de ferramentas essenciais para Automação RPA com Python, que facilitam o dia a dia de desenvolvimento.',
     long_description_content_type='text/markdown',
     long_description=open('README.md', 'r', encoding='utf-8').read(),
     author='Camilo Costa de Carvalho',
@@ -12,12 +12,17 @@ setup(
     license='MIT',
     classifiers=[
         'Development Status :: 3 - Alpha',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
+        'Operating System :: Microsoft :: Windows',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
+        'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    keywords='basic-tools, email-tools, email-validation, file-tools, simple-functions, rpa-tools, rpa-functions, RPA, Automação, Python, Ferramentas de RPA, Automação de Processos, Biblioteca Python para RPA',
+    keywords='basic-tools, email-tools, email-validation, file-tools, simple-functions, rpa-tools, rpa-functions, Tools, Rpa, Automation, RPA, Automação, Python, Ferramentas de RPA, Automação de Processos, Biblioteca Python para RPA',
     install_requires=['loguru', 'colorama', 'email_validator'],
 )
