@@ -56,7 +56,7 @@ def count_files(
                     if file.endswith(f'.{type_extension}'):
                         result['qt'] += 1
         result['success'] = True
-        success_print(f'Function: {count_files.__name__} counted {result['qt']} files.')
+        success_print(f'Function: {count_files.__name__} counted {result["qt"]} files.')
         
     except Exception as e:
         result['success'] = False
