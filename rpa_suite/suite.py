@@ -10,7 +10,7 @@ from .email.sender_smtp import send_email
 
 """MODULE FILE"""
 from .file.counter import count_files
-from .file.temp_dir import create_temp_dir, delete_temp_dir
+from .file.temp_dir import create_temp_dir, clear_temp_dir
 
 """MODULE LOG"""
 from .log.loggin import logging_decorator
@@ -63,7 +63,7 @@ class Rpa_suite():
     # file
     count_files = count_files
     create_temp_dir = create_temp_dir
-    delete_temp_dir = delete_temp_dir
+    clear_temp_dir = clear_temp_dir
     
     # log
     alert_print = alert_print
