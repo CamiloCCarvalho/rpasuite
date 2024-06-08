@@ -122,6 +122,7 @@ def send_email(
             
     # Add Attachment
     if attachments:
+        result['qt_attach'] = 0
         result['attchament'] = True
         for path_to_attach in attachments:
             file_name = os.path.basename(path_to_attach)
@@ -170,7 +171,7 @@ def send_email(
         server_by_smtp.quit()
         result['success'] = True
         success_print(f'Email(s) Sent!')
-        
+
 
     except smtplib.SMTPException as e:
         result['success'] = False

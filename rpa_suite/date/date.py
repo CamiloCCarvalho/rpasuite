@@ -1,9 +1,10 @@
 import datetime as dt
+from typing import Optional as Op
+from typing import Tuple
 from rpa_suite.log.printer import error_print
 
 
-        
-def get_hms() -> tuple:
+def get_hms() -> Tuple[Op[str], Op[str], Op[str]]:
     
     """
     Function to return hour, minute and second. The return is in the form of a tuple with strings being able to store and use the values individually.
@@ -63,10 +64,14 @@ def get_hms() -> tuple:
                 hours[1:]
                 
         return hours, minutes, seconds
+    
     except Exception as e:
-        return error_print(f'Unable to capture the time. Error: {str(e)}')
 
-def get_dma() -> tuple:
+        error_print(f'Unable to capture the time. Error: {str(e)}')
+        return None, None, None
+
+
+def get_dma() -> Tuple[Op[str], Op[str], Op[str]]:
     """
     Function to return day, month and year. The return is in the form of a tuple with strings being able to store and use the values individually.
     
@@ -112,4 +117,6 @@ def get_dma() -> tuple:
         return day_got, month_got, year_got
     
     except Exception as e:
-        return error_print(f'Unable to capture the time. Error: {str(e)}')
+
+        error_print(f'Unable to capture the time. Error: {str(e)}')
+        return None, None, None

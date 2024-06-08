@@ -125,7 +125,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - Funções para validação/varredura (strings, substrings, palavras)
 
 ## Release
-Versão: **Alpha 0.9.3**
+Versão: **Alpha 0.9.4**
 
 Lançamento: *20/02/2024*
 

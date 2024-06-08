@@ -7,7 +7,7 @@ def wait_for_exec(
                 fn_to_exec: Callable[..., Any],
                 *args,
                 **kwargs
-                ) -> dict:
+                ) -> dict[str, bool]:
     
     """
     Timer function, wait for a value in ``seconds`` to execute the function of the argument.
@@ -74,7 +74,7 @@ def exec_and_wait(
                 fn_to_exec: Callable[..., Any],
                 *args,
                 **kwargs
-                ) -> dict:
+                ) -> dict[str, bool]:
     
     """
     Timer function, executes a function and waits for the time in ``seconds``

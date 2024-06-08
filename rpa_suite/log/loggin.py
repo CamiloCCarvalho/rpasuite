@@ -4,7 +4,7 @@ from loguru import logger
 def logging_decorator(
                     fn: Callable
                     ) -> Callable:
-    
+
     """
     Function responsible for displaying log message in the console for functions that are called. \n
     Displays function name, and the result of the function in case of return, without return returns None.

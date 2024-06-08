@@ -8,7 +8,7 @@ def exec_at_hour(
                 fn_to_exec: Callable[..., Any],
                 *args,
                 **kwargs,
-                ) -> dict:
+                ) -> dict[str, bool]:
     
     """
     Timed function, executes the function at the specified time, by ``default`` it executes at runtime, optionally you can choose the time for execution.
@@ -65,35 +65,18 @@ def exec_at_hour(
     minutes: str
     moment_now: str
     
-    # Preprocessing
-    run = True
-    now = dt.now()
-    hours = str(now.hour) if now.hour > 10 else f"0{now.hour}"
-    minutes = str(now.minute) if now.minute > 10 else f"0{now.minute}"
-    moment_now = f'{hours}:{minutes}'
-    
-    if hour_to_exec == None:
+    try:
+        # Preprocessing
+        run = True
+        now = dt.now()
+        hours = str(now.hour) if now.hour > 10 else f"0{now.hour}"
+        minutes = str(now.minute) if now.minute > 10 else f"0{now.minute}"
+        moment_now = f'{hours}:{minutes}'
         
-        # Process
-        while run:
-            try:
-                fn_to_exec(*args, **kwargs)
-                run = False
-                result['tried'] = not run
-                result['success'] = True
-                success_print(f'{fn_to_exec.__name__}: Successfully executed!')
-                break
-                
-            except Exception as e:
-                run = False
-                result['tried'] = not run
-                result['success'] = False
-                error_print(f'An error occurred that prevented the function from executing: {fn_to_exec.__name__} correctly. Error: {str(e)}')
-                break
-    else:
-        # Executes the function call only at the time provided in the argument.
-        while run:
-            if moment_now == hour_to_exec:
+        if hour_to_exec == None:
+            
+            # Process
+            while run:
                 try:
                     fn_to_exec(*args, **kwargs)
                     run = False
@@ -108,11 +91,35 @@ def exec_at_hour(
                     result['success'] = False
                     error_print(f'An error occurred that prevented the function from executing: {fn_to_exec.__name__} correctly. Error: {str(e)}')
                     break
-            else:
-                time.sleep(30)
-                now = dt.now()
-                hours = str(now.hour) if now.hour > 10 else f"0{now.hour}"
-                minutes = str(now.minute) if now.minute > 10 else f"0{now.minute}"
-                moment_now = f'{hours}:{minutes}'
+        else:
+            # Executes the function call only at the time provided in the argument.
+            while run:
+                if moment_now == hour_to_exec:
+                    try:
+                        fn_to_exec(*args, **kwargs)
+                        run = False
+                        result['tried'] = not run
+                        result['success'] = True
+                        success_print(f'{fn_to_exec.__name__}: Successfully executed!')
+                        break
+                        
+                    except Exception as e:
+                        run = False
+                        result['tried'] = not run
+                        result['success'] = False
+                        error_print(f'An error occurred that prevented the function from executing: {fn_to_exec.__name__} correctly. Error: {str(e)}')
+                        break
+                else:
+                    time.sleep(30)
+                    now = dt.now()
+                    hours = str(now.hour) if now.hour > 10 else f"0{now.hour}"
+                    minutes = str(now.minute) if now.minute > 10 else f"0{now.minute}"
+                    moment_now = f'{hours}:{minutes}'
 
-    return result
+        return result
+    
+    except Exception as e:
+        
+        result['success'] = False
+        error_print(f'An error occurred on function from executing: {fn_to_exec.__name__}. Error: {str(e)}')
+        return result
