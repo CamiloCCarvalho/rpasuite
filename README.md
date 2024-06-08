@@ -109,11 +109,11 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **waiter** - Funções para aguardar em relação a execução de uma função, podendo ser antes ou depois
         - **exec_at** - Funções para executar em momentos pré determinados
     - **date**
-        - **date** - Funções para capturar data, mes, ano, hora, minutos de forma individual em apenas uma linha
+        - **date** - Funções para capturar data, mês, ano, hora, minutos de forma individual em apenas uma linha
     - **email**
         - **sender_smtp** - Funções para envio de email SMPT 
     - **file**
-        - **counter** - Funções para contagens
+        - **counter** - Funções para contagem de arquivos
         - **temp_dir** - Funções para diretórios temporários
     - **log**
         - **loggin** - Funções decoradoras com log de execução das funções
@@ -125,7 +125,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - Funções para validação/varredura (strings, substrings, palavras)
 
 ## Release
-Versão: **Alpha 0.8.8**
+Versão: **Alpha 0.9.3**
 
 Lançamento: *20/02/2024*
 

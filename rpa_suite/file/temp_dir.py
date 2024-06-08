@@ -1,29 +1,35 @@
 import os, shutil
+from typing import Union
 from rpa_suite.log.printer import error_print, alert_print, success_print
 
-def create_temp_dir(path_to_create: str = 'default') -> dict:
-    
+
+def create_temp_dir(path_to_create: str = 'default', name_temp_dir: str='temp') -> dict[str, Union[bool, str, None]]:
+
     """
     Function responsible for creating a temporary directory to work with files and etc. \n
-    
+
     Parameters:
     ----------
     ``path_to_create: str`` - should be a string with the full path pointing to the folder where the temporary folder should be created, if it is empty the ``default`` value will be used which will create a folder in the current directory where the file containing this function was called.
-    
+
+    ``name_temp_dir: str`` - should be a string representing the name of the temporary directory to be created. If it is empty, the ``temp`` value will be used as the default directory name.
+
     Return:
     ----------
     >>> type:dict
-        * 'success': bool - represents if the action was performed successfully
-        * 'path_created': str - path of the directory that was created in the process
+        * 'success': bool - represents case the action was performed successfully
+        * 'path_created': str - path of the directory that was created on the process
         
     Description: pt-br
     ----------
     Função responsavel por criar diretório temporário para trabalhar com arquivos e etc. \n
-    
+
     Parametros:
     ----------
     ``path_to_create: str`` - deve ser uma string com o path completo apontando para a pasta onde deve ser criada a pasta temporaria, se estiver vazio sera usado valor ``default`` que criará pasta no diretório atual onde o arquivo contendo esta função foi chamada.
-    
+
+    ``name_temp_dir: str`` - deve ser uma string representando o nome do diretório temporário a ser criado. Se estiver vazio, o valor ``temp`` será usado como o nome padrão do diretório.
+
     Retorno:
     ----------
     >>> type:dict
@@ -34,128 +40,132 @@ def create_temp_dir(path_to_create: str = 'default') -> dict:
     # Local Variables
     result: dict = {
         'success': bool,
-        'path_created': str
+        'path_created': str,
     }
     
-    # Preprocessing
-    default_dir: str
     try:
+        # by 'default', defines path to local script execution path
         if path_to_create == 'default':
-            default_dir = os.path.dirname(os.path.abspath(__file__))
-        else:
-            default_dir = fr'{path_to_create}'
+            path_to_create: str = os.getcwd()
+
+        # Build path to new dir
+        full_path: str = os.path.join(path_to_create, name_temp_dir)
+
+        # Create dir in this block
+        try:
+
+            # Successefully created
+            os.makedirs(full_path, exist_ok=False)
+
+            result['success'] = True
+            result['path_created'] = fr'{full_path}'
+
+            success_print(f"Diretório:'{full_path}' foi criado com sucesso.")
+
+        except FileExistsError:
+            result['success'] = False
+            result['path_created'] = None
+            alert_print(f"Diretório:'{full_path}' já existe.")
+
+        except PermissionError:
+            result['success'] = False
+            result['path_created'] = None
+            alert_print(f"Permissão negada: não é possível criar o diretório '{full_path}'.")
+
     except Exception as e:
         result['success'] = False
+        result['path_created'] = None
         error_print(f'Error capturing current path to create temporary directory! Error: {str(e)}')
         
-    # Process
-    try:
-        if not os.path.exists(fr'{default_dir}\temp'):
-            try:
-                os.mkdir(fr'{default_dir}\temp')
-                if os.path.exists(fr'{default_dir}\temp'):
-                    result['success'] = True
-                    success_print(fr'Directory created in: {default_dir}\temp')
-                else:
-                    result['success'] = False
-                    raise Exception
-            except Exception as e:
-                error_print(f'Unable to create temporary directory! Error: {str(e)}')
-        else:
-            result['success'] = True
-            alert_print(fr'NOTICE! directory already exists in: {default_dir}\temp ')
-    except Exception as e:
-        error_print(f'Error when trying to create temporary directory in: {default_dir} - Error: {str(e)}')
-        
-    # Postprocessing
-    result['path_created'] = fr'{default_dir}\temp'
-    
-    return result
+    finally:
+        return result
 
 
-def clear_temp_dir(path_to_clear: str = 'default', name_dir: str = '') -> dict:
-    
+def delete_temp_dir(path_to_delete: str = 'default', name_temp_dir: str='temp', delete_files: bool = False) -> dict[str, Union[bool, str, None]]:
+
     """
-    Function responsible for cleaning the temporary directory at the specified path. \n
+    Function responsible for deleting a temporary directory. \n
     
     Parameters:
     ----------
-    ``path_to_cleaned: str`` - a string that points to the destination to be cleaned, which can be: \n
-        - relative path - based on the file where this function is being called
-        - absolute path - based on the local disk of the machine or server
-            
-    If not declared or if the argument is left empty, then the ``default`` value will be used, which will search for the folder in the current directory where the file containing this function was called.
-    
+    ``path_to_delete: str`` - should be a string with the full path pointing to the folder where the temporary folder should be deleted, if it is empty the ``default`` value will be used which will delete a folder in the current directory where the file containing this function was called.
+
+    ``name_temp_dir: str`` - should be a string representing the name of the temporary directory to be deleted. If it is empty, the ``temp`` value will be used as the default directory name.
+
+    ``delete_files: bool`` - should be a boolean indicating whether to delete files in the directory. If it is False, files in the directory will not be deleted.
+
     Return:
     ----------
     >>> type:dict
-        * 'success': bool - represents if the action was performed successfully
-        * 'path_cleaned': str - path of the directory that was cleaned in the process
+        * 'success': bool - represents case the action was performed successfully
+        * 'path_deleted': str - path of the directory that was deleted on the process
         
     Description: pt-br
     ----------
-    Função responsavel por limpar o diretório temporário no caminho especificado. \n
-    
+    Função responsavel por deletar diretório temporário. \n
+
     Parametros:
     ----------
-    ``path_to_cleaned: str`` - uma string que aponta para o destino a limpar podendo ser: \n
-        - caminho relativo - com base no arquivo onde esta sendo chamada a função
-        - caminho absoluto - com base no disco local da maquina ou servidor
-        
-    não declarar ou deixar o argumento vazio então será usado valor ``default`` que buscará a pasta no diretório atual onde o arquivo contendo esta função foi chamada.
-    
+    ``path_to_delete: str`` - deve ser uma string com o path completo apontando para a pasta onde deve ser deletada a pasta temporaria, se estiver vazio sera usado valor ``default`` que deletará pasta no diretório atual onde o arquivo contendo esta função foi chamada.
+
+    ``name_temp_dir: str`` - deve ser uma string representando o nome do diretório temporário a ser deletado. Se estiver vazio, o valor ``temp`` será usado como o nome padrão do diretório.
+
+    ``delete_files: bool`` - deve ser um booleano indicando se deve deletar arquivos no diretório. Se for False, arquivos no diretório não serão deletados.
+
     Retorno:
     ----------
     >>> type:dict
         * 'success': bool - representa se ação foi realizada com sucesso
-        * 'path_cleaned': str - path do diretório que foi executada limpeza no processo
+        * 'path_deleted': str - path do diretório que foi deletado no processo
     """
-    
+
     # Local Variables
-    temp_dir_result: dict = {
+    result: dict = {
         'success': bool,
-        'path_cleaned': str
+        'path_deleted': str,
     }
-    
-    # Preprocessing
-    default_dir: str
-    personal_name_dir_clear: str = 'temp' if name_dir == '' else name_dir
-    
-    # Process
+
     try:
-        if path_to_clear == 'default':
-            default_dir = os.path.dirname(os.path.abspath(__file__))
-        else:
-            default_dir = fr'{path_to_clear}'
+        # by 'default', defines path to local script execution path
+        if path_to_delete == 'default':
+            path_to_delete: str = os.getcwd()
+
+        # Build path to new dir
+        full_path: str = os.path.join(path_to_delete, name_temp_dir)
+
+        # Delete dir in this block
+        try:
+
+            # Check if directory exists
+            if os.path.exists(full_path):
+
+                # Check if delete_files is True
+                if delete_files:
+                    # Delete all files in the directory
+                    shutil.rmtree(full_path)
+
+                else:
+                    # Delete the directory only
+                    os.rmdir(full_path)
+
+                result['success'] = True
+                result['path_deleted'] = fr'{full_path}'
+
+                success_print(f"Diretório:'{full_path}' foi deletado com sucesso.")
+            else:
+                result['success'] = False
+                result['path_deleted'] = None
+                alert_print(f"Diretório:'{full_path}' não existe.")
+
+        except PermissionError:
+            result['success'] = False
+            result['path_deleted'] = None
+            alert_print(f"Permissão negada: não é possível deletar o diretório '{full_path}'.")
+
     except Exception as e:
-        temp_dir_result['success'] = False
-        error_print(f'Unable to capture current path to clear temporary folder! Error: {str(e)}')
+        result['success'] = False
+        result['path_deleted'] = None
+        error_print(f'Error capturing current path to delete temporary directory! Error: {str(e)}')
         
-    try:
-        if os.path.exists(fr'{default_dir}/{personal_name_dir_clear}'):
-            for root, dirs, files in os.walk(fr'{default_dir}\{personal_name_dir_clear}', topdown=False):
-                for name in files:
-                    try:
-                        os.remove(os.path.join(root, name))
-                    except:
-                        pass
-                for name in dirs:
-                    try:
-                        os.rmdir(os.path.join(root, name))
-                    except:
-                        pass
-            temp_dir_result['success'] = True
-            success_print(fr'Directory cleaned: "{default_dir}\{personal_name_dir_clear}"')
-        else:
-            temp_dir_result['success'] = False
-            temp_dir_result['path_cleaned'] = None
-            alert_print(fr'Directory does not exist: "{default_dir}\{personal_name_dir_clear}"')
-            
-    except Exception as e:
-        error_print(fr'Error when trying to clear temporary directory: "{default_dir}\{personal_name_dir_clear}" - Error: {str(e)}')
-        
-    # Postprocessing
-    if temp_dir_result['success']:
-        temp_dir_result['path_cleaned'] = fr'{default_dir}\{personal_name_dir_clear}'
-    
-    return temp_dir_result
+    finally:
+        return result

@@ -10,3 +10,4 @@ tasks.md
 README.html
 uploader.py 
 how_update.py
+rpa_suite/clock/scheduler.py

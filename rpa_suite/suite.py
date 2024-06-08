@@ -10,10 +10,10 @@ from .email.sender_smtp import send_email
 
 """MODULE FILE"""
 from .file.counter import count_files
-from .file.temp_dir import create_temp_dir, clear_temp_dir
+from .file.temp_dir import create_temp_dir, delete_temp_dir
 
 """MODULE LOG"""
-from .log.loggin import logging_decorator
+# from .log.loggin import logging_decorator
 from .log.printer import alert_print, success_print, error_print, info_print, print_call_fn, print_retur_fn, magenta_print, blue_print
 
 """MODULE REGEX"""
@@ -63,7 +63,8 @@ class Rpa_suite():
     # file
     count_files = count_files
     create_temp_dir = create_temp_dir
-    clear_temp_dir = clear_temp_dir
+    delete_temp_dir = delete_temp_dir
+    #clear_temp_dir = clear_temp_dir
     
     # log
     alert_print = alert_print
@@ -83,11 +84,10 @@ class Rpa_suite():
     search_in = search_in
     
 # Create a instance of Rpa_suite
-rpa = Rpa_suite()
+
 
 # Define function to return this instance
-def invoke(Rpa_instance):
-    return Rpa_instance
+def invoke():
+    suite = Rpa_suite()
+    return suite
 
-# call to invoke to return a instace to your code in import suite
-invoke(rpa)
