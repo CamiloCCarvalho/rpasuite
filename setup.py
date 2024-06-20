@@ -11,8 +11,7 @@ setup(
     author_email='camilo.carvalho@triasoftware.com.br',
     license='MIT',
     classifiers=[
-        'Development Status :: 1 - Beta',
-        'Programming Language :: Python :: 3.10',
+        'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
         'License :: OSI Approved :: MIT License',
