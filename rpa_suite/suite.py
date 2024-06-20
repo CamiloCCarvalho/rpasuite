@@ -1,29 +1,41 @@
+
 """MODULE CLOCK"""
 from .clock.waiter import wait_for_exec, exec_and_wait
 from .clock.exec_at import exec_at_hour
 
+
 """MODULE DATE"""
 from .date.date import get_hms, get_dma
 
+
 """MODULE EMAIL"""
 from .email.sender_smtp import send_email
+
 
 """MODULE FILE"""
 from .file.counter import count_files
 from .file.temp_dir import create_temp_dir, delete_temp_dir
 
+
 """MODULE LOG"""
 # from .log.loggin import logging_decorator
 from .log.printer import alert_print, success_print, error_print, info_print, print_call_fn, print_retur_fn, magenta_print, blue_print
 
+from .log.logger import config_logger
+from .log.functions_logger import log_start_run_debug, log_debug, log_info, log_warning, log_error, log_critical 
+
+
 """MODULE REGEX"""
 from .regex.list_from_text import create_list_using_regex
+
 
 """MODULE VALIDATE"""
 from .validate.mail_validator import valid_emails
 from .validate.string_validator import search_in
 
+
 class Rpa_suite():
+
     """
     The ``Rpa_suite`` class is a generic representation of the modules, with the aim of centralizing all submodules for access through an instance of this representational Object. It contains variables pointed to the functions of the submodules present in the rpa-site.
 
@@ -66,7 +78,7 @@ class Rpa_suite():
     delete_temp_dir = delete_temp_dir
     #clear_temp_dir = clear_temp_dir
 
-    # log
+    # log - printer
     alert_print = alert_print
     success_print = success_print
     error_print = error_print
@@ -75,6 +87,15 @@ class Rpa_suite():
     print_retur_fn = print_retur_fn
     magenta_print = magenta_print
     blue_print = blue_print
+    
+    # log - logger with file and prints
+    config_logger = config_logger
+    log_start_run_debug = log_start_run_debug
+    log_debug = log_debug
+    log_info = log_info
+    log_warning = log_warning
+    log_error = log_error
+    log_critical = log_critical
 
     # regex
     create_list_using_regex = create_list_using_regex
@@ -88,10 +109,10 @@ class Rpa_suite():
 
 # Define function to return this instance
 def invoke() -> Rpa_suite:
-    
+
     """
     Function responsible for return a object Rpa_suite with access all modules by .name_module or use 'from rpa_suite import suite' to >>> suite.functions_avaliable()
     """
-    
+
     suite = Rpa_suite()
     return suite

@@ -101,6 +101,7 @@ No setup do nosso projeto já estão inclusas as dependências, só será necess
 - colorama
 - loguru
 - email-validator
+- colorlog
   
 ## Estrutura do módulo
 O módulo principal do rpa-suite é dividido em categorias. Cada categoria contém módulos com funções destinadas a cada tipo de tarefa
@@ -116,7 +117,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **counter** - Funções para contagem de arquivos
         - **temp_dir** - Funções para diretórios temporários
     - **log**
-        - **loggin** - Funções decoradoras com log de execução das funções
+        - **logger** - Objeto de log, cria diretório/arquivo de log integrado aos prints
         - **printer** - Funções print personalizados (alerta, erro, sucesso, informativo)
     - **regex**
         - **list_from_text** - Funções para gerar listas, dividindo texto usando padrão regex
@@ -125,7 +126,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - Funções para validação/varredura (strings, substrings, palavras)
 
 ## Release
-Versão: **Alpha 0.9.4**
+Versão: **Beta 1.0.0**
 
 Lançamento: *20/02/2024*
 
