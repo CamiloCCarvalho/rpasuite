@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='rpa_suite',
-    version='1.0.0',
+    version='1.0.1',
     packages=find_packages(),
     description='Conjunto de ferramentas essenciais para Automação RPA com Python, que facilitam o dia a dia de desenvolvimento.',
     long_description_content_type='text/markdown',
@@ -11,7 +11,7 @@ setup(
     author_email='camilo.carvalho@triasoftware.com.br',
     license='MIT',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 1 - Beta',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',

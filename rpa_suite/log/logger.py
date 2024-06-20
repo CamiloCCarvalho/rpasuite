@@ -1,5 +1,5 @@
 import logging
-from logging import CRITICAL, ERROR, WARNING, INFO, DEBUG
+from logging import DEBUG
 from logging import FileHandler, StreamHandler, Filter
 from colorlog import ColoredFormatter
 from typing import Optional as Op
