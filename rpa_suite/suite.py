@@ -1,3 +1,31 @@
+# suite.py
+
+"""
+This file is the heart of the library, acting as a central access point to all available submodules. It imports and instantiates all functions from the submodules into a single object, `Rpa_suite`, allowing users to access all functionalities of the library by importing just this object.
+
+The structure of the library has been designed to be modular and organized, with each submodule dedicated to a specific type of functionality. Each submodule is contained in its own folder, making the code easier to navigate and maintain.
+
+Upon installing the library, users only need to import the `Rpa_suite` object to have access to all available functions. This is done through the `invoke` function, which returns an instance of the `Rpa_suite` object.
+
+Here is an overview of the available submodules:
+
+- **CLOCK**: Functions related to time, such as waiting for an execution or executing at a specific hour.
+- **DATE**: Functions for working with dates.
+- **EMAIL**: Functions for sending emails.
+- **FILE**: Functions for working with files, such as counting files or creating temporary directories.
+- **LOG**: Functions for logging events and printing messages.
+- **REGEX**: Functions for working with regular expressions.
+- **VALIDATE**: Functions for validating inputs, such as emails or strings.
+
+Remember, to use the library, just do the following:
+
+    # On your project
+        from rpa_suite import suite as rpa
+
+    # call functions
+        rpa.success_print(f'This work!')
+
+"""
 
 """MODULE CLOCK"""
 from .clock.waiter import wait_for_exec, exec_and_wait
@@ -21,8 +49,8 @@ from .file.temp_dir import create_temp_dir, delete_temp_dir
 # from .log.loggin import logging_decorator
 from .log.printer import alert_print, success_print, error_print, info_print, print_call_fn, print_retur_fn, magenta_print, blue_print
 
-from .log.logger import config_logger
-from .log.functions_logger import log_start_run_debug, log_debug, log_info, log_warning, log_error, log_critical 
+from .log.logger_uru import config_logger
+from .log.functions_logger_uru import log_start_run_debug, log_debug, log_info, log_warning, log_error, log_critical
 
 
 """MODULE REGEX"""

@@ -1,3 +1,5 @@
+# /sender_smtp.py
+
 import smtplib, os
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart

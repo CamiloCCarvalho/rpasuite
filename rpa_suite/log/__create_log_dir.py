@@ -1,3 +1,5 @@
+# /_create_log_dir.py
+
 import os
 from typing import Union
 from rpa_suite.log.printer import error_print, alert_print, success_print

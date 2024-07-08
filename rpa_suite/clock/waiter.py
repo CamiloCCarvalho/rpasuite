@@ -1,3 +1,5 @@
+# /waiter.py
+
 import time
 from typing import Callable, Any
 from rpa_suite.log.printer import error_print, success_print

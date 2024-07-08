@@ -1,3 +1,5 @@
+# /log_decorator.py
+
 from typing import Callable
 from loguru import logger
 

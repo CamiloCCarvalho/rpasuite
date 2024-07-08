@@ -1,3 +1,5 @@
+# /functions_logger_uru.py
+
 from loguru import logger
 from rpa_suite.log.printer import error_print, alert_print
 import inspect, os

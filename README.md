@@ -107,26 +107,27 @@ No setup do nosso projeto já estão inclusas as dependências, só será necess
 O módulo principal do rpa-suite é dividido em categorias. Cada categoria contém módulos com funções destinadas a cada tipo de tarefa
 - **rpa_suite**
     - **clock**
-        - **waiter** - Funções para aguardar em relação a execução de uma função, podendo ser antes ou depois
-        - **exec_at** - Funções para executar em momentos pré determinados
+        - **waiter** - Função capaz de aguardar para executar a função do argumento, ou executar a função do argumento para aguardar posteriormente
+        - **exec_at** - Função capaz de executar a função do argumento no horario especificado "xx:yy" parecido com scheduler, porem com a vantagem de ter o horario como variavel dentro do escopo de código podendo gerar variações pela propria natureza da aplicação
     - **date**
-        - **date** - Funções para capturar data, mês, ano, hora, minutos de forma individual em apenas uma linha
+        - **date** - Funções capazes de extrair dia/mes/ano e hora/min/seg, facilitando a necessidade de formatar o resultado de datetime, a função ja devolve os valores em trio formatados em string
     - **email**
-        - **sender_smtp** - Funções para envio de email SMPT 
+        - **sender_smtp** - Funções para envio de email SMPT com configuração simples já default porem personalizavel
     - **file**
         - **counter** - Funções para contagem de arquivos
         - **temp_dir** - Funções para diretórios temporários
     - **log**
-        - **logger** - Objeto de log, cria diretório/arquivo de log integrado aos prints
-        - **printer** - Funções print personalizados (alerta, erro, sucesso, informativo)
+        - **logger_uru** - Instanciador de stream e handlefile que cria na pasta raiz do arquivo chamador pasta de log e seta o stream para as funções de log
+        - **functions_logger_uru** - Funções de log parecida com os prints personalizados, setadas e personalizadas para todos log levels usado pelo ´logger_uru´, já escreve no arquivo setado além de gerar o print no terminal
+        - **printer** - Funções de print personalizados (alerta, erro, sucesso, informativo)
     - **regex**
-        - **list_from_text** - Funções para gerar listas, dividindo texto usando padrão regex
+        - **list_from_text** - Funções para gerar listas, dividindo texto usando padrão regex (necessita de melhorias)
     - **validate**
-        - **mail_validator** - Funções para validação de emails
-        - **string_validator** - Funções para validação/varredura (strings, substrings, palavras)
+        - **mail_validator** - Função para validar lista de emails, devolvendo a lista com emails validos a partir da lista original 
+        - **string_validator** - Função que valida presença de letras, palavras, e texto em strings
 
 ## Release
-Versão: **Beta 1.0.1**
+Versão: **Beta 1.0.2**
 
 Lançamento: *20/02/2024*
 

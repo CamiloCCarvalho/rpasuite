@@ -1,5 +1,7 @@
+# /_functions_logger.py
+
 import logging
-from .logger import file_handler
+from ._logger import file_handler
 from rpa_suite.log.printer import error_print, success_print
 
 

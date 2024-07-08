@@ -1,3 +1,5 @@
+# /printer.py
+
 from colorama import Fore
 
 # Windows bash colors
