@@ -102,6 +102,9 @@ No setup do nosso projeto já estão inclusas as dependências, só será necess
 - loguru
 - email-validator
 - colorlog
+
+[!IMPORTANT]
+No caso da função de screenshot é necessario ter as libs 'pyautogui' 'pillow' e 'pyscreeze' instalados, geralmente a instalação de pyautogui já instala as demais dependencias deste caso.
   
 ## Estrutura do módulo
 O módulo principal do rpa-suite é dividido em categorias. Cada categoria contém módulos com funções destinadas a cada tipo de tarefa
@@ -116,6 +119,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
     - **file**
         - **counter** - Funções para contagem de arquivos
         - **temp_dir** - Funções para diretórios temporários
+        -**screen_shot** -  Função para criar diretório e arquivo de print com nome do diretório, arquivo e delay personalizáveis.
     - **log**
         - **logger_uru** - Instanciador de stream e handlefile que cria na pasta raiz do arquivo chamador pasta de log e seta o stream para as funções de log
         - **functions_logger_uru** - Funções de log parecida com os prints personalizados, setadas e personalizadas para todos log levels usado pelo ´logger_uru´, já escreve no arquivo setado além de gerar o print no terminal
@@ -127,7 +131,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - Função que valida presença de letras, palavras, e texto em strings
 
 ## Release
-Versão: **Beta 1.0.2**
+Versão: **Beta 1.0.3**
 
 Lançamento: *20/02/2024*
 
