@@ -119,7 +119,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
     - **file**
         - **counter** - Funções para contagem de arquivos
         - **temp_dir** - Funções para diretórios temporários
-        -**screen_shot** -  Função para criar diretório e arquivo de print com nome do diretório, arquivo e delay personalizáveis.
+        - **screen_shot** -  Função para criar diretório e arquivo de print com nome do diretório, arquivo e delay personalizáveis
     - **log**
         - **logger_uru** - Instanciador de stream e handlefile que cria na pasta raiz do arquivo chamador pasta de log e seta o stream para as funções de log
         - **functions_logger_uru** - Funções de log parecida com os prints personalizados, setadas e personalizadas para todos log levels usado pelo ´logger_uru´, já escreve no arquivo setado além de gerar o print no terminal
