@@ -2,7 +2,7 @@
 
 import os, time
 from datetime import datetime
-from rpa_suite import suite as rpa
+from rpa_suite.log.printer import error_print
 
 
 try:
@@ -56,10 +56,9 @@ def screen_shot(file_path: str, file_name: str = 'screenshot', save_with_date: b
             # if dir not exists create it
             try:
                 os.makedirs(file_path)
-                rpa.success_print(f"Diretório criado com sucesso em: '{file_path}'!")
 
             except OSError as e:
-                rpa.error_print(f"Falha ao criar o diretório em: '{file_path}'! Error: {str(e)}")
+                error_print(f"Falha ao criar o diretório em: '{file_path}'! Error: {str(e)}")
 
         
         if save_with_date: # use date on file name
@@ -78,5 +77,5 @@ def screen_shot(file_path: str, file_name: str = 'screenshot', save_with_date: b
     
     except Exception as e:
 
-        rpa.error_print(f'Erro durante a função {screen_shot.__name__}! Error: {str(e)}')
+        error_print(f'Erro durante a função {screen_shot.__name__}! Error: {str(e)}')
         return None
