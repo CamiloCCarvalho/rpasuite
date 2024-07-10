@@ -12,7 +12,7 @@ Here is an overview of the available submodules:
 - **CLOCK**: Functions related to time, such as waiting for an execution or executing at a specific hour.
 - **DATE**: Functions for working with dates.
 - **EMAIL**: Functions for sending emails.
-- **FILE**: Functions for working with files, such as counting files or creating temporary directories.
+- **FILE**: Functions for working with files, such as counting files or creating temporary directories and screenshot too.
 - **LOG**: Functions for logging events and printing messages.
 - **REGEX**: Functions for working with regular expressions.
 - **VALIDATE**: Functions for validating inputs, such as emails or strings.
@@ -43,7 +43,7 @@ from .email.sender_smtp import send_email
 """MODULE FILE"""
 from .file.counter import count_files
 from .file.temp_dir import create_temp_dir, delete_temp_dir
-
+from .file.screen_shot import screen_shot
 
 """MODULE LOG"""
 # from .log.loggin import logging_decorator
@@ -104,6 +104,7 @@ class Rpa_suite():
     count_files = count_files
     create_temp_dir = create_temp_dir
     delete_temp_dir = delete_temp_dir
+    screen_shot = screen_shot
     #clear_temp_dir = clear_temp_dir
 
     # log - printer
@@ -133,7 +134,6 @@ class Rpa_suite():
     search_in = search_in
 
 # Create a instance of Rpa_suite
-
 
 # Define function to return this instance
 def invoke() -> Rpa_suite:
