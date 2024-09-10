@@ -33,7 +33,7 @@ def success_print(string_text: str, color=Colors.green, ending="\n") -> None:
     ----------
         >>> type:None
     """
-    print(f'{color} {string_text} {Colors.default}', end=ending) 
+    print(f'{color}{string_text}{Colors.default}', end=ending) 
 
 
 def alert_print(string_text: str, color=Colors.yellow, ending="\n") -> None:
@@ -51,7 +51,7 @@ def alert_print(string_text: str, color=Colors.yellow, ending="\n") -> None:
     ----------
         >>> type:None
     """
-    print(f'{color} {string_text} {Colors.default}', end=ending) 
+    print(f'{color}{string_text}{Colors.default}', end=ending) 
 
 
 def info_print(string_text: str, color=Colors.cyan, ending="\n") -> None:
@@ -69,7 +69,7 @@ def info_print(string_text: str, color=Colors.cyan, ending="\n") -> None:
     ----------
         >>> type:None
     """
-    print(f'{color} {string_text} {Colors.default}', end=ending) 
+    print(f'{color}{string_text}{Colors.default}', end=ending) 
 
 
 def error_print(string_text: str, color=Colors.red, ending="\n") -> None:
@@ -87,7 +87,7 @@ def error_print(string_text: str, color=Colors.red, ending="\n") -> None:
     ----------
         >>> type:None
     """
-    print(f'{color} {string_text} {Colors.default}', end=ending) 
+    print(f'{color}{string_text}{Colors.default}', end=ending) 
 
 
 def magenta_print(string_text: str, color=Colors.magenta, ending="\n") -> None:
@@ -105,7 +105,7 @@ def magenta_print(string_text: str, color=Colors.magenta, ending="\n") -> None:
     ----------
         >>> type:None
     """
-    print(f'{color} {string_text} {Colors.default}', end=ending) 
+    print(f'{color}{string_text}{Colors.default}', end=ending) 
 
 
 def blue_print(string_text: str, color=Colors.blue, ending="\n") -> None:
@@ -123,7 +123,7 @@ def blue_print(string_text: str, color=Colors.blue, ending="\n") -> None:
     ----------
         >>> type:None
     """
-    print(f'{color} {string_text} {Colors.default}', end=ending)
+    print(f'{color}{string_text}{Colors.default}', end=ending)
 
 
 def print_call_fn(string_text: str, color=Colors.call_fn, ending="\n") -> None:
@@ -142,7 +142,7 @@ def print_call_fn(string_text: str, color=Colors.call_fn, ending="\n") -> None:
     ----------
         >>> type:None
     """
-    print(f'{color} {string_text} {Colors.default}', end=ending)
+    print(f'{color}{string_text}{Colors.default}', end=ending)
 
 
 def print_retur_fn(string_text: str, color=Colors.retur_fn, ending="\n") -> None:
@@ -161,4 +161,4 @@ def print_retur_fn(string_text: str, color=Colors.retur_fn, ending="\n") -> None
     ----------
         >>> type:None
     """
-    print(f'{color} {string_text} {Colors.default}', end=ending)
+    print(f'{color}{string_text}{Colors.default}', end=ending)
