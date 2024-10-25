@@ -1,4 +1,4 @@
-![RPA Suite](https://raw.githubusercontent.com/CamiloCCarvalho/rpa_suite/refs/heads/master/logo-rpa-suite.png)
+![RPA Suite](https://raw.githubusercontent.com/CamiloCCarvalho/rpa_suite/refs/heads/master/logo-rpa-suite.svg)
 
 
 <h1 align="left">
@@ -131,10 +131,10 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - Função que valida presença de letras, palavras, e texto em strings
 
 ## Release
-Versão: **Beta 1.1.9**
+Versão: **Beta 1.2.0**
 
 Lançamento: *20/02/2024*
-Última atualização: *09/09/2024*
+Última atualização: *25/10/2024*
 
 Status: Em desenvolvimento.
 
