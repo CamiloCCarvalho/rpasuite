@@ -19,7 +19,7 @@ def log_start_run_debug(msg_start_loggin: str) -> None: # represent start applic
 
     except Exception as e:
 
-        error_print(f'Para usar o log_start_run_debug é necessario instanciar file_handler usando o arquivo "logger_uru" em algum arquivo de configuração do seu projeto primeiramente! Error: {str(e)}')
+        error_print(f'To use log_start_run_debug you need instance file_handler using file "logger_uru" on one file in your project! Error: {str(e)}')
 
     try:
         try:
@@ -28,7 +28,7 @@ def log_start_run_debug(msg_start_loggin: str) -> None: # represent start applic
                     f.write('\n')
 
         except Exception as e:
-            alert_print(f'Não foi possivel gerar break_row para log inicial!')
+            alert_print(f"Don't able to break_row for initial log!")
 
         # logger.debug(f'{msg_start_loggin}')
         frame = inspect.currentframe().f_back
@@ -46,7 +46,7 @@ def log_start_run_debug(msg_start_loggin: str) -> None: # represent start applic
         logger.bind(filename=filename, lineno=lineno).debug(f'{msg_start_loggin}')
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_start_run_debug.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_start_run_debug.__name__}! Error: {str(e)}')
 
 
 def log_debug(msg) -> None:
@@ -59,19 +59,19 @@ def log_debug(msg) -> None:
         frame = inspect.currentframe().f_back
         full_path_filename = frame.f_code.co_filename
 
-        # Obtenha o nome do arquivo e o nome da pasta
+        # Obtem o nome do arquivo e o nome da pasta
         filename = os.path.basename(full_path_filename)
         foldername = os.path.basename(os.path.dirname(full_path_filename))
 
-        # Combine o nome da pasta e o nome do arquivo
+        # Combina o nome da pasta e o nome do arquivo
         filename = os.path.join(foldername, filename)
         lineno = frame.f_lineno
 
-        # Vincule o nome do arquivo e a linha à mensagem de log
+        # Vincula o nome do arquivo e a linha à mensagem de log
         logger.bind(filename=filename, lineno=lineno).debug(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_debug.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_debug.__name__}! Error: {str(e)}')
 
 def log_info(msg) -> None:
 
@@ -83,19 +83,19 @@ def log_info(msg) -> None:
         frame = inspect.currentframe().f_back
         full_path_filename = frame.f_code.co_filename
 
-        # Obtenha o nome do arquivo e o nome da pasta
+        # Obtem o nome do arquivo e o nome da pasta
         filename = os.path.basename(full_path_filename)
         foldername = os.path.basename(os.path.dirname(full_path_filename))
 
-        # Combine o nome da pasta e o nome do arquivo
+        # Combina o nome da pasta e o nome do arquivo
         filename = os.path.join(foldername, filename)
         lineno = frame.f_lineno
 
-        # Vincule o nome do arquivo e a linha à mensagem de log
+        # Vincula o nome do arquivo e a linha à mensagem de log
         logger.bind(filename=filename, lineno=lineno).info(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_info.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_info.__name__}! Error: {str(e)}')
 
 def log_warning(msg) -> None:
 
@@ -119,7 +119,7 @@ def log_warning(msg) -> None:
         logger.bind(filename=filename, lineno=lineno).warning(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_warning.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_warning.__name__}! Error: {str(e)}')
 
 
 def log_error(msg) -> None:
@@ -144,7 +144,7 @@ def log_error(msg) -> None:
         logger.bind(filename=filename, lineno=lineno).error(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_error.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_error.__name__}! Error: {str(e)}')
 
 
 def log_critical(msg) -> None:
@@ -169,4 +169,4 @@ def log_critical(msg) -> None:
         logger.bind(filename=filename, lineno=lineno).critical(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_critical.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_critical.__name__}! Error: {str(e)}')

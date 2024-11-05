@@ -19,7 +19,7 @@ class Filters:
 
                 for word in string_words:
                     if word in record["message"]:
-                        record["message"] = 'Log Alterado devido a palavra Filtrada!'
+                        record["message"] = 'Log with filtered words!'
                         return True
 
         return True
@@ -106,5 +106,5 @@ def config_logger(path_dir:str = None, name_log_dir:str = None, name_file_log: s
 
     except Exception as e:
 
-        error_print(f'Houve um erro durante a execução da função: {config_logger.__name__}! Error: {str(e)}.')
+        error_print(f'Error to execute function:{config_logger.__name__}! Error: {str(e)}.')
         return None

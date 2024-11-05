@@ -104,7 +104,7 @@ No setup do nosso projeto já estão inclusas as dependências, só será necess
 - colorlog
 
 [!IMPORTANT]
-No caso da função de screenshot é necessario ter as libs 'pyautogui' 'pillow' e 'pyscreeze' instalados, geralmente a instalação de pyautogui já instala as demais dependencias deste caso.
+No caso da função de screenshot é necessario ter as libs 'pyautogui' 'pillow' e 'pyscreeze' instalados, geralmente a instalação de pyautogui já instala as demais dependências deste caso.
   
 ## Estrutura do módulo
 O módulo principal do rpa-suite é dividido em categorias. Cada categoria contém módulos com funções destinadas a cada tipo de tarefa
@@ -120,24 +120,36 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **counter** - Funções para contagem de arquivos
         - **temp_dir** - Funções para diretórios temporários
         - **screen_shot** -  Função para criar diretório e arquivo de print com nome do diretório, arquivo e delay personalizáveis
+        - **file_flag** -  Funções para criar e deletar arquivo utilizado como flag de execução, tendo path e nome do arquivo já automatico porem personalizavel para se adequar ao seu projeto
     - **log**
         - **logger_uru** - Instanciador de stream e handlefile que cria na pasta raiz do arquivo chamador pasta de log e seta o stream para as funções de log
         - **functions_logger_uru** - Funções de log parecida com os prints personalizados, setadas e personalizadas para todos log levels usado pelo ´logger_uru´, já escreve no arquivo setado além de gerar o print no terminal
         - **printer** - Funções de print personalizados (alerta, erro, sucesso, informativo)
     - **regex**
-        - **list_from_text** - Funções para gerar listas, dividindo texto usando padrão regex (necessita de melhorias)
+        - **pattern_in_text** - Função para otimizar o uso mais comum de regex buscando padrões em um texto
     - **validate**
         - **mail_validator** - Função para validar lista de emails, devolvendo a lista com emails validos a partir da lista original 
-        - **string_validator** - Função que valida presença de letras, palavras, e texto em strings
+        - **string_validator** - Função que valida presença de letras, palavras, e textos e possibilita contar as ocorrencias em uma string
 
 ## Release
-Versão: **Beta 1.2.0**
+Versão: **Beta 1.3.0**
 
 Lançamento: *20/02/2024*
-Última atualização: *25/10/2024*
+Última atualização: *05/11/2024*
 
 Status: Em desenvolvimento.
 
+
+### Notas da ultima atualização
+
+- Correções de bugs em diversas funções relacionadas a tempo: *exec_at_hour* , *wait_for_exec* , *exec_and_wait*
+- Correções de bugs com tempo superior a 10 minutos nas funções de data: *get_hms* e *get_dma*
+- Função **get_dma** atualizada e **renomeada** para **get_dmy** para manter o padrão em ingles
+- Função *send_email* atualizada para suportar autenticação *SSL* ou *TLS* via argumentos recebidos nos parametros
+- Adicionado parametro de *"display_message"* para o usuario poder ativar ou desativar as mensagens de console em cada função
+- Correção de bug na função *"count_files"* para realizar de maneira correta a soma de todos arquivos nos diretórios
+- Funções de regex e busca em textos por strings e palavras atualizadas
+- Implementado nova função para arquivo de flag para execuções, no submodulo file, as funções são: *"file_flag_create"* e *"file_flag_delete"*
 
 ## Mais Sobre
 

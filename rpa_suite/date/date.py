@@ -9,7 +9,7 @@ from rpa_suite.log.printer import error_print
 def get_hms() -> Tuple[Op[str], Op[str], Op[str]]:
     
     """
-    Function to return hour, minute and second. The return is in the form of a tuple with strings being able to store and use the values individually.
+    Function to return Hour, Minute and Second. The return is in the form of a tuple with strings being able to store and use the values individually.
     
     Treatment:
     ----------
@@ -51,9 +51,9 @@ def get_hms() -> Tuple[Op[str], Op[str], Op[str]]:
     
     # Preprocessing
     now = dt.datetime.now()
-    hours: str = str(now.hour) if now.hour > 10 else f"0{now.hour}"
-    minutes: str = str(now.minute) if now.minute > 10 else f"0{now.minute}"
-    seconds: str = str(now.second) if now.second > 10 else f"0{now.second}"
+    hours: str = str(now.hour) if now.hour >= 10 else f"0{now.hour}"
+    minutes: str = str(now.minute) if now.minute >= 10 else f"0{now.minute}"
+    seconds: str = str(now.second) if now.second >= 10 else f"0{now.second}"
     
     # Process
     try:
@@ -73,9 +73,9 @@ def get_hms() -> Tuple[Op[str], Op[str], Op[str]]:
         return None, None, None
 
 
-def get_dma() -> Tuple[Op[str], Op[str], Op[str]]:
+def get_dmy() -> Tuple[Op[str], Op[str], Op[str]]:
     """
-    Function to return day, month and year. The return is in the form of a tuple with strings being able to store and use the values individually.
+    Function to return Day, Month and Year. The return is in the form of a tuple with strings being able to store and use the values individually.
     
     Return:
     ----------
@@ -84,7 +84,7 @@ def get_dma() -> Tuple[Op[str], Op[str], Op[str]]:
         
     Example:
     ---------
-    >>> day, month, year = get_hms() \n
+    >>> day, month, year = get_dmy() \n
         * NOTE:  Note that it is possible to destructure the return to store simultaneously.
         
     Description: pt-br
@@ -98,7 +98,7 @@ def get_dma() -> Tuple[Op[str], Op[str], Op[str]]:
         
     Exemplo:
     ---------
-    >>> dia, mes, ano = get_hms() \n
+    >>> dia, mes, ano = get_dmy() \n
         * OBS.:  Note que é possivel desestruturar o retorno para armazenar de forma simultânea.
     """
     
@@ -112,9 +112,9 @@ def get_dma() -> Tuple[Op[str], Op[str], Op[str]]:
     
     # Process
     try:
-        day_got: str = str(now.day) if now.day > 10 else f"0{now.day}"
-        month_got: str = str(now.month) if now.month > 10 else f"0{now.month}"
-        year_got: str = str(now.year) if now.year > 10 else f"0{now.year}"
+        day_got: str = str(now.day) if now.day >= 10 else f"0{now.day}"
+        month_got: str = str(now.month) if now.month >= 10 else f"0{now.month}"
+        year_got: str = str(now.year) if now.year >= 10 else f"0{now.year}"
     
         return day_got, month_got, year_got
     

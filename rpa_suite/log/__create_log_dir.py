@@ -38,13 +38,15 @@ def _create_log_dir(path_to_create: str = 'default', name_log_dir: str='logs') -
         * 'success': bool - representa se ação foi realizada com sucesso
         * 'path_created': str - path do diretório que foi criado no processo
     """
-    
+
+
     # Local Variables
     result: dict = {
         'success': bool,
         'path_created': str,
     }
-    
+
+
     try:
         # by 'default', defines path to local script execution path
         if path_to_create == 'default':
@@ -62,7 +64,7 @@ def _create_log_dir(path_to_create: str = 'default', name_log_dir: str='logs') -
             result['success'] = True
             result['path_created'] = fr'{full_path}'
 
-            success_print(f"Diretório:'{full_path}' foi criado com sucesso.")
+            success_print(f"Dir:'{full_path}' created!")
 
         except FileExistsError:
             result['success'] = False
@@ -72,7 +74,7 @@ def _create_log_dir(path_to_create: str = 'default', name_log_dir: str='logs') -
         except PermissionError:
             result['success'] = False
             result['path_created'] = None
-            alert_print(f"Permissão negada: não é possível criar o diretório '{full_path}'.")
+            alert_print(f"Permission Denied: Not Able to create: '{full_path}'.")
 
     except Exception as e:
         result['success'] = False

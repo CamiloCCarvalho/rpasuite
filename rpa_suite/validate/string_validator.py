@@ -2,7 +2,7 @@
 
 from rpa_suite.log.printer import success_print, error_print
 
-def search_in(
+def search_str_in(
             origin_text: str,
             searched_word: str,
             case_sensitivy: bool = True,
@@ -91,6 +91,7 @@ def search_in(
                     words_lowercase = [word.lower() for word in origin_words]
                     searched_word = searched_word.lower()
                     result['is_found'] = searched_word in words_lowercase
+                    
             except Exception as e:
                 return error_print(f'Unable to complete the search: {searched_word}. Error: {str(e)}')
                 
@@ -102,19 +103,11 @@ def search_in(
                     origin_text_lower: str = origin_text.lower()
                     searched_word_lower: str = searched_word.lower()
                     result['is_found'] = origin_text_lower.__contains__(searched_word_lower)
+                    
             except Exception as e:
                 return error_print(f'Unable to complete the search: {searched_word}. Error: {str(e)}')
-            
-        elif search_by == 'regex':
-            pass
-            """try:
-                if case_sensitivy:
-                    print(f'metodo para buscar com sensitivy...')
-                else:
-                    print(f'metodo para buscar sem sensitive...')
-            except Exception as e:
-                return print(f'Não foi possivel concluir a busca de: {searched_word}. Error: {str(e)}')"""
-            
+
+
     except Exception as e:
         return error_print(f'Unable to search for: {searched_word}. Error: {str(e)}')
     

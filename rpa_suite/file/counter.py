@@ -6,8 +6,9 @@ from rpa_suite.log.printer import error_print, success_print
 
 
 def count_files(
-    dir_to_count: List[str], 
-    type_extension: str = '*'
+    dir_to_count: List[str] = ['.'], 
+    type_extension: str = '*',
+    display_message: bool = False,
 ) -> Dict[str, Union[bool, int]]:
 
     """
@@ -40,25 +41,25 @@ def count_files(
         * 'qt': int - numero que representa a quantidade de arquivos que foram contados
     """
 
+
     # Local Variables
     result: dict = {
-        'success': bool,
-        'qt': int
+        'success': False,
+        'qt': 0
     }
 
-    # Preprocessing
-    result['success'] = False
-    result['qt'] = 0
 
     # Process
     try:
         for dir in dir_to_count:
             for current_dir, sub_dir, files in os.walk(dir):
                 for file in files:
-                    if file.endswith(f'.{type_extension}'):
+                    if type_extension == '*' or file.endswith(f'.{type_extension}'):
                         result['qt'] += 1
         result['success'] = True
-        success_print(f'Function: {count_files.__name__} counted {result["qt"]} files.')
+        
+        if display_message:
+            success_print(f'Function: {count_files.__name__} counted {result["qt"]} files.')
 
     except Exception as e:
         result['success'] = False

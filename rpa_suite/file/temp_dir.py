@@ -5,7 +5,7 @@ from typing import Union
 from rpa_suite.log.printer import error_print, alert_print, success_print
 
 
-def create_temp_dir(path_to_create: str = 'default', name_temp_dir: str='temp') -> dict[str, Union[bool, str, None]]:
+def create_temp_dir(path_to_create: str = 'default', name_temp_dir: str='temp', display_message: bool = False) -> dict[str, Union[bool, str, None]]:
 
     """
     Function responsible for creating a temporary directory to work with files and etc. \n
@@ -62,17 +62,18 @@ def create_temp_dir(path_to_create: str = 'default', name_temp_dir: str='temp') 
             result['success'] = True
             result['path_created'] = fr'{full_path}'
 
-            success_print(f"Diretório:'{full_path}' foi criado com sucesso.")
+            if display_message:
+                success_print(f"Dir:'{full_path}' Created!")
 
         except FileExistsError:
             result['success'] = False
             result['path_created'] = None
-            alert_print(f"Diretório:'{full_path}' já existe.")
+            alert_print(f"Dir:'{full_path}' already exists.")
 
         except PermissionError:
             result['success'] = False
             result['path_created'] = None
-            alert_print(f"Permissão negada: não é possível criar o diretório '{full_path}'.")
+            alert_print(f"Permission Denied: Not Able to create dir:'{full_path}'.")
 
     except Exception as e:
         result['success'] = False
@@ -83,7 +84,7 @@ def create_temp_dir(path_to_create: str = 'default', name_temp_dir: str='temp') 
         return result
 
 
-def delete_temp_dir(path_to_delete: str = 'default', name_temp_dir: str='temp', delete_files: bool = False) -> dict[str, Union[bool, str, None]]:
+def delete_temp_dir(path_to_delete: str = 'default', name_temp_dir: str='temp', delete_files: bool = False, display_message: bool = False) -> dict[str, Union[bool, str, None]]:
 
     """
     Function responsible for deleting a temporary directory. \n
@@ -153,16 +154,18 @@ def delete_temp_dir(path_to_delete: str = 'default', name_temp_dir: str='temp', 
                 result['success'] = True
                 result['path_deleted'] = fr'{full_path}'
 
-                success_print(f"Diretório:'{full_path}' foi deletado com sucesso.")
+                if display_message:
+                    success_print(f"Dir:'{full_path}' Deleted!")
+                    
             else:
                 result['success'] = False
                 result['path_deleted'] = None
-                alert_print(f"Diretório:'{full_path}' não existe.")
+                alert_print(f"Dir:'{full_path}' Don't exists.")
 
         except PermissionError:
             result['success'] = False
             result['path_deleted'] = None
-            alert_print(f"Permissão negada: não é possível deletar o diretório '{full_path}'.")
+            alert_print(f"Permission Denied: Not Able to delete dir: '{full_path}'.")
 
     except Exception as e:
         result['success'] = False

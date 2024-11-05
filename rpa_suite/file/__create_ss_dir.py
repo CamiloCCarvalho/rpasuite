@@ -8,7 +8,7 @@ from rpa_suite.log.printer import error_print, alert_print, success_print
 def __create_ss_dir(path_to_create: str = 'default', name_ss_dir: str='screenshots') -> dict[str, Union[bool, str, None]]:
 
     """
-    Function responsible for creating a screenshots directory to work with your screenshot files. \n
+    Function responsible for creating a ScreenShots directory to work with your screenshot files. \n
 
     Parameters:
     ----------

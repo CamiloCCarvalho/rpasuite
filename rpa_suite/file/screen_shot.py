@@ -4,11 +4,11 @@ import os, time
 from datetime import datetime
 from rpa_suite.log.printer import error_print, success_print
 from .__create_ss_dir import __create_ss_dir
+from colorama import Fore
 
 
 
-
-def screen_shot(path_dir:str = None, file_name: str = 'screenshot', save_with_date: bool = True, delay: int = 1, use_default_path_and_name: bool = True, name_ss_dir:str = None) -> str | None:
+def screen_shot(path_dir:str = None, file_name: str = 'screenshot', save_with_date: bool = True, delay: int = 1, use_default_path_and_name: bool = True, name_ss_dir:str = None, display_message: bool = False) -> str | None:
 
     """
     Function responsible for create a dir for screenshot, and file screenshot and save this in dir to create, if dir exists save it on original dir. By default uses date on file name. \n
@@ -50,7 +50,7 @@ def screen_shot(path_dir:str = None, file_name: str = 'screenshot', save_with_da
             import pyscreeze
             
         except ImportError:
-            raise ImportError(" The ‘pyautogui’ e ‘Pillow’ libraries are necessary to use this module. Please install them with ‘pip install pyautogui pillow.")
+            raise ImportError(f"\nThe libraries ‘pyautogui’ and ‘Pillow’ are necessary to use this module. {Fore.YELLOW}Please install them with: ‘pip install pyautogui pillow‘{Fore.WHITE}")
         
         time.sleep(delay)
 
@@ -68,9 +68,10 @@ def screen_shot(path_dir:str = None, file_name: str = 'screenshot', save_with_da
             file_name = f'{file_name}_{datetime.today().strftime("%d_%m_%Y-%H_%M_%S")}.png'
             path_file_screenshoted = os.path.join(path_dir, file_name)
             
-            success_print(path_file_screenshoted)
-            
             image.save(path_file_screenshoted)
+            if display_message:
+                success_print(path_file_screenshoted)
+            
             return path_file_screenshoted
         
         else: # not use date on file name
@@ -79,9 +80,12 @@ def screen_shot(path_dir:str = None, file_name: str = 'screenshot', save_with_da
             path_file_screenshoted = os.path.join(path_dir, file_name)
             
             image.save(path_file_screenshoted)
+            if display_message:
+                success_print(path_file_screenshoted)
+                
             return path_file_screenshoted
     
     except Exception as e:
 
-        error_print(f'Erro durante a função {screen_shot.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{screen_shot.__name__}! Error: {str(e)}')
         return None

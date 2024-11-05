@@ -4,7 +4,8 @@ import email_validator
 from rpa_suite.log.printer import error_print, success_print
 
 def valid_emails(
-                email_list: list[str]
+                email_list: list[str],
+                display_message: bool = False,
                 ) -> dict:
     
     """
@@ -71,7 +72,10 @@ def valid_emails(
                 
             except email_validator.EmailNotValidError:
                 invalid_emails.append(email)
-        success_print(f'Function: {valid_emails.__name__} executed.')
+        
+        if display_message:
+            success_print(f'Function:{valid_emails.__name__} executed!')
+            
     except Exception as e:
         error_print(f'Error when trying to validate email list: {str(e)}')
 

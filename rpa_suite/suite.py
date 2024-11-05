@@ -44,6 +44,7 @@ from .email.sender_smtp import send_email
 from .file.counter import count_files
 from .file.temp_dir import create_temp_dir, delete_temp_dir
 from .file.screen_shot import screen_shot
+from .file.file_flag import file_flag_create, file_flag_delete
 
 """MODULE LOG"""
 # from .log.loggin import logging_decorator
@@ -54,7 +55,7 @@ from .log.functions_logger_uru import log_start_run_debug, log_debug, log_info, 
 
 
 """MODULE REGEX"""
-from .regex.list_from_text import create_list_using_regex
+from .regex.pattern_in_text import check_pattern_in_text
 
 
 """MODULE VALIDATE"""
@@ -105,6 +106,8 @@ class Rpa_suite():
     create_temp_dir = create_temp_dir
     delete_temp_dir = delete_temp_dir
     screen_shot = screen_shot
+    file_flag_create = file_flag_create
+    file_flag_delete = file_flag_delete
     #clear_temp_dir = clear_temp_dir
 
     # log - printer
@@ -127,7 +130,7 @@ class Rpa_suite():
     log_critical = log_critical
 
     # regex
-    create_list_using_regex = create_list_using_regex
+    check_pattern_in_text = check_pattern_in_text
 
     # validate
     valid_emails = valid_emails

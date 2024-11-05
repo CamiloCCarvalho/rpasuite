@@ -19,7 +19,8 @@ def send_email(
                 attachments: list[str] = None,
                 type_content: str = 'html',
                 smtp_server: str = 'smtp.office365.com',
-                smtp_port: int = 587
+                smtp_port: int = 587,
+                authentication_tls: bool = True, 
                 ) -> dict:
 
     """
@@ -37,7 +38,8 @@ def send_email(
     ``attachments: list[str]`` - list with path of attachments if any. (default None).
     ``type_content: str`` - type of message content can be 'plain' or 'html' (default 'html').
     ``smtp_server: str`` - server to be used to connect with the email account (default 'smtp.office365.com')
-    ``smtp_port: int`` - port to be used on this server (default 587) 
+    ``smtp_port: int`` - port to be used on this server (default 587 - TLS), commum use 465 for SSL authentication 
+    ``authentication_tls: bool`` - authentication method (default True), if False use SSL authentication
     
     Return:
     ----------
@@ -68,7 +70,8 @@ def send_email(
     ``attachments: list[str]`` - lista com caminho de anexos se houver. (default None).
     ``type_content: str`` - tipo de conteudo da mensagem pode ser 'plain' ou 'html' (default 'html').
     ``smtp_server: str`` - servidor a ser utilizado para conectar com a conta de email (default 'smtp.office365.com')
-    ``smtp_port: int`` - porta a ser utilizada nesse servidor (default 587) 
+    ``smtp_port: int`` - porta a ser utilizada nesse servidor (default 587 - TLS), comum usar 465 para autenticação por SSL 
+    ``authentication_tls: bool`` - metódo de autenticação (default True), caso Falso usa autenticação por SSL
     
     Retorno:
     ----------
@@ -141,11 +144,22 @@ def send_email(
 
     # SMTP server config
     try:
-        server_by_smtp = smtplib.SMTP(smtp_server, smtp_port)
-        server_by_smtp.starttls()
-        server_by_smtp.login(email_from, pass_from)
-        email_content = msg.as_string()
-
+        
+        # authentication TLS True -> Using TLS
+        if authentication_tls:
+            
+            server_by_smtp = smtplib.SMTP(smtp_server, smtp_port)
+            server_by_smtp.starttls()
+            server_by_smtp.login(email_from, pass_from)
+            email_content = msg.as_string()
+            
+        else: # authentication TLS False -> Using SSL
+            
+            # connect SMTP server using SSL
+            server_by_smtp = smtplib.SMTP_SSL(smtp_server, smtp_port)
+            server_by_smtp.login(email_from, pass_from)
+            email_content = msg.as_string()
+            
         # Treats the email list before trying to send, keeping only valid emails
         try:  
             for emails in email_to:
@@ -170,7 +184,7 @@ def send_email(
             except smtplib.SMTPException as e:
                 error_print(f"The email: {email} don't sent, caused by error: {str(e)}")
 
-        server_by_smtp.quit()
+        #server_by_smtp.quit()
         result['success'] = True
         success_print(f'Email(s) Sent!')
 
@@ -178,6 +192,9 @@ def send_email(
     except smtplib.SMTPException as e:
         result['success'] = False
         error_print(f'Error while trying sent Email: {str(e)}')
+        
+    finally:
+        server_by_smtp.quit()
 
     # Postprocessing
     result['valid_mails'] = email_valido

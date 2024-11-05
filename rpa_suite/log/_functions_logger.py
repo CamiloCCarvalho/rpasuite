@@ -17,7 +17,7 @@ def log_start_run_debug(msg_start_loggin: str) -> None: # represent start applic
         success_print(f'{msg_start_loggin}')
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_start_run_debug.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_start_run_debug.__name__}! Error: {str(e)}')
 
 
 def log_debug(msg) -> None:
@@ -30,7 +30,7 @@ def log_debug(msg) -> None:
         logging.debug(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_debug.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_debug.__name__}! Error: {str(e)}')
 
 def log_info(msg) -> None:
 
@@ -42,7 +42,7 @@ def log_info(msg) -> None:
         logging.info(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_debug.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_debug.__name__}! Error: {str(e)}')
         
 def log_info(msg) -> None:
 
@@ -54,7 +54,7 @@ def log_info(msg) -> None:
         logging.info(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_info.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_info.__name__}! Error: {str(e)}')
 
 
 def log_warning(msg) -> None:
@@ -67,7 +67,7 @@ def log_warning(msg) -> None:
         logging.warning(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_warning.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_warning.__name__}! Error: {str(e)}')
 
 
 def log_error(msg) -> None:
@@ -80,7 +80,7 @@ def log_error(msg) -> None:
         logging.error(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_error.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_error.__name__}! Error: {str(e)}')
 
 
 def log_critical(msg) -> None:
@@ -93,4 +93,4 @@ def log_critical(msg) -> None:
         logging.critical(msg)
 
     except Exception as e:
-        error_print(f'Erro durante a função: {log_critical.__name__}! Error: {str(e)}')
+        error_print(f'Error to execute function:{log_critical.__name__}! Error: {str(e)}')
