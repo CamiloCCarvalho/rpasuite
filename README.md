@@ -1,4 +1,4 @@
-![RPA Suite](https://raw.githubusercontent.com/CamiloCCarvalho/rpa_suite/refs/heads/master/logo-rpa-suite.png)
+![RPA Suite](https://raw.githubusercontent.com/CamiloCCarvalho/rpa_suite/db6977ef087b1d8c6d1053c6e0bafab6b690ac61/logo-rpa-suite.svg)
 
 <h1 align="left">
     RPA Suite
