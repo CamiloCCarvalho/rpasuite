@@ -132,15 +132,16 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
         - **string_validator** - Função que valida presença de letras, palavras, e textos e possibilita contar as ocorrencias em uma string
 
 ## Release
-Versão: **Beta 1.3.0**
+Versão: **Beta 1.3.1**
 
 Lançamento: *20/02/2024*
-Última atualização: *05/11/2024*
+
+Última atualização: *10/11/2024*
 
 Status: Em desenvolvimento.
 
-
-### Notas da ultima atualização
+#
+### Notas da atualização: 1.3.1
 
 - Correções de bugs em diversas funções relacionadas a tempo: *exec_at_hour* , *wait_for_exec* , *exec_and_wait*
 - Correções de bugs com tempo superior a 10 minutos nas funções de data: *get_hms* e *get_dma*
@@ -150,6 +151,8 @@ Status: Em desenvolvimento.
 - Correção de bug na função *"count_files"* para realizar de maneira correta a soma de todos arquivos nos diretórios
 - Funções de regex e busca em textos por strings e palavras atualizadas
 - Implementado nova função para arquivo de flag para execuções, no submodulo file, as funções são: *"file_flag_create"* e *"file_flag_delete"*
+- correção de imports no arquivo suite.py das funções *"get_dmy"* e *"search_str_in"*
+- ajuste de cores no svg da logo rpa-suite
 
 ## Mais Sobre
 

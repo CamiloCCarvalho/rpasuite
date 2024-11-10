@@ -113,8 +113,8 @@ def search_str_in(
     
     # Postprocessing
     if result['is_found']:
-        success_print(f'Function: {search_in.__name__} found: {result["number_occurrences"]} occurrences for "{searched_word}".')
+        success_print(f'Function: {search_str_in.__name__} found: {result["number_occurrences"]} occurrences for "{searched_word}".')
     else:
-        success_print(f'Function: {search_in.__name__} found no occurrences of "{searched_word}" during the search.')
+        success_print(f'Function: {search_str_in.__name__} found no occurrences of "{searched_word}" during the search.')
     
     return result

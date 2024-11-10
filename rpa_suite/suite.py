@@ -33,7 +33,7 @@ from .clock.exec_at import exec_at_hour
 
 
 """MODULE DATE"""
-from .date.date import get_hms, get_dma
+from .date.date import get_hms, get_dmy
 
 
 """MODULE EMAIL"""
@@ -60,7 +60,7 @@ from .regex.pattern_in_text import check_pattern_in_text
 
 """MODULE VALIDATE"""
 from .validate.mail_validator import valid_emails
-from .validate.string_validator import search_in
+from .validate.string_validator import search_str_in
 
 
 class Rpa_suite():
@@ -96,7 +96,7 @@ class Rpa_suite():
 
     # date
     get_hms = get_hms
-    get_dma = get_dma
+    get_dmy = get_dmy
 
     # email
     send_email = send_email
@@ -134,7 +134,7 @@ class Rpa_suite():
 
     # validate
     valid_emails = valid_emails
-    search_in = search_in
+    search_str_in = search_str_in
 
 # Create a instance of Rpa_suite
 
