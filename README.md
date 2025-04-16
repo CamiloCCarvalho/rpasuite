@@ -5,7 +5,6 @@
 </h1>
 <br>
 
-![PyPI Latest Release](https://img.shields.io/pypi/v/rpa-suite.svg)
 [![PyPI Downloads](https://static.pepy.tech/badge/rpa-suite/month)](https://pepy.tech/projects/rpa_suite)
 ![PyPI Downloads](https://img.shields.io/pypi/dm/rpa-suite.svg?label=PyPI%20downloads)
 [![PyPI version](https://img.shields.io/pypi/v/rpa-suite)](https://pypi.org/project/rpa-suite/)
