@@ -7,7 +7,6 @@ from rpa_suite.functions._printer import error_print, success_print
 import time
 from typing import Callable, Any
 from datetime import datetime as dt
-from typing import Callable, Any
 
 
 class Clock():

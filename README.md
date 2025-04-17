@@ -19,8 +19,17 @@
 ## O que é?
 **RPA Suite:** um conjunto abrangente de ferramentas projetadas para simplificar e otimizar o desenvolvimento de projetos de automação RPA com Python. Embora nossa suíte seja um conjunto de Ferramentas de RPA especializado, sua versatilidade a torna igualmente útil para uma ampla gama de projetos de desenvolvimento. Esta desenvolvendo com Selenium, Botcity ou Playwright? Experimente a RPA Suite e descubra como podemos facilitar seu projeto, ou qualquer projeto de Robôs de Software.
 
-## Sumário do conteudo
+<br>
+
+## Documentação
+- **[Documentação no GitHub](https://github.com/CamiloCCarvalho/rpasuite/blob/master/docs/GUIDE.md)**
+Conta com guia de uso , instação e todas funcionalidades. 
+
+<br>
+
+## Sumário
 - [O que é?](#o-que-é)
+- [Documentação](#documentação)
 - [Sumário do conteudo](#sumário-do-conteudo)
 - [Destaque](#destaque)
 - [Objetivo](#objetivo)
@@ -30,7 +39,6 @@
 - [Estrutura do módulo](#estrutura-do-módulo)
 - [Release](#release)
 - [Mais Sobre](#mais-sobre)
-- [Notas da atualização: 1.4.9](#notas-da-atualização-149)
 
 
 ## Destaque
@@ -39,16 +47,23 @@
 
 **Simples**: Construímos as ferramentas de maneira mais direta e assertiva possível, utilizando apenas bibliotecas conhecidas no mercado para garantir o melhor desempenho possível.
 
+<br>
+
 ## Objetivo
 
 Nosso objetivo é se tornar a Biblioteca Python para RPA referência. Tornando o desenvolvimento de RPAs mais produtivo, oferecendo uma gama de funções para tal:
 
-- Envio de emails (já configurado e personalizavel)
-- Validação de emails (limpeza e tratamento)
-- Busca por palavras, strings ou substrings (patterns) em textos.
-- Criação e deleção de pasta/arquivo temporário com um comando
+- Envio e validação de Emails com apenas uma linha
+- Criação e Manipulação de registros de Logs
+- Busca por palavras, strings e padrões em textos
+- Criar e Deletar Pastas e arquivos temporarios
 - Console com mensagens de melhor visualização com cores definidas para alerta, erro, informativo e sucesso.
+- Módulo dedicado para execução com Paralelismo
+- Funções que facilitam execuções Assincronas
+- Registro de Screenshot com apenas um comando
 - E muito mais
+
+<br>
 
 ## Instalação
 Para **instalar** o projeto, utilize o comando:
@@ -93,6 +108,9 @@ rpa.email.send_mail(...)
 > python -m pip uninstall loguru mail_validator colorama pillow pyautogui
 > ```
 
+<br>
+
+
 ## Exemplo
 
 Do módulo principal, importe a suite. Ela retorna uma instância do Objeto de classe Rpa_suite, onde possui variáveis apontando para todas funções dos submódulos:
@@ -110,6 +128,7 @@ rpa.clock.wait_for_exec(time, my_function, param1, param2)
 # Usando submódulo email para envio de email por SMTP comum
 rpa.email.send_smtp(...)
 ```
+<br>
 
 ## Dependências
 
@@ -136,6 +155,8 @@ No setup do nosso projeto já estão inclusas as dependências, só será necess
 
 > **⚠️ IMPORTANTE:**
 > No caso da função de screenshot, é necessário ter as bibliotecas `pyautogui`, `pillow` e `pyscreeze` instaladas. Geralmente, a instalação de `pyautogui` já inclui as demais dependências necessárias.
+
+<br>
 
 ## Estrutura do módulo
 
@@ -210,12 +231,12 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
 ### Versão: **Beta 1.5.2**
 
 - **Data de Lançamento:** *20/02/2024*
-- **Última Atualização:** *15/04/2025*
+- **Última Atualização:** *17/04/2025*
 - **Status:** Em desenvolvimento
 
-Esta versão marca um grande avanço no desenvolvimento da RPA Suite, trazendo melhorias significativas na arquitetura, novas funcionalidades e maior simplicidade no uso. Confira as principais mudanças na seção [Notas da atualização: 1.5.2](#notas-da-atualização-152).
+Esta versão marca um grande avanço no desenvolvimento da RPA Suite, trazendo melhorias significativas na arquitetura, novas funcionalidades e maior simplicidade no uso. Confira as principais mudanças abaixo.
 
-### Notas da atualização: 1.5.2
+### Notas da atualização:
 
 - Submódulos agora são objetos internos do objeto principal `Suite`, acessíveis via `rpa.modulo.function()` ou diretamente pelo submódulo.
 - Estrutura reformulada para maior simplicidade, com pastas `core` (núcleo) e `utils` (ferramentas utilitárias).
