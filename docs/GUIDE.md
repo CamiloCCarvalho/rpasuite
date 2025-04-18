@@ -13,7 +13,8 @@ Você pode fazer a importação de pelo menos duas formas diferentes.
 
 ## Quick Start
 
-### Using Example
+### Instalation
+
 
 Primeiramente certifique-se de ter instalado o Python, este passo é muito importante 😄
 
@@ -38,6 +39,9 @@ pip install rpa_suite
 > **⚠️ Lembrete:**
 > para o uso em ambientes virtuais lembre-se de ativar o seu ambiente no terminal onde pretende fazer instalações.
 
+> **⚠️ Importante:**
+> Atualmente não estamos fazendo otimizações para versão na plataforma Linux, recomendamos o uso apenas na plataforma Windows (8.1 ou superior).
+
 <hr>
 <br>
 
@@ -45,9 +49,9 @@ pip install rpa_suite
 
 ### Form 1:
 
-A variavel **rpa** esta disponivel já na importação do modulo com a maioria dos objetos instanciados
+A variavel **rpa** esta disponivel já na importação do modulo com a maioria dos objetos instanciados.
 
-Assim sendo, você pode acessar diretamente os methodos do submodulo que esta usando em uma unica linha.
+Você pode acessar diretamente os metodos dos submodulos com esta variavel.
 
 ```python
 # Importando a suite instanciada com todas funcionalidades
@@ -60,19 +64,17 @@ rpa.log.config_logger()
 rpa.log.log_start_run_debug(f'teste')
 
 
-# result:
-# > este código deve gerar uma pasta no diretório raiz onde esta sendo executado, com um arquigo de log e gerar um log inicial
-
+# Este código deve gerar uma pasta 'log' no diretório raiz onde esta sendo executado, com um arquigo 'log.log' e escrever um log inicial no arquivo e no terminal
+>>> DD.MM.YY.HH:MM DEBUG    teste
 ```
 
 ### Form 2:
 
-Também deixamos o acesso facilitado para você instanciar a Suite de ferramentas criando seu proprio objeto.
+Também é possivel instanciar a Suite de ferramentas criando seu proprio objeto.
 
-Assim você importa a classe Suite e instancia, tendo acesso da mesma forma a todos recursos.
+Importe a classe ``Suite``, instancie  e acesse da mesma forma todos recursos.
 
 ```python
-
 # Importando objeto Suite para criar sua propria instancia
 from rpa_suite.suite import Suite
 
@@ -87,17 +89,15 @@ rpa.log.config_logger()
 rpa.log.log_start_run_debug(f'teste')
 
 
-# result:
-# > este código deve gerar uma pasta no diretório raiz onde esta sendo executado, com um arquigo de log e gerar um log inicial
-
+# Este código deve gerar uma pasta 'log' no diretório raiz onde esta sendo executado, com um arquigo 'log.log' e escrever um log inicial no arquivo e no terminal
+>>> DD.MM.YY.HH:MM DEBUG    teste
 ```
 
 ### Form 3:
 
-Também é possivel importar a variavel **suite** que tem os Objetos como classes para você instanciar.
+Opcionalmente pode usar a variavel **suite** que possui as classes disponiveis.
 
 ```python
-
 # Importando o objeto instanciado 'suite' também te dará acesso aos outros objetos 
 from rpa_suite import suite
 
@@ -110,15 +110,13 @@ my_logger.config_logger()
 # Gerando um log no arquivo
 my_logger.log_start_run_debug(f'teste')
 
-# result:
-# > Este código deve gerar uma pasta no diretório raiz onde esta sendo executado e escrever no arquigo de log
-
+# Este código deve gerar uma pasta 'log' no diretório raiz onde esta sendo executado, com um arquigo 'log.log' e escrever um log inicial no arquivo e no terminal
+>>> DD.MM.YY.HH:MM DEBUG    teste
 ```
-
 
 ### Form 4:
 
-Também é possivel importar a variavel **suite** que tem os Objetos como classes para você instanciar.
+Para usar isoladamente apenas um Submodulo, acesse ``core`` e faça a importação do modulo desejado.
 
 ```python
 
@@ -134,27 +132,26 @@ my_logger.config_logger()
 # Escrevendo no arquivo de log
 my_logger.log_start_run_debug(f'teste')
 
-# result:
-# > Este código deve gerar uma pasta no diretório raiz onde esta sendo executado e escrever no arquigo de log
+# Este código deve gerar uma pasta 'log' no diretório raiz onde esta sendo executado, com um arquigo 'log.log' e escrever um log inicial no arquivo e no terminal
+>>> DD.MM.YY.HH:MM DEBUG    teste
 ```
 
 <hr>
 <br>
 
-
 # Modules Guide
 
 ## Print
 
-Print é um submodulo do nosso conjunto. Este tem um caracteristica difernente dos demais.
+**Print** é um submodulo do nosso conjunto.
+Este tem um caracteristica difernente dos demais.
 
-Este possui o arquivo "print.py" dentro de "**core** e possui a classe Print como todos outros submodulos.
-
-Mas também é feita a implementação de todas seus methodos diretamente no objeto Suite a finalidade é facilitar seu uso já que provavelmente é a função mais utilizada da lib no dia a dia.
+Sua implementação foi feita tanto no Objeto raiz como também no seu modulo dedicado, acesse seus métodos tanto pela variavel ``rpa`` como também pela classe **Print**.
 
 Abaixo todos métodos e argumentos disponiveis de **Print**:
 
 Metodos:
+
 - ``success_print``
 - ``alert_print``
 - ``error_print``
@@ -165,9 +162,10 @@ Metodos:
 - ``print_return_fn``
 
 Argumentos:
-- ``string_text``
-- ``color``
-- ``ending``
+
+- ``string_text``: ``str``
+- ``color`` : ``Obj Colors``
+- ``ending`` : ``str``
 
 > Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
 >
@@ -175,11 +173,11 @@ Argumentos:
 >
 > `from rpa_suite.core import Print`
 
+<br>
 
 Exemplo de uso das funções de ``Print``:
 
 ```python
-
 # Importação do objeto instanciado de Suite
 from rpa_suite import rpa
 
@@ -216,13 +214,14 @@ rpa.print_return_fn(f'foo2')
 Abaixo variações do uso e possibilidade de mudar as cores a sua vontade:
 
 > É possivel mudar a cor do seu print a sua vontade, importe o objeto de cores para isso.
-> 
+>
 > Defina também o "ending" assim como o print padrão do python.
+
+<br>
 
 Exemplo manipulando as cores e o ending:
 
 ```python
-
 # Importação do objeto de Suite e Colors
 from rpa_suite import rpa
 from rpa_suite.core.print import Colors
@@ -241,21 +240,29 @@ rpa.info_print(string_text=f'All arguments explicts',
 
 <br>
 
-
 ## Date
 
-Date é um Objeto simples que tem por finalidade apenas acelerar a conversão de Data e Hora, em muitos casos precisamos capturar Datas o que já é bem facil, no entando queremos pular a parte chata de ter que ficar formatando as datas e horas.
+**Date** é um Objeto simples que tem por finalidade apenas acelerar a conversão de Data e Hora.
+Em muitos casos precisamos capturar Datas o que já é bem facil, no entando queremos pular a parte chata de ter que ficar formatando.
 
-Sua principal funcionalidade é devolver uma tupla ja com **Dia**, **Mes** e **Ano** formatada como **string** usando 2 digitos e o ano em 4 digitos. O mesmo valoe para **Horas**, **Minutos** e **Segundos**.
+Sua principal funcionalidade é devolver uma tupla ja com **Dia**, **Mes** e **Ano** formatada como **string** usando 2 digitos e o ano em 4 digitos. O mesmo valoe para **Horas**, **Minutos** e **Segundos** (este ultimo apenas com 2 digitos).
 
 Abaixo todos métodos e argumentos disponiveis de **Date**:
 
 Metodos:
+
 - ``get_dmy``
 - ``get_hms``
 
 Argumentos:
+
 - ``Na verão atual não há argumentos``
+
+Retorno:
+
+- ``get_dmy``  -> ``Tuple(str)``: ``'dd', 'mm', 'YYYY'``
+- ``get_hms``  -> ``Tuple(str)``: ``'hour', 'min', 'sec'``
+- Obs.: Apenas "Year" tem 4 digitos, os demais dados são sempre em 2 digitos **string**.
 
 > Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
 >
@@ -263,10 +270,11 @@ Argumentos:
 >
 > `from rpa_suite.core import Date`
 
+<br>
+
 Exemplo de uso dos Metodos de ``Date``:
 
 ```python
-
 # Importando a suite instanciada com todas funcionalidades
 from rpa_suite import rpa
 
@@ -277,49 +285,56 @@ dd, mm, yyyy = rpa.date.get_dmy()
 hour, minute, sec = rpa.date.get_hms()
 
 # exibindo o retorno obtido para data
-rpa.info_print(f'{dd}/{mm}/{yyyy}')
+rpa.info_print(f'date: {dd}/{mm}/{yyyy}')
 
 # exibindo o retorno obtido para horario
-rpa.info_print(f'{hour}/{minute}/{sec}')
+rpa.info_print(f'hour: {hour}:{minute}:{sec}')
+
+>>> date: 18/04/2025
+>>> hour: 04:44:29
 ```
 
 <br>
 
 ## Clock
 
-CLock é um Objeto dedicado a fazer controle de execução quando é necessario aguardar para executar, executar e aguardar ou até mesmo executar num horario especifico determinado bloco de código, funções e até mesmo servir como uma especie de Schedule para execução do seu RPA. 
+**CLock** é um Objeto dedicado a fazer controle de execução.
+Por vezes precisamos que um bloco de código ou uma função inteira aguarde, execute e espere, ou até mesmo podemos usar como Schedule para um robo inteiro.
 
 Abaixo todos métodos e argumentos disponiveis de **Clock**:
 
-
 Metodo ``exec_at_hour``:
-- Função temporizada, executa a função no horário especificado, por ``default`` executa no momento da chamada em tempo de execução, opcionalmente pode escolher o horário para execução, sendo uma string contendo horas e minutos com dois digitos como demonstrado a seguir: ``hh:mm``
 
+- Função temporizada, executa a função no horário especificado, por ``default`` executa no momento da chamada em tempo de execução, opcionalmente pode escolher o horário para execução, sendo uma ``string`` contendo horas e minutos com dois digitos como demonstrado a seguir: ``'hh:mm'``.
 - Parametros:
-  - ``hour_to_exec``: Horario para execução do tipo ``string`` `hh:mm`
-  - ``fn_to_exec``: Sua função que deseja que execute.
-  - ``*args*``: Argumentos posicionais da sua função.
-  - ``**kwargs``: Argumentos nomeados da sua função.
+
+  - ``hour_to_exec`` : ``str`` - Horario no formato `'hh:mm'`.
+  - ``fn_to_exec``: ``Callable`` - Função que deseja executar.
+  - ``*args*``: Argumentos posicionais da função.
+  - ``**kwargs``: Argumentos nomeados da função.
 
 <br>
 
 Metodo ``wait_for_exec``:
-- Função temporizada, aguarda uma quantidade de tempo em segundos para executa a função em seguida, por ``default`` executa no momento da chamada em tempo de execução.
 
+- Função temporizada, aguarda uma quantidade de tempo em **segundos** para executa a função em seguida.
+Por ``default`` executa no momento da chamada em tempo de execução.
 - Parametros:
-  - ``wait_time``: Tempo em segundos para aguardar, tipo ``int``
-  - ``fn_to_exec``: Sua função que deseja que execute.
+
+  - ``wait_time`` : ``int`` - Tempo em segundos para aguardar.
+  - ``fn_to_exec`` : ``Callable`` - Função que deseja executar.
   - ``*args*``: Argumentos posicionais da sua função.
   - ``**kwargs``: Argumentos nomeados da sua função.
 
 <br>
 
 Metodo ``exec_and_wait``:
-- Função temporizada, executa a função do argumento e em seguinda aguarda o tempo desejado em segundos, por ``default`` executa no momento da chamada em tempo de execução.
 
+- Função temporizada, executa a função do argumento e em seguinda aguarda o tempo desejado em segundos, por ``default`` executa no momento da chamada em tempo de execução.
 - Parametros:
-  - ``wait_time``: Tempo em segundos para aguardar após execução, tipo ``int``
-  - ``fn_to_exec``: Sua função que deseja que execute.
+
+  - ``wait_time``:``int`` - Tempo em segundos para aguardar após execução.
+  - ``fn_to_exec``: ``Callable`` - Função que deseja executar.
   - ``*args*``: Argumentos posicionais da sua função.
   - ``**kwargs``: Argumentos nomeados da sua função.
 
@@ -331,10 +346,11 @@ Metodo ``exec_and_wait``:
 >
 > `from rpa_suite.core import Clock`
 
+<br>
+
 Exemplo de uso ``exec_at_hour``:
 
 ```python
-
 # Importando a suite instanciada com todas funcionalidades
 from rpa_suite import rpa
 
@@ -354,18 +370,15 @@ b = 9
 rpa.clock.exec_at_hour('12:52', sum, a, b)
 
 # result: A função soma deve ser executada no horario 12:52 do sistema onde esta rodando  o código.
-# >>> 27
-# >>> sum: Successfully executed!
-
+>>> 27
+>>> sum: Successfully executed!
 ```
 
 <br>
 
-
 Exemplo de uso ``wait_for_exec``:
 
 ```python
-
 # Importando a suite instanciada com todas funcionalidades
 from rpa_suite import rpa
 
@@ -385,9 +398,8 @@ b = 9
 rpa.clock.wait_for_exec(10, sum, a, b)
 
 # result: A função soma deve ser executada após o tempo definido.
-# >>> 27
-# >>> Function: wait_for_exec executed the function: sum.
-
+>>> 27
+>>> Function: wait_for_exec executed the function: sum.
 ```
 
 <br>
@@ -395,7 +407,6 @@ rpa.clock.wait_for_exec(10, sum, a, b)
 Exemplo de uso ``exec_and_wait``:
 
 ```python
-
 # Importando a suite instanciada com todas funcionalidades
 from rpa_suite import rpa
 
@@ -422,13 +433,166 @@ rpa.success_print(f'Run after: {time_await}')
 >>> 27
 >>> Function: wait_for_exec executed the function: sum.
 >>> Run after: 10
+```
+
+<br>
+
+
+## Directory
+
+**Directory** é um Objeto dedicado a manipulação de diretórios, criação de pastas, exclusão de pastas, e exclusão de conteudos dentro de pastas.
+
+Abaixo todos métodos e argumentos disponiveis de **Directory**:
+
+Metodo ``create_temp_dir``:
+
+- Função responsavel por criar diretório temporário, pode também criar diretório com nome desejado e salvar o path relativo para uso posterior. Por ``default`` o nome do diretório é "temp" e o caminho é onde esta sendo executada a função
+- Argumentos:
+
+  - ``path_to_create``: ``str`` - Caminho para criar o diretório.
+  - ``name_temp_dir``: ``str`` - Nome desejado para o diretório.
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+
+<br>
+
+Metodo ``delete_temp_dir``:
+
+- Função responsavel por deletar diretório temporário, pode também deletar diretório com nome desejado e opcionalmente excluir diretórios que estejam populados com conteudo. Por ``default`` o nome do diretório é "temp" e o caminho é onde esta sendo executada a função.
+- Argumentos:
+
+  - ``path_to_delete``: ``str`` - Caminho para deletar o diretório
+  - ``name_temp_dir``: ``str`` - Nome do diretório a deletar
+  - ``delete_files``: ``bool`` - Opção se deseja excluir diretório mesmo populado
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal
+
+<br>
+
+> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
+>
+> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
+>
+> `from rpa_suite.core import Directory`
+
+<br>
+
+Exemplo de uso ``create_temp_dir``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# Acessando a instancia de 'dir' directory acessamos seu método para criar uma pasta temporaria
+result = rpa.directory.create_temp_dir()
+
+# Exibindo o dict de resultado obtido com o retorno da função
+# A função retorna um dict com o status de sucesso e o path da pasta criada
+rpa.success_print(result)
+
+>>> A função deve criar uma pasta chamada 'temp' no diretório onde esta sendo executado este código.
+>>> result: {'success': True, 'path_created': 'C:\\User\\path\\to\\your_project\\temp'}
+
+
+# Usando argumentos
+result_example2 = rpa.directory.create_temp_dir(path_to_create=r'.\docs', name_temp_dir='mydir')
+
+# Exibindo o dict de resultado obtido com o retorno da função
+# A função retorna um dict com o status de sucesso e o path da pasta criada
+rpa.success_print(result_example2)
+
+>>> A função deve criar uma pasta chamada 'docs' e interna a esta outra chamada 'mydir' considerando a raiz atual como ponto de partida.
+>>> result_example2: {'success': True, 'path_created': '.\\docs\\mydir'}
+```
+
+<br>
+
+Exemplo de uso ``delete_temp_dir``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# Acessando a instancia de 'dir' directory acessamos seu método para criar uma pasta temporaria
+result = rpa.directory.delete_temp_dir()
+
+# Exibindo o dict de resultado obtido com o retorno da função
+# A função retorna um dict com o status de sucesso e o path da pasta deletada
+rpa.success_print(result)
+
+>>> A função deve deleta uma pasta chamada 'temp' no diretório onde esta sendo executado este código.
+>>> result: {'success': True, 'path_deleted': 'C:\\Intel\\PERSONAL\\_rpa_suite\\test_suite\\temp'}
+
+# Usando argumentos
+result_example2 = rpa.directory.delete_temp_dir(
+    path_to_delete=r'.\docs', 
+    name_temp_dir='mydir',
+    delete_files=True)
+
+# Exibindo o dict de resultado obtido com o retorno da função
+# A função retorna um dict com o status de sucesso e o path da pasta deletada
+rpa.success_print(result_example2)
+
+>>> A função deve deletar uma pasta chamada 'mydir' interna em relação a pasta 'docs' considerando a raiz atual como ponto de partida.
+>>> result_example2: {'success': True, 'path_deleted': '.\\docs\\mydir'}
+```
+
+## Email
+
+**Email** é um Objeto dedicado a emails, envio e manipulação, no entanto temos apenas formato SMPT implementado, *em breve vamos disponibilizar outros métodos*.
+
+Abaixo todos métodos e argumentos disponiveis de **Email**:
+
+Metodo ``send_smtp``:
+
+- Função responsavel por fazer envio de emails usando SMTP, com possibilidade de incluir anexos, a finalidade é reduzir a quantidade de código usado para tal, pois emails precisam de muitos detalhes declarados.
+Por ``default`` o servidor, a porta e a autenticação são definidos seguindo o padrão da hostinger, e o body do email já é definido para aceitar conteudo em HTML.
+
+- Argumentos:
+
+  - ``email_user`` : ``str`` - Email do remetente.
+  - ``email_password`` : ``str`` - Senha do remetente.
+  - ``email_to`` : ``str`` - Email do destinatario.
+  - ``subject_title`` : ``str`` - Titulo do email.
+  - ``body_message`` : ``str`` - Mensagem do Email, **aceita HTML**.
+  - ``attachments`` : ``list[str]`` - Lista com path de anexos.
+  - ``smtp_server`` : ``str`` - Servidor a utilizar.
+  - ``smtp_port`` : ``int`` - Porta a utilizar.
+  - ``auth_tls`` : ``bool`` - Tipo de autenticação, se **False usa SSL**.
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+
+<br>
+
+> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
+>
+> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
+>
+> `from rpa_suite.core import Email`
+
+<br>
+
+Exemplo de uso ``send_smtp``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# Acessando a instancia de 'Email' acessamos seu método para enviar email por SMTP
+rpa.email.send_smtp(email_user='your@email.com',
+                    email_password='your_password',
+                    email_to='destiny@email.com',
+                    subject_title='Test Title',
+                    body_message='Test body message.',
+                    attachments=['C:/Users/rpa_suite/Pictures/logo_rpa_suite.jpg'],
+                    smtp_server='smtp.gmail.com',
+                    smtp_port=587,
+                    auth_tls=False,
+                    display_message=True)
 
 ```
 
 <br>
 
 
-### ***Other modules guide comming soon!***
 
+## ***Other modules guide comming soon!***
 
-
+<br>

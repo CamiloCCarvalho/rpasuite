@@ -58,7 +58,8 @@ class Directory():
 
     def create_temp_dir(self,
                         path_to_create: str = 'default',
-                        name_temp_dir: str='temp') -> dict[str, Union[bool, str, None]]:
+                        name_temp_dir: str='temp',
+                        display_message: bool = False) -> dict[str, Union[bool, str, None]]:
 
         """
         Function responsible for creating a temporary directory to work with files and etc. \n
@@ -68,6 +69,8 @@ class Directory():
         ``path_to_create: str`` - should be a string with the full path pointing to the folder where the temporary folder should be created, if it is empty the ``default`` value will be used which will create a folder in the current directory where the file containing this function was called.
 
         ``name_temp_dir: str`` - should be a string representing the name of the temporary directory to be created. If it is empty, the ``temp`` value will be used as the default directory name.
+
+        ``display_message: bool`` - should be a bool to display messages on terminal, by default False.
 
         Return:
         ----------
@@ -84,6 +87,8 @@ class Directory():
         ``path_to_create: str`` - deve ser uma string com o path completo apontando para a pasta onde deve ser criada a pasta temporaria, se estiver vazio sera usado valor ``default`` que criará pasta no diretório atual onde o arquivo contendo esta função foi chamada.
 
         ``name_temp_dir: str`` - deve ser uma string representando o nome do diretório temporário a ser criado. Se estiver vazio, o valor ``temp`` será usado como o nome padrão do diretório.
+
+        ``display_message: bool`` - deve ser um bool para exibir mensagens no terminal, por padrão False.
 
         Retorno:
         ----------
@@ -115,17 +120,17 @@ class Directory():
                 result['success'] = True
                 result['path_created'] = fr'{full_path}'
 
-                success_print(f"Diretório:'{full_path}' foi criado com sucesso.")
+                if display_message: success_print(f"Directory:'{full_path}' successfully created.")
 
             except FileExistsError:
                 result['success'] = False
                 result['path_created'] = None
-                alert_print(f"Diretório:'{full_path}' já existe.")
+                if display_message: alert_print(f"Directory:'{full_path}' already exists.")
 
             except PermissionError:
                 result['success'] = False
                 result['path_created'] = None
-                alert_print(f"Permissão negada: não é possível criar o diretório '{full_path}'.")
+                alert_print(f"Permission denied: Not possible to create Directory '{full_path}'.")
 
         except Exception as e:
             result['success'] = False
@@ -139,7 +144,8 @@ class Directory():
     def delete_temp_dir(self,
                         path_to_delete: str = 'default',
                         name_temp_dir: str='temp',
-                        delete_files: bool = False) -> dict[str, Union[bool, str, None]]:
+                        delete_files: bool = False,
+                        display_message: bool = False) -> dict[str, Union[bool, str, None]]:
 
         """
         Function responsible for deleting a temporary directory. \n
@@ -209,16 +215,16 @@ class Directory():
                     result['success'] = True
                     result['path_deleted'] = fr'{full_path}'
 
-                    success_print(f"Diretório:'{full_path}' foi deletado com sucesso.")
+                    if display_message: success_print(f"Directory:'{full_path}' successfully delete.")
                 else:
                     result['success'] = False
                     result['path_deleted'] = None
-                    alert_print(f"Diretório:'{full_path}' não existe.")
+                    if display_message: alert_print(f"Directory:'{full_path}' don't exists.")
 
             except PermissionError:
                 result['success'] = False
                 result['path_deleted'] = None
-                alert_print(f"Permissão negada: não é possível deletar o diretório '{full_path}'.")
+                alert_print(f"Permission denied: Not possible to delete Directory '{full_path}'.")
 
         except Exception as e:
             result['success'] = False
