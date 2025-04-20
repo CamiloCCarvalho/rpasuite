@@ -15,7 +15,6 @@ Você pode fazer a importação de pelo menos duas formas diferentes.
 
 ### Instalation
 
-
 Primeiramente certifique-se de ter instalado o Python, este passo é muito importante 😄
 
 Segundo passo também é essencial que seria instalar a nossa lib:
@@ -47,7 +46,7 @@ pip install rpa_suite
 
 ## Usage Guide
 
-### Form 1:
+### Form 1: Using variable rpa _(recommended)_
 
 A variavel **rpa** esta disponivel já na importação do modulo com a maioria dos objetos instanciados.
 
@@ -68,7 +67,7 @@ rpa.log.log_start_run_debug(f'teste')
 >>> DD.MM.YY.HH:MM DEBUG    teste
 ```
 
-### Form 2:
+### Form 2: Using object Suite
 
 Também é possivel instanciar a Suite de ferramentas criando seu proprio objeto.
 
@@ -93,7 +92,7 @@ rpa.log.log_start_run_debug(f'teste')
 >>> DD.MM.YY.HH:MM DEBUG    teste
 ```
 
-### Form 3:
+### Form 3: Using variable suite
 
 Opcionalmente pode usar a variavel **suite** que possui as classes disponiveis.
 
@@ -114,7 +113,7 @@ my_logger.log_start_run_debug(f'teste')
 >>> DD.MM.YY.HH:MM DEBUG    teste
 ```
 
-### Form 4:
+### Form 4: Modular use
 
 Para usar isoladamente apenas um Submodulo, acesse ``core`` e faça a importação do modulo desejado.
 
@@ -298,7 +297,7 @@ rpa.info_print(f'hour: {hour}:{minute}:{sec}')
 
 ## Clock
 
-**CLock** é um Objeto dedicado a fazer controle de execução.
+**Clock** é um Objeto dedicado a fazer controle de execução.
 Por vezes precisamos que um bloco de código ou uma função inteira aguarde, execute e espere, ou até mesmo podemos usar como Schedule para um robo inteiro.
 
 Abaixo todos métodos e argumentos disponiveis de **Clock**:
@@ -310,7 +309,7 @@ Metodo ``exec_at_hour``:
 
   - ``hour_to_exec`` : ``str`` - Horario no formato `'hh:mm'`.
   - ``fn_to_exec``: ``Callable`` - Função que deseja executar.
-  - ``*args*``: Argumentos posicionais da função.
+  - ``*args``: Argumentos posicionais da função.
   - ``**kwargs``: Argumentos nomeados da função.
 
 <br>
@@ -318,12 +317,12 @@ Metodo ``exec_at_hour``:
 Metodo ``wait_for_exec``:
 
 - Função temporizada, aguarda uma quantidade de tempo em **segundos** para executa a função em seguida.
-Por ``default`` executa no momento da chamada em tempo de execução.
+  Por ``default`` executa no momento da chamada em tempo de execução.
 - Parametros:
 
   - ``wait_time`` : ``int`` - Tempo em segundos para aguardar.
   - ``fn_to_exec`` : ``Callable`` - Função que deseja executar.
-  - ``*args*``: Argumentos posicionais da sua função.
+  - ``*args``: Argumentos posicionais da sua função.
   - ``**kwargs``: Argumentos nomeados da sua função.
 
 <br>
@@ -335,7 +334,7 @@ Metodo ``exec_and_wait``:
 
   - ``wait_time``:``int`` - Tempo em segundos para aguardar após execução.
   - ``fn_to_exec``: ``Callable`` - Função que deseja executar.
-  - ``*args*``: Argumentos posicionais da sua função.
+  - ``*args``: Argumentos posicionais da sua função.
   - ``**kwargs``: Argumentos nomeados da sua função.
 
 <br>
@@ -437,7 +436,6 @@ rpa.success_print(f'Run after: {time_await}')
 
 <br>
 
-
 ## Directory
 
 **Directory** é um Objeto dedicado a manipulação de diretórios, criação de pastas, exclusão de pastas, e exclusão de conteudos dentro de pastas.
@@ -460,10 +458,10 @@ Metodo ``delete_temp_dir``:
 - Função responsavel por deletar diretório temporário, pode também deletar diretório com nome desejado e opcionalmente excluir diretórios que estejam populados com conteudo. Por ``default`` o nome do diretório é "temp" e o caminho é onde esta sendo executada a função.
 - Argumentos:
 
-  - ``path_to_delete``: ``str`` - Caminho para deletar o diretório
-  - ``name_temp_dir``: ``str`` - Nome do diretório a deletar
-  - ``delete_files``: ``bool`` - Opção se deseja excluir diretório mesmo populado
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal
+  - ``path_to_delete``: ``str`` - Caminho para deletar o diretório.
+  - ``name_temp_dir``: ``str`` - Nome do diretório a deletar.
+  - ``delete_files``: ``bool`` - Opção se deseja excluir diretório mesmo populado.
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
 
 <br>
 
@@ -544,8 +542,7 @@ Abaixo todos métodos e argumentos disponiveis de **Email**:
 Metodo ``send_smtp``:
 
 - Função responsavel por fazer envio de emails usando SMTP, com possibilidade de incluir anexos, a finalidade é reduzir a quantidade de código usado para tal, pois emails precisam de muitos detalhes declarados.
-Por ``default`` o servidor, a porta e a autenticação são definidos seguindo o padrão da hostinger, e o body do email já é definido para aceitar conteudo em HTML.
-
+  Por ``default`` o servidor, a porta e a autenticação são definidos seguindo o padrão da hostinger, e o body do email já é definido para aceitar conteudo em HTML.
 - Argumentos:
 
   - ``email_user`` : ``str`` - Email do remetente.
@@ -589,9 +586,133 @@ rpa.email.send_smtp(email_user='your@email.com',
 
 ```
 
+## File
+
+**File** é um Objeto dedicado a operações basicas com arquivos, como contagem, criação e exclusão. Porem com finalidades mais definidas para acelerar o desenvolvimento e facilitar tarefas simples.
+
+Abaixo todos métodos e argumentos disponiveis de **File**:
+
+Metodo ``flag_create``:
+
+- Função responsavel por criar um arquivo que serve como flag para indicar a execução do script, automação ou aplicação.
+  Por ``default`` o nome do arquivo é ``running.flag`` porem pode ser mudando via argumento, e o diretório onde é criado é a raiz onde esta sendo executado, podendo este também ser alterado via parametros.
+- Argumentos:
+
+  - ``name_file`` : ``str`` - Nome do arquivo desejado incluindo a extensão.
+  - ``path_to_create`` : ``str`` - Caminho do diretório onde deve ser criado o arquivo.
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+
 <br>
 
+Metodo ``flag_delete``:
 
+- Função responsavel por deletar um arquivo que serve como flag para indicar a execução do script, automação ou aplicação.
+  Por ``default`` o nome do arquivo é ``running.flag`` porem pode ser mudando via argumento, e o diretório onde ira excluir é a raiz onde esta sendo executado, podendo este também ser alterado via parametros.
+- Argumentos:
+
+  - ``name_file`` : ``str`` - Nome do arquivo desejado incluindo a extensão.
+  - ``path_to_delete`` : ``str`` - Caminho do diretório onde deve ser excluido o arquivo.
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+
+<br>
+
+Metodo ``count_files``:
+
+- Função responsavel por contar arquivos em um diretório, possivel especificar o diretório onde deseja contar e a extensão desejada, principal caracteristica é que ja percorreo as demais pastas internas se houver.
+  Por ``default`` o caminho onde busca pelo diretório é a raiz onde esta sendo executado ``'.'`` usando assim por padrão o caminho relativo, também é definido que busque por todas extensões. A contagem é retornada em um ``dict``.
+- Argumentos:
+
+  - ``dir_to_count`` : ``str`` - Caminho para o diretório desejado para fazer a contagem
+  - ``type_extension`` : ``str`` - Extensão que deseja realizar a contagem.
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+
+<br>
+
+Metodo ``screen_shot``:
+
+- Função responsavel por registrar uma imagem do monitor utilizado, podendo passar diversos argumentos para parametrizar da melhor maneira que deseja, principal caracteristica é que cria tanto a pasta como o arquivo de maneira automatica se nenhum argumento for passado, registrando cada imagem com uso de data e horario para poder registrar multiplas imagens se necessario.
+  Por ``default`` o caminho onde cria o diretório é a raiz onde esta sendo executado e o nome do diretório é ``screenshots``, e o nome do arquivo é ``'screenshot_dd_mm_aaaa-hh-mm-ss.png'``.
+- Argumentos:
+
+  - ``file_name`` : ``str`` - Nome do arquivo, ``default`` sendo ``'screenshot'``.
+  - ``path_dir`` : ``str`` - Caminho para criar o diretório.
+  - ``save_with_date`` : ``bool`` - Se deseja a data no nome do arquivo, ``default`` sendo ``'True'``.
+  - ``delay`` : ``int`` - Atraso para geração de imagem, ``default`` sendo ``1``.
+  - ``use_default_path_and_name`` : ``bool`` - Se deseja usar nome e caminho padrão, por padrão ``True``.
+  - ``name_ss_dir`` : ``str`` - Nome desejado para o diretório caso não escolha manter o padrão.
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+
+
+<br>
+
+> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
+>
+> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
+>
+> `from rpa_suite.core import File`
+
+<br>
+
+Exemplo de uso ``flag_create``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# Acessando a instancia de 'File' acessamos seu método para criar um arquivo de flag no diretório onde esta sendo executado este arquivo
+rpa.file.flag_create(name_file='running_my_bot.flag',
+                    display_message=True)
+
+
+>>> Flag file created.
+```
+
+Exemplo de uso ``flag_delete``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# Acessando a instancia de 'File' acessamos seu método para deletar um arquivo de flag no diretório onde esta sendo executado este arquivo
+rpa.file.flag_delete(name_file='running_my_bot.flag',
+                    display_message=True)
+
+
+>>> Flag file deleted.
+```
+
+Exemplo de uso ``count_files``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# Considere que existe a pasta 'docs' no mesmo nivel deste arquivo, com 3 arquivos dentro dela
+
+# Acessando a instancia de 'File' acessamos seu método para contar arquivos, caminho relativo passado em forma de lista caso queira contar varios diretórios
+result = rpa.file.count_files(['docs'], display_message=True)
+rpa.success_print(result)
+
+
+>>> Function: count_files counted 3 files.
+>>> {'success': True, 'qt': 3}
+```
+
+Exemplo de uso ``screen_shot``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# !Important: Esta funcionalidade precisa das libs: pyautogui e pillow! (rpa_suite já as instala, porem verifique em caso de problemas)
+
+# Acessando a instancia de 'File' acessamos seu método para realizar screenshots com apenas uma linha.
+rpa.file.screen_shot()
+
+>>> Diretório:'C:\Users\You\your_project\here\screenshots' foi criado com sucesso.
+```
+
+<br>
 
 ## ***Other modules guide comming soon!***
 
