@@ -714,6 +714,24 @@ rpa.file.screen_shot()
 
 <br>
 
+## Pendentes:
+- Modulos (pré instanciados):
+  - log
+  - regex
+  - validate
+
+  Modulos (necessario instanciar no momento do uso):
+  - Asyncrun
+  - Parallel
+  - Browser
+
+  Em desenvolvimento:
+  - OCR: Leitura de multiplos tipos de documentos com multiplas saidas
+  - Computer Vision (Bot Desktop)
+  - Table (Excel/csv/odf)
+  - Database
+
+
 ## ***Other modules guide comming soon!***
 
 <br>
