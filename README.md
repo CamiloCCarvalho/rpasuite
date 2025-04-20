@@ -22,7 +22,7 @@
 <br>
 
 ## Documentação
-- **[Documentação no GitHub](https://github.com/CamiloCCarvalho/rpasuite/blob/master/docs/GUIDE.md)**
+- **[Documentação no GitHub](https://github.com/CamiloCCarvalho/rpasuite/wiki)**
 Conta com guia de uso , instação e todas funcionalidades. 
 
 <br>
