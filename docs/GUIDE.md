@@ -654,7 +654,7 @@ Metodo ``screen_shot``:
 - Função responsavel por registrar uma imagem do monitor utilizado, podendo passar diversos argumentos para parametrizar da melhor maneira que deseja, principal caracteristica é que cria tanto a pasta como o arquivo de maneira automatica se nenhum argumento for passado, registrando cada imagem com uso de data e horario para poder registrar multiplas imagens se necessario.
   
   Por ``default`` o caminho onde cria o diretório é a raiz onde esta sendo executado e o nome do diretório é ``screenshots``, e o nome do arquivo é ``'screenshot_dd_mm_aaaa-hh-mm-ss.png'``.
-  
+
 - Argumentos:
 
   - ``file_name`` : ``str`` - Nome do arquivo, ``default`` sendo ``'screenshot'``.
@@ -739,7 +739,7 @@ rpa.file.screen_shot()
 
 ## Log
 
-**Log** é um Objeto dedicado criação, registro e acompanhamento de logs. Sua estrutura é bastante simples conta com apenas 2 tipos de método, o primeiro para fazer a configuração, criando um diretório e arquivo para registro.
+**Log** é um Objeto dedicado a criação, registro e acompanhamento de logs. Sua estrutura é bastante simples conta com apenas 2 tipos de método, o primeiro para fazer a configuração, criando um diretório e arquivo para registro.
 
 O segundo tipo gerando os logs desejados. 
 
@@ -904,25 +904,120 @@ if result:
 <br>
 
 
+## Validate
+
+**Validate** é um Objeto dedicado para busca de palavras e padrões em texto, mantendo o conteudo original sem modificação e evitando falsos positivos de validações muito simples.
+
+Principais destaques: 
+  - A busca pode ser por string ou word, a busca por word valida os espaços em volta da palavra para evitar falsos positivos.
+  - O conteudo original não é alterado e não é necessario criar uma copia para fazer Lower e Upper para seu uso
+  - Também sera implementado a possibilidade de fazer ``replace`` de forma avançada para manter a originalidade do conteudo base. 
+
+Abaixo todos métodos e argumentos disponiveis de **Validate**:
+
+Metodo ``word``:
+
+- Função responsavel por realizar a busca de uma string ou palavra em uma string, com possibilidade de ser case sensitive e mudar a forma de validação da busca com _search_by_.
+
+  Por ``default`` o tipo de busca é ``'string'`` podendo ser alterado para ``'word'``.
+
+- Argumentos:
+
+  - ``origin_text`` : ``str`` - Conteudo de texto para a busca, deve ser uma string.
+  - ``searched_word`` : ``str`` - Padrão desejado para a busca.
+  - ``case_sensitivy`` : ``bool`` - Opção que indica se deve ser uma busca case sensitive.
+  - ``search_by`` : ``str`` - Opção que indica a forma de busca, pode ser ``string`` ou ``word``, a busca por _word_ divide a string original possibilitando encontrar apenas ocorrencias validas.
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
 
 
+<br>
+
+> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
+>
+> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
+>
+> `from rpa_suite.core import Validate`
+
+
+<br>
+
+Exemplo de uso ``word``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# Acessando a instancia de 'Validate' acessamos seu método que busca strings com foco em palavras. Implementaremos um retorno com numero de ocorrencias e as posições de inicio e fim de cada ocorrencia.
+result: dict = rpa.validate.word(origin_text='Texto de origem', searched_word='Origem', case_sensitivy=True, search_by='string', display_message=True)
+
+rpa.success_print(result)
+
+>>> Function: word found no occurrences of "Origem" during the search.
+>>> {'is_found': False, 'number_occurrences': 0, 'positions': []}
+```
+
+<br>
+
+Metodo ``emails``:
+
+- Função responsavel por realizar validação de emails, que deve ser passado como uma lista de strings, sua implementação utiliza a biblioteca __mail_validator__.
+
+- Argumentos:
+
+  - ``email_list`` : ``list[str]`` - Lista de emails que deseja validar.
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+
+- Retorno:
+  - ``dict``: Dicionario que indica os resultados.
+      - ``success``: ``bool`` - Chave que indica verdadeiro apenas se **todos** emails forem validos.
+      - ``valid_emails``: ``list[str]`` - Lista de emails que são validos.
+      - ``invalid_emails``: ``lis[str]`` - Lista de emails que não são validos.
+      - ``qt_valids``: ``int`` - Numero de emails validos.
+      - ``qt_invalids``: ``int`` - Numero de emails invalidos.
+      - ``map_validation``: ``list[ Obj(ValidatedEmail) ]`` - Lista com os Objetos de _mail_validator_ que foi retornada. 
+
+<br>
+
+> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
+>
+> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
+>
+> `from rpa_suite.core import Validate`
+
+
+<br>
+
+Exemplo de uso ``emails``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# Acessando a instancia de 'Validate' acessamos seu método 'emails' que valida uma lista conferindo se os emails são validos, utiliza a lib email_validator que pode ser um pouco lenta.
+result: dict = rpa.validate.emails(email_list=['email@teste.com', 'test@test.br', 'invnalid_email@test'], display_message=True)
+
+rpa.success_print(result)
+
+>>> Function: emails executed.
+>>> {'success': False, 'valid_emails': ['email@teste.com'], 'invalid_emails': ['test@test.br', 'invnalid_email@test'], 'qt_valids': 1, 'qt_invalids': 2, 'map_validation': [<ValidatedEmail email@teste.com>]}
+```
+
+<br>
 
 
 
 ## Pendentes:
-- Modulos (pré instanciados):
-  - validate
 
   Modulos (deve instanciar no momento do uso):
   - Asyncrun
   - Parallel
   - Browser
 
-  Em desenvolvimento:
-  - OCR: Leitura de multiplos tipos de documentos com multiplas saidas
-  - Computer Vision (Bot Desktop)
-  - Table (Excel/csv/odf)
-  - Database
+  Estamos desenvolvendo:
+  - Módulo de OCR.
+  - Módulo de Visão Computacional (Bot Desktop)
+  - Módulo para leitura e escrita de tabelas (Excel/csv/odf)
+  - Módulo para registro de log e histórico com Database
 
 
 ## ***Other modules guide comming soon!***
