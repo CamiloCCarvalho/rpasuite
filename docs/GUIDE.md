@@ -906,12 +906,11 @@ if result:
 
 ## Validate
 
-**Validate** é um Objeto dedicado para busca de palavras e padrões em texto, mantendo o conteudo original sem modificação e evitando falsos positivos de validações muito simples.
+**Validate** é um Objeto dedicado para validação de dados, podendo ser palavras, strings e emails.
 
 Principais destaques: 
-  - A busca pode ser por string ou word, a busca por word valida os espaços em volta da palavra para evitar falsos positivos.
-  - O conteudo original não é alterado e não é necessario criar uma copia para fazer Lower e Upper para seu uso
-  - Também sera implementado a possibilidade de fazer ``replace`` de forma avançada para manter a originalidade do conteudo base. 
+  - Método word procura por palavras porem já faz a validação de espaços e pode separar um texto inteiro por lista de palavras para evitar falsos positivos.
+  - Método emails pode validar listas de emails o que facilita filtrar apenas emails validos para o envio com apenas uma chamada, retornando um dicionario com completo com todas informações como quantidade, e listas separadas de emails validos e invalidos.  
 
 Abaixo todos métodos e argumentos disponiveis de **Validate**:
 
