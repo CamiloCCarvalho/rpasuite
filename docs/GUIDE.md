@@ -304,8 +304,11 @@ Abaixo todos métodos e argumentos disponiveis de **Clock**:
 
 Metodo ``exec_at_hour``:
 
-- Função temporizada, executa a função no horário especificado, por ``default`` executa no momento da chamada em tempo de execução, opcionalmente pode escolher o horário para execução, sendo uma ``string`` contendo horas e minutos com dois digitos como demonstrado a seguir: ``'hh:mm'``.
-- Parametros:
+- Função temporizada, executa a função no horário especificado.
+
+  por ``default`` executa no momento da chamada em tempo de execução, opcionalmente pode escolher o horário para execução, sendo uma ``string`` contendo horas e minutos com dois digitos como demonstrado a seguir: ``'hh:mm'``.
+
+- Argumentos:
 
   - ``hour_to_exec`` : ``str`` - Horario no formato `'hh:mm'`.
   - ``fn_to_exec``: ``Callable`` - Função que deseja executar.
@@ -317,8 +320,10 @@ Metodo ``exec_at_hour``:
 Metodo ``wait_for_exec``:
 
 - Função temporizada, aguarda uma quantidade de tempo em **segundos** para executa a função em seguida.
+
   Por ``default`` executa no momento da chamada em tempo de execução.
-- Parametros:
+
+- Argumentos:
 
   - ``wait_time`` : ``int`` - Tempo em segundos para aguardar.
   - ``fn_to_exec`` : ``Callable`` - Função que deseja executar.
@@ -329,8 +334,11 @@ Metodo ``wait_for_exec``:
 
 Metodo ``exec_and_wait``:
 
-- Função temporizada, executa a função do argumento e em seguinda aguarda o tempo desejado em segundos, por ``default`` executa no momento da chamada em tempo de execução.
-- Parametros:
+- Função temporizada, executa a função do argumento e em seguinda aguarda o tempo desejado em segundos.
+
+  Por ``default`` executa no momento da chamada em tempo de execução.
+
+- Argumentos:
 
   - ``wait_time``:``int`` - Tempo em segundos para aguardar após execução.
   - ``fn_to_exec``: ``Callable`` - Função que deseja executar.
@@ -444,7 +452,10 @@ Abaixo todos métodos e argumentos disponiveis de **Directory**:
 
 Metodo ``create_temp_dir``:
 
-- Função responsavel por criar diretório temporário, pode também criar diretório com nome desejado e salvar o path relativo para uso posterior. Por ``default`` o nome do diretório é "temp" e o caminho é onde esta sendo executada a função
+- Função responsavel por criar diretório temporário, pode também criar diretório com nome desejado e salvar o path relativo para uso posterior.
+
+  Por ``default`` o nome do diretório é "temp" e o caminho é onde esta sendo executada a função.
+
 - Argumentos:
 
   - ``path_to_create``: ``str`` - Caminho para criar o diretório.
@@ -455,7 +466,10 @@ Metodo ``create_temp_dir``:
 
 Metodo ``delete_temp_dir``:
 
-- Função responsavel por deletar diretório temporário, pode também deletar diretório com nome desejado e opcionalmente excluir diretórios que estejam populados com conteudo. Por ``default`` o nome do diretório é "temp" e o caminho é onde esta sendo executada a função.
+- Função responsavel por deletar diretório temporário, pode também deletar diretório com nome desejado e opcionalmente excluir diretórios que estejam populados com conteudo.
+
+  Por ``default`` o nome do diretório é "temp" e o caminho é onde esta sendo executada a função.
+
 - Argumentos:
 
   - ``path_to_delete``: ``str`` - Caminho para deletar o diretório.
@@ -542,7 +556,9 @@ Abaixo todos métodos e argumentos disponiveis de **Email**:
 Metodo ``send_smtp``:
 
 - Função responsavel por fazer envio de emails usando SMTP, com possibilidade de incluir anexos, a finalidade é reduzir a quantidade de código usado para tal, pois emails precisam de muitos detalhes declarados.
-  Por ``default`` o servidor, a porta e a autenticação são definidos seguindo o padrão da hostinger, e o body do email já é definido para aceitar conteudo em HTML.
+  
+  Por ``default`` o servidor, a porta e a autenticação são definidos seguindo o padrão da hostinger, e o body do email já é definido para aceitar conteudo em _HTML_.
+
 - Argumentos:
 
   - ``email_user`` : ``str`` - Email do remetente.
@@ -595,7 +611,9 @@ Abaixo todos métodos e argumentos disponiveis de **File**:
 Metodo ``flag_create``:
 
 - Função responsavel por criar um arquivo que serve como flag para indicar a execução do script, automação ou aplicação.
+  
   Por ``default`` o nome do arquivo é ``running.flag`` porem pode ser mudando via argumento, e o diretório onde é criado é a raiz onde esta sendo executado, podendo este também ser alterado via parametros.
+
 - Argumentos:
 
   - ``name_file`` : ``str`` - Nome do arquivo desejado incluindo a extensão.
@@ -607,6 +625,7 @@ Metodo ``flag_create``:
 Metodo ``flag_delete``:
 
 - Função responsavel por deletar um arquivo que serve como flag para indicar a execução do script, automação ou aplicação.
+  
   Por ``default`` o nome do arquivo é ``running.flag`` porem pode ser mudando via argumento, e o diretório onde ira excluir é a raiz onde esta sendo executado, podendo este também ser alterado via parametros.
 - Argumentos:
 
@@ -619,7 +638,9 @@ Metodo ``flag_delete``:
 Metodo ``count_files``:
 
 - Função responsavel por contar arquivos em um diretório, possivel especificar o diretório onde deseja contar e a extensão desejada, principal caracteristica é que ja percorreo as demais pastas internas se houver.
+  
   Por ``default`` o caminho onde busca pelo diretório é a raiz onde esta sendo executado ``'.'`` usando assim por padrão o caminho relativo, também é definido que busque por todas extensões. A contagem é retornada em um ``dict``.
+
 - Argumentos:
 
   - ``dir_to_count`` : ``str`` - Caminho para o diretório desejado para fazer a contagem
@@ -631,7 +652,9 @@ Metodo ``count_files``:
 Metodo ``screen_shot``:
 
 - Função responsavel por registrar uma imagem do monitor utilizado, podendo passar diversos argumentos para parametrizar da melhor maneira que deseja, principal caracteristica é que cria tanto a pasta como o arquivo de maneira automatica se nenhum argumento for passado, registrando cada imagem com uso de data e horario para poder registrar multiplas imagens se necessario.
+  
   Por ``default`` o caminho onde cria o diretório é a raiz onde esta sendo executado e o nome do diretório é ``screenshots``, e o nome do arquivo é ``'screenshot_dd_mm_aaaa-hh-mm-ss.png'``.
+  
 - Argumentos:
 
   - ``file_name`` : ``str`` - Nome do arquivo, ``default`` sendo ``'screenshot'``.
@@ -729,7 +752,11 @@ Abaixo todos métodos e argumentos disponiveis de **Log**:
 
 Metodo ``config_logger``:
 
-- Função por configurar um logger e apontar para o caminho do arquivo desejado, gerando assim os logs no arquivo e também registrando as mensagems no console, todas mensagens já são personalizadas para diferencia-las. Também conta com um filtro de palavras para excluir dados sensiveis se necessario. (Neste módulo estamos realizando ajustes constantemente para oferecer uma esperiencia mais completa)
+- Função por configurar um logger e apontar para o caminho do arquivo desejado, gerando assim os logs no arquivo e também registrando as mensagems no console, todas mensagens já são personalizadas para diferencia-las. 
+
+  Também conta com um filtro de palavras para excluir dados sensiveis se necessario. (Neste módulo estamos realizando ajustes constantemente para oferecer uma esperiencia mais completa)
+
+
   Por ``default`` o caminho onde cria o diretório e arquivo é a raiz onde esta sendo executado ``'.'`` usando assim por padrão o caminho relativo, esta mesmo caminho é utilizado pelas funções de log para registra as mensagens no arquivo e também no console.
 
 > **⚠️ Importante:**
@@ -739,14 +766,16 @@ Metodo ``config_logger``:
 
   - ``path_dir`` : ``str`` - Caminho para criar o diretório, por ``default`` o caminho do arquivo em execução.
   - ``name_log_dir`` : ``str`` - Nome do diretório de logs, por ``default`` chama-se ``'Logs'``.
-  - ``name_file_log`` : ``str`` - NOme do arquivo de log, por ``default`` chama-se ``'log'`` com extensão fixa: ``.log``
+  - ``name_file_log`` : ``str`` - Nome do arquivo de log, por ``default`` chama-se ``'log'`` com extensão fixa: ``.log``
   - ``filter_words`` : ``list[str]`` - Lista de palavras que deseja filtrar para não aparecer no registro, use para dados sensiveis.
 
 <br>
 
 Metodos ``log_start_run_debug``, ``log_debug``, ``log_info``, ``log_warning``, ``log_error``, ``log_critical``:
 
-- Métodos responsaveis por gera um registro de log no arquivo e no console. Em especial o prieiro método ``log_start_run_debug`` adiciona uma linha vazia antes de registrar o conteudo, facilitando dividir o arquivo para encontrar pontos de inicio de execução. Todos os métodos são pré personalizados por seus leveis e também com cores para facilitar que sejam diferenciados entre si.
+- Métodos responsaveis por gera um registro de log no arquivo e no console. Em especial o prieiro método ``log_start_run_debug`` adiciona uma linha vazia antes de registrar o conteudo, facilitando dividir o arquivo para encontrar pontos de inicio de execução. 
+
+Todos os métodos são pré personalizados por seus leveis e também com cores para facilitar que sejam diferenciados entre si.
 
 > **⚠️ Importante:**
 > Garanta que seja executado o método config_logger antes de chamar os métodos de log para garantir que não haverá erros.
@@ -818,12 +847,73 @@ rpa.log.log_debug(f'Executando tarefa exemplo 5 com debug')
 <br>
 
 
+## Regex
+
+**Regex** é um Objeto dedicado para uso de regex, contamos com um método convencional para buscar uma substring em uma string. Posteriormente vamos adicionar funcionalidades para tornar este módulo mais interessante e utilizavel em mais casos.
+
+Principais destaques: 
+  - Facilidade de realizar busca de uma string dentro de outra string de maneira mais rapida que o convencional com uso de re.
+  - Tem uso mais amplo que o padrão do python com ``__contains__`` pois já devolve um valor boleano com a possibilidade de mudar o estado de busca com uso de case sensitive como False. 
+
+Abaixo todos métodos e argumentos disponiveis de **Regex**:
+
+Metodo ``check_pattern_in_text``:
+
+- Função responsavel por realizar a busca de uma string em outra string, capacidade de ser ou não case sensitive sem uso de blocos ``if`` e sem a necessidade de fazer Upper ou Lower no conteudo original.
+
+
+- Argumentos:
+
+  - ``origin_text`` : ``str`` - Conteudo de texto para a busca, deve ser uma string.
+  - ``pattern_to_search`` : ``str`` - Padrão desejado para a busca.
+  - ``case_sensitive`` : ``bool`` - Opção que indica se deve ser uma busca case sensitive.
+  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+
+
+<br>
+
+> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
+>
+> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
+>
+> `from rpa_suite.core import Regex`
+
+
+<br>
+
+Exemplo de uso ``check_pattern_in_text``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# Acessando a instancia de 'Regex' acessamos seu método que busca padrões em um texto, com opção de ser case sensitive e exibir mensagem retornando um valor booleano
+result: bool = rpa.regex.check_pattern_in_text(origin_text= 'This is a simple text with a pattern to search: Hello, World!',
+                                pattern_to_search= 'hello, world',
+                                case_sensitive= False,
+                                display_message= True)
+
+if result:
+    rpa.success_print('found!')
+
+
+>>> Pattern found successfully!
+>>> found!
+```
+
+<br>
+
+
+
+
+
+
+
 ## Pendentes:
 - Modulos (pré instanciados):
-  - regex
   - validate
 
-  Modulos (necessario instanciar no momento do uso):
+  Modulos (deve instanciar no momento do uso):
   - Asyncrun
   - Parallel
   - Browser
