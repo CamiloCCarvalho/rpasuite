@@ -16,28 +16,27 @@ from time import sleep
 import os, requests
 
 
-class Browser():
-    
+class Browser:
     """
     Browser Object for Automation (Work in Progress)
-    This class provides an interface for automating browser interactions using 
-    Google Chrome with a debugging port. It includes methods for starting, 
-    configuring, navigating, and interacting with the browser. The implementation 
+    This class provides an interface for automating browser interactions using
+    Google Chrome with a debugging port. It includes methods for starting,
+    configuring, navigating, and interacting with the browser. The implementation
     is still under development and may require further enhancements.
-    
+
     Attributes:
         driver: The WebDriver instance used to control the browser.
         port (int): The debugging port used to connect to the browser. Default is 9393.
         path_driver (str): The path to the ChromeDriver executable.
-        
+
     Methods:
         __init__(port: int = 9393, close_all_chrome_on_this_port: bool = False):
-            Initializes the Browser object with the specified debugging port and 
+            Initializes the Browser object with the specified debugging port and
             optionally closes all Chrome instances running on the same port.
         configure_browser() -> None:
             Configures the browser with debugging options and initializes the WebDriver.
         start_browser(close_chrome_on_this_port: bool = True, display_message: bool = False):
-            Starts the Chrome browser with the specified debugging port and initializes 
+            Starts the Chrome browser with the specified debugging port and initializes
             the WebDriver.
         find_ele(value, by=By.XPATH, timeout=12, display_message=True):
             Finds a single element on the page using the specified locator strategy.
@@ -47,29 +46,29 @@ class Browser():
             Closes all Chrome processes forcefully.
         close_browser(display_message: bool = False):
             Closes the browser instance and terminates the associated Chrome processes.
-    
+
     pt-br
     ----------
     Objeto Browser para Automação (Em Desenvolvimento)
-    Esta classe fornece uma interface para automação de interações com o navegador 
-    Google Chrome utilizando uma porta de depuração. Inclui métodos para iniciar, 
-    configurar, navegar e interagir com o navegador. A implementação ainda está em 
+    Esta classe fornece uma interface para automação de interações com o navegador
+    Google Chrome utilizando uma porta de depuração. Inclui métodos para iniciar,
+    configurar, navegar e interagir com o navegador. A implementação ainda está em
     desenvolvimento e pode requerer melhorias adicionais.
-    
+
     Atributos:
         driver: A instância do WebDriver usada para controlar o navegador.
         port (int): A porta de depuração usada para conectar ao navegador. O padrão é 9393.
         path_driver (str): O caminho para o executável do ChromeDriver.
-        
+
     Métodos:
         __init__(port: int = 9393, close_all_chrome_on_this_port: bool = False):
-            Inicializa o objeto Browser com a porta de depuração especificada e, 
-            opcionalmente, fecha todas as instâncias do Chrome que estão sendo executadas 
+            Inicializa o objeto Browser com a porta de depuração especificada e,
+            opcionalmente, fecha todas as instâncias do Chrome que estão sendo executadas
             na mesma porta.
         configure_browser() -> None:
             Configura o navegador com opções de depuração e inicializa o WebDriver.
         start_browser(close_chrome_on_this_port: bool = True, display_message: bool = False):
-            Inicia o navegador Chrome com a porta de depuração especificada e inicializa 
+            Inicia o navegador Chrome com a porta de depuração especificada e inicializa
             o WebDriver.
         find_ele(value, by=By.XPATH, timeout=12, display_message=True):
             Localiza um único elemento na página usando a estratégia de localização especificada.
@@ -84,12 +83,13 @@ class Browser():
     driver: None
     port: int = None
     path_driver = None
-    
+
     def __init__(self, port: int = 9393, close_all_chrome_on_this_port: bool = False):
         self.port = port
         self.path_driver = ChromeDriverManager().install()
 
-        if close_all_chrome_on_this_port: self._close_all_chrome()
+        if close_all_chrome_on_this_port:
+            self._close_all_chrome()
         ...
 
     def configure_browser(self) -> None:
@@ -102,33 +102,40 @@ class Browser():
             FileNotFoundError: If the specified path to the ChromeDriver executable does not exist.
             Exception: For any other errors encountered during the browser configuration process.
         """
-        
+
         try:
             # Use the absolute path from comment
-            
+
             options = Options()
-            options.add_experimental_option("debuggerAddress",
-                                         f"127.0.0.1:{str(self.port)}")
-            
-            # Additional configs  
+            options.add_experimental_option(
+                "debuggerAddress", f"127.0.0.1:{str(self.port)}"
+            )
+
+            # Additional configs
             options.add_argument("--start-maximized")
             options.add_argument("--disable-notifications")
-            
+
             # Verifica se o caminho do driver está correto
             if not os.path.exists(self.path_driver):
-                raise FileNotFoundError(f'O caminho do driver não foi encontrado: {self.path_driver}')
-            
+                raise FileNotFoundError(
+                    f"O caminho do driver não foi encontrado: {self.path_driver}"
+                )
+
             # Create driver with options and chromedriver path
             self.driver = webdriver.Chrome(
-                #service=self.path_driver,
+                # service=self.path_driver,
                 options=options,
-                keep_alive=True
+                keep_alive=True,
             )
 
         except Exception as e:
-            error_print(f'Erro durante a função: {self.configure_browser.__name__}! Error: {str(e)}.')
+            error_print(
+                f"Erro durante a função: {self.configure_browser.__name__}! Error: {str(e)}."
+            )
 
-    def start_browser(self, close_chrome_on_this_port: bool = True, display_message: bool = False):
+    def start_browser(
+        self, close_chrome_on_this_port: bool = True, display_message: bool = False
+    ):
         """
         Starts a Chrome browser instance with remote debugging enabled.
         Args:
@@ -143,67 +150,74 @@ class Browser():
             - Configures the browser instance using the `configure_browser` method.
             - Optionally displays a success message if `display_message` is True.
         """
-        
+
         try:
-            if close_chrome_on_this_port: self.close_browser()
+            if close_chrome_on_this_port:
+                self.close_browser()
 
             # Inicia o Chrome com debugging port
-            os.system(f'start chrome.exe --remote-debugging-port={str(self.port)} --user-data-dir="C:/temp/chrome_profile"')
+            os.system(
+                f'start chrome.exe --remote-debugging-port={str(self.port)} --user-data-dir="C:/temp/chrome_profile"'
+            )
 
             # Aguardar até que o Chrome esteja realmente aberto
             while True:
                 try:
                     # Tenta conectar ao Chrome na porta de depuração
-                    response = requests.get(f'http://127.0.0.1:{self.port}/json')
+                    response = requests.get(f"http://127.0.0.1:{self.port}/json")
                     if response.status_code == 200:
                         break  # O Chrome está aberto
                 except requests.ConnectionError:
                     sleep(1)  # Espera um segundo antes de tentar novamente
-            
+
             # Inicializa o Chrome com as opções
             self.configure_browser()
-            
-            if display_message: success_print(f'Browser: Iniciado com sucesso!')
-            
+
+            if display_message:
+                success_print(f"Browser: Iniciado com sucesso!")
+
         except Exception as e:
-            error_print(f'Erro ao iniciar navegador: {str(e)}.')
+            error_print(f"Erro ao iniciar navegador: {str(e)}.")
 
-
-    def find_ele(self, value: str, by:By=By.XPATH, timeout=12, display_message=True):
+    def find_ele(self, value: str, by: By = By.XPATH, timeout=12, display_message=True):
         """
         Locate and return a web element on the page using the specified locator strategy.
         Args:
             value (str): The locator value to identify the web element.
-            by (selenium.webdriver.common.by.By, optional): The locator strategy to use. 
+            by (selenium.webdriver.common.by.By, optional): The locator strategy to use.
                 Defaults to By.XPATH.
-            timeout (int, optional): The maximum time to wait for the element to appear, in seconds. 
+            timeout (int, optional): The maximum time to wait for the element to appear, in seconds.
                 Defaults to 12.
-            display_message (bool, optional): Whether to display an error message if the element 
+            display_message (bool, optional): Whether to display an error message if the element
                 is not found. Defaults to True.
         Returns:
             selenium.webdriver.remote.webelement.WebElement: The located web element if found.
             None: If the element is not found or an exception occurs.
         Raises:
-            Exception: Propagates any exception encountered during the element search if 
+            Exception: Propagates any exception encountered during the element search if
                 `display_message` is set to False.
         """
-        
+
         try:
             sleep(2)
             element = WebDriverWait(self.driver, timeout).until(
                 EC.presence_of_element_located((by, value))
-            ); return element
-        
+            )
+            return element
+
         except Exception as e:
 
             if display_message:
-                error_print(f'Erro durante a função: {self.find_ele.__name__}! Error: {str(e)}.')
+                error_print(
+                    f"Erro durante a função: {self.find_ele.__name__}! Error: {str(e)}."
+                )
                 return None
-            else: return None
+            else:
+                return None
 
     # find elements (needs implementation)
     ...
-    
+
     # navigate
     def get(self, url: str, display_message: bool = False):
         """
@@ -214,14 +228,14 @@ class Browser():
         Raises:
             Exception: If an error occurs while navigating to the URL, it logs the error message.
         """
-        
+
         try:
             self.driver.get(url)
-            if display_message: success_print(f'Browser: Navegando para: {url}')
-            
-        except Exception as e:
-            error_print(f'Erro ao navegar para a URL: {url}. Error: {str(e)}.')
+            if display_message:
+                success_print(f"Browser: Navegando para: {url}")
 
+        except Exception as e:
+            error_print(f"Erro ao navegar para a URL: {url}. Error: {str(e)}.")
 
     def _close_all_browsers(self):
         """
@@ -233,10 +247,9 @@ class Browser():
         """
 
         try:
-            os.system('taskkill /F /IM chrome.exe >nul 2>&1')
+            os.system("taskkill /F /IM chrome.exe >nul 2>&1")
         except:
             pass
-
 
     def close_browser(self, display_message: bool = False):
         """
@@ -257,46 +270,62 @@ class Browser():
         Observação:
             Use com cautela, especialmente o encerramento extremo, pois pode afetar outros processos do Chrome em execução.
         """
-        
+
         try:
             # Primeiro tenta fechar todas as janelas via Selenium
             try:
                 self.driver.close()
             except:
                 pass
-                
+
             # Depois tenta encerrar a sessão
             try:
                 self.driver.quit()
             except:
                 pass
-            
+
             # Aguarda um momento para o processo ser liberado
             sleep(1)
-            
+
             # Força o fechamento do processo específico do Chrome
-            os.system(f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" >nul 2>&1')
-            
+            os.system(
+                f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" >nul 2>&1'
+            )
+
             # Verifica se o processo foi realmente terminado
-            check = os.system(f'tasklist /fi "imagename eq chrome.exe" /fi "commandline like *--remote-debugging-port={str(self.port)}*" >nul 2>&1')
-            
+            check = os.system(
+                f'tasklist /fi "imagename eq chrome.exe" /fi "commandline like *--remote-debugging-port={str(self.port)}*" >nul 2>&1'
+            )
+
             if check == 0:
                 # Processo ainda existe, tenta método mais agressivo
-                os.system(f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" /t >nul 2>&1')
-                if display_message: alert_print(f'Browser: Fechado via força!')
-                
+                os.system(
+                    f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" /t >nul 2>&1'
+                )
+                if display_message:
+                    alert_print(f"Browser: Fechado via força!")
+
             else:
-                if display_message: success_print(f'Browser: Fechado com sucesso!')
-            
+                if display_message:
+                    success_print(f"Browser: Fechado com sucesso!")
+
         except Exception as e:
-            
-            
+
             try:
-                if display_message: alert_print(f'Erro ao fechar navegador: {str(e)}, Tentando meio mais forte!')
+                if display_message:
+                    alert_print(
+                        f"Erro ao fechar navegador: {str(e)}, Tentando meio mais forte!"
+                    )
 
                 # Último recurso - mata todos os processos do Chrome (use com cautela)
-                os.system(f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" /t >nul 2>&1')
-                if display_message: alert_print(f'Browser: Fechado via força extrema!')
-                
+                os.system(
+                    f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" /t >nul 2>&1'
+                )
+                if display_message:
+                    alert_print(f"Browser: Fechado via força extrema!")
+
             except Exception as error_ultimate:
-                if display_message: error_print(f'Falha crítica ao tentar fechar o navegador! Error: {str(error_ultimate)}!')
+                if display_message:
+                    error_print(
+                        f"Falha crítica ao tentar fechar o navegador! Error: {str(error_ultimate)}!"
+                    )

@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Dict, List, Union
 
 
-class File():
+class File:
     """
     Class that provides utilities for file management, including creation, deletion, and manipulation of files.
 
@@ -63,19 +63,20 @@ class File():
         save_with_date (bool): Indica se o nome do arquivo deve incluir a data
         delay (int): O tempo de espera antes de capturar a tela
     """
-    
+
     def __init__(self):
         self.__create_ss_dir = create_ss_dir
 
-    def screen_shot(self,
-                    file_name: str = 'screenshot',
-                    path_dir:str = None,
-                    save_with_date: bool = True,
-                    delay: int = 1, 
-                    use_default_path_and_name: bool = True,
-                    name_ss_dir:str | None = None,
-                    display_message: bool = False) -> str | None:
-
+    def screen_shot(
+        self,
+        file_name: str = "screenshot",
+        path_dir: str = None,
+        save_with_date: bool = True,
+        delay: int = 1,
+        use_default_path_and_name: bool = True,
+        name_ss_dir: str | None = None,
+        display_message: bool = False,
+    ) -> str | None:
         """
         Function responsible for create a dir for screenshot, and file screenshot and save this in dir to create, if dir exists save it on original dir. By default uses date on file name. \n
 
@@ -107,7 +108,7 @@ class File():
         ``use_default_path_and_name: bool`` - deve ser um booleano, por padrão `True`
         ``name_ss_dir: str`` - deve ser uma string, por padrão do tipo `None`
         ``display_message`` - deve ser um booleano, por padrão `False`
-        
+
         Retorno:
         ----------
         >>> tipo: str
@@ -116,107 +117,118 @@ class File():
 
         # proccess
         try:
-            
+
             try:
                 import pyautogui
                 import pyscreeze
-                
+
             except ImportError:
-                raise ImportError(f"\nThe 'pyautogui' e 'Pillow' libraries are necessary to use this module. {Fore.YELLOW}Please install them with: 'pip install pyautogui pillow'{Fore.WHITE}")
-            
+                raise ImportError(
+                    f"\nThe 'pyautogui' e 'Pillow' libraries are necessary to use this module. {Fore.YELLOW}Please install them with: 'pip install pyautogui pillow'{Fore.WHITE}"
+                )
+
             time.sleep(delay)
 
             if not use_default_path_and_name:
                 result_tryed: dict = self.__create_ss_dir(path_dir, name_ss_dir)
-                path_dir = result_tryed['path_created']
+                path_dir = result_tryed["path_created"]
             else:
                 result_tryed: dict = self.__create_ss_dir()
-                path_dir = result_tryed['path_created']
+                path_dir = result_tryed["path_created"]
 
-            
-            if save_with_date: # use date on file name
+            if save_with_date:  # use date on file name
                 image = pyautogui.screenshot()
-                file_name = f'{file_name}_{datetime.today().strftime("%d_%m_%Y-%H_%M_%S")}.png'
+                file_name = (
+                    f'{file_name}_{datetime.today().strftime("%d_%m_%Y-%H_%M_%S")}.png'
+                )
                 path_file_screenshoted = os.path.join(path_dir, file_name)
-                
+
                 image.save(path_file_screenshoted)
-                
-                if display_message: success_print(path_file_screenshoted)
-                    
+
+                if display_message:
+                    success_print(path_file_screenshoted)
+
                 return path_file_screenshoted
-            
-            else: # not use date on file name
+
+            else:  # not use date on file name
                 image = pyautogui.screenshot()
-                file_name = f'{file_name}.png'
+                file_name = f"{file_name}.png"
                 path_file_screenshoted = os.path.join(path_dir, file_name)
-                
+
                 image.save(path_file_screenshoted)
-                
-                if display_message: success_print(path_file_screenshoted)
-                    
+
+                if display_message:
+                    success_print(path_file_screenshoted)
+
                 return path_file_screenshoted
-        
+
         except Exception as e:
 
-            error_print(f'Error to execute function:{self.screen_shot.__name__}! Error: {str(e)}')
+            error_print(
+                f"Error to execute function:{self.screen_shot.__name__}! Error: {str(e)}"
+            )
             return None
 
-
-    def flag_create(self,
-                    name_file: str = 'running.flag',
-                    path_to_create: str | None = None,
-                    display_message: bool = True) -> None:
+    def flag_create(
+        self,
+        name_file: str = "running.flag",
+        path_to_create: str | None = None,
+        display_message: bool = True,
+    ) -> None:
         """
         Cria um arquivo de sinalização indicando que o robô está em execução.
         """
-        
+
         try:
             if path_to_create == None:
                 path_origin: str = os.getcwd()
-                full_path_with_name = fr'{path_origin}/{name_file}'
+                full_path_with_name = rf"{path_origin}/{name_file}"
             else:
-                full_path_with_name = fr'{path_to_create}/{name_file}'
-                
-            with open(full_path_with_name, 'w', encoding='utf-8') as file:
-                file.write('[RPA Suite] - Running Flag File')
-            if display_message: success_print("Flag file created.")
+                full_path_with_name = rf"{path_to_create}/{name_file}"
+
+            with open(full_path_with_name, "w", encoding="utf-8") as file:
+                file.write("[RPA Suite] - Running Flag File")
+            if display_message:
+                success_print("Flag file created.")
 
         except Exception as e:
-            error_print(f'Erro na função file_scheduling_create: {str(e)}')
+            error_print(f"Erro na função file_scheduling_create: {str(e)}")
 
-
-    def flag_delete(self,
-                    name_file: str = 'running.flag',
-                    path_to_delete: str | None = None,
-                    display_message: bool = True,) -> None:
-        
+    def flag_delete(
+        self,
+        name_file: str = "running.flag",
+        path_to_delete: str | None = None,
+        display_message: bool = True,
+    ) -> None:
         """
         Deleta o arquivo de sinalização indicando que o robô terminou a execução.
         """
-        
+
         try:
 
             if path_to_delete == None:
                 path_origin: str = os.getcwd()
-                full_path_with_name = fr'{path_origin}/{name_file}'
+                full_path_with_name = rf"{path_origin}/{name_file}"
             else:
-                full_path_with_name = fr'{path_to_delete}/{name_file}'
-                
+                full_path_with_name = rf"{path_to_delete}/{name_file}"
+
             if os.path.exists(full_path_with_name):
                 os.remove(full_path_with_name)
-                if display_message: success_print("Flag file deleted.")
+                if display_message:
+                    success_print("Flag file deleted.")
             else:
                 alert_print("Flag file not found.")
 
         except Exception as e:
-            error_print(f'Erro na função file_scheduling_delete: {str(e)}')
+            error_print(f"Erro na função file_scheduling_delete: {str(e)}")
             time.sleep(1)
 
-    def count_files(self,
-                    dir_to_count: List[str] = ['.'], 
-                    type_extension: str = '*',
-                    display_message: bool = False,) -> Dict[str, Union[bool, int]]:
-
+    def count_files(
+        self,
+        dir_to_count: List[str] = ["."],
+        type_extension: str = "*",
+        display_message: bool = False,
+    ) -> Dict[str, Union[bool, int]]:
         """
         Function responsible for counting files within a folder, considers subfolders to do the count, searches by file type, being all files by default. \n
 
@@ -248,25 +260,25 @@ class File():
         """
 
         # Local Variables
-        result: dict = {
-            'success': False,
-            'qt': 0
-        }
+        result: dict = {"success": False, "qt": 0}
 
         # Process
         try:
             for dir in dir_to_count:
                 for _, _, files in os.walk(dir):
                     for file in files:
-                        if type_extension == '*' or file.endswith(f'.{type_extension}'):
-                            result['qt'] += 1
-            result['success'] = True
-            
-            if display_message: success_print(f'Function: {self.count_files.__name__} counted {result["qt"]} files.')
+                        if type_extension == "*" or file.endswith(f".{type_extension}"):
+                            result["qt"] += 1
+            result["success"] = True
+
+            if display_message:
+                success_print(
+                    f'Function: {self.count_files.__name__} counted {result["qt"]} files.'
+                )
 
         except Exception as e:
-            result['success'] = False
-            error_print(f'Error when trying to count files! Error: {str(e)}')
+            result["success"] = False
+            error_print(f"Error when trying to count files! Error: {str(e)}")
 
         finally:
             return result

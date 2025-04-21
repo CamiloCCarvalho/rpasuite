@@ -24,14 +24,12 @@ import sys
 import hashlib
 
 
-
 # Windows bash colors
-class Colors():
-
+class Colors:
     """
     This class provides color constants based on the colorama library,
     allowing for visual formatting of texts in the Windows terminal.
-    
+
     Attributes:
         black (str): Black color
         blue (str): Blue color
@@ -47,10 +45,10 @@ class Colors():
 
     pt-br
     ------
-    
+
     Esta classe fornece constantes de cores baseadas na biblioteca colorama,
     permitindo a formatação visual de textos no terminal Windows.
-    
+
     Atributos:
         black (str): Cor preta
         blue (str): Cor azul
@@ -65,27 +63,26 @@ class Colors():
         retur_fn (str): Cor amarela clara (usada para retornos de função)
     """
 
-    black     = f'{Fore.BLACK}'
-    blue      = f'{Fore.BLUE}'
-    green     = f'{Fore.GREEN}'
-    cyan      = f'{Fore.CYAN}'
-    red       = f'{Fore.RED}'
-    magenta   = f'{Fore.MAGENTA}'
-    yellow    = f'{Fore.YELLOW}'
-    white     = f'{Fore.WHITE}'
-    default   = f'{Fore.WHITE}'
-    call_fn   = f'{Fore.LIGHTMAGENTA_EX}'
-    retur_fn  = f'{Fore.LIGHTYELLOW_EX}'
+    black = f"{Fore.BLACK}"
+    blue = f"{Fore.BLUE}"
+    green = f"{Fore.GREEN}"
+    cyan = f"{Fore.CYAN}"
+    red = f"{Fore.RED}"
+    magenta = f"{Fore.MAGENTA}"
+    yellow = f"{Fore.YELLOW}"
+    white = f"{Fore.WHITE}"
+    default = f"{Fore.WHITE}"
+    call_fn = f"{Fore.LIGHTMAGENTA_EX}"
+    retur_fn = f"{Fore.LIGHTYELLOW_EX}"
 
 
-class Suite():
-
+class Suite:
     """
     RPA Suite is a Python module that provides a set of tools for process automation.
-    
+
     To use the module, import it as follows:
         >>> from rpa_suite import rpa
-    
+
     Example of usage:
         >>> from rpa_suite import rpa
         >>> rpa.email.send_smtp(
@@ -96,7 +93,7 @@ class Suite():
         ...     body_message="<p>Test message</p>"
         ... )
         >>> rpa.alert_print("Hello World")
-    
+
     Available modules:
         ``clock``: Utilities for time and stopwatch manipulation
         ``date``: Functions for date manipulation
@@ -111,10 +108,10 @@ class Suite():
     pt-br
     -----
     RPA Suite é um módulo Python que fornece um conjunto de ferramentas para automação de processos.
-    
+
     Para utilizar o módulo, importe-o da seguinte forma:
         >>> from rpa_suite import rpa
-    
+
     Exemplo de uso:
         >>> from rpa_suite import rpa
         >>> rpa.email.send_smtp(
@@ -125,7 +122,7 @@ class Suite():
         ...     body_message="<p>Mensagem de teste</p>"
         ... )
         >>> rpa.alert_print("Hello World")
-    
+
     Módulos disponíveis:
         ``clock``: Utilitários para manipulação de tempo e cronômetro
         ``date``: Funções para manipulação de datas
@@ -137,7 +134,7 @@ class Suite():
         ``regex``: Operações com expressões regulares
         ``validate``: Funções de validação de dados
     """
-    
+
     # SUBMODULES
     clock: Clock = Clock()
     date: Date = Date()
@@ -150,35 +147,32 @@ class Suite():
     validate: Validate = Validate()
     Parallel: ParallelRunner = ParallelRunner
     Asyn: AsyncRunner = AsyncRunner
-    
+
     # On this case, we are importing the Browser class only if the selenium and webdriver_manager modules are installed.
     # This is useful to avoid unnecessary imports and dependencies if the user does not need the Browser functionality.
     import importlib.util
 
     # from .browser import Browser
-    if importlib.util.find_spec("selenium") and importlib.util.find_spec("webdriver_manager"):
+    if importlib.util.find_spec("selenium") and importlib.util.find_spec(
+        "webdriver_manager"
+    ):
         from .core.browser import Browser
+
         browser: Browser = Browser
-    
-    
+
     # VARIABLES INTERNAL
     try:
         __version__ = pkg_resources.get_distribution("rpa_suite").version
     except Exception:
-        __version__ = 'unknown'
-    
-    __id_hash__ = 'rpa_suite'
-    
-    
+        __version__ = "unknown"
+
+    __id_hash__ = "rpa_suite"
+
     def __init__(self):
-        self.__id_hash__ = 'rpa_suite'
+        self.__id_hash__ = "rpa_suite"
         self.__id_hash__ = hashlib.sha256(self.__version__.encode()).hexdigest()
-    
-    def success_print(self,
-            string_text: str,
-            color=Colors.green,
-            ending="\n") -> None:
-        
+
+    def success_print(self, string_text: str, color=Colors.green, ending="\n") -> None:
         """
         Print that indicates ``SUCCESS``. Customized with the color Green \n
         Return:
@@ -191,14 +185,10 @@ class Suite():
         ----------
             >>> type:None
         """
-        
-        print(f'{color}{string_text}{Colors.default}', end=ending) 
 
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-    def alert_print(self,
-                    string_text: str,
-                    color=Colors.yellow,
-                    ending="\n") -> None:
+    def alert_print(self, string_text: str, color=Colors.yellow, ending="\n") -> None:
         """
         Print that indicates ``ALERT``. Customized with the color Yellow \n
 
@@ -213,13 +203,9 @@ class Suite():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending) 
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def info_print(self,
-                    string_text: str,
-                    color=Colors.cyan,
-                    ending="\n") -> None:
+    def info_print(self, string_text: str, color=Colors.cyan, ending="\n") -> None:
         """
         Print that indicates ``INFORMATION``. Customized with the color Cyan \n
 
@@ -234,13 +220,9 @@ class Suite():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending) 
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def error_print(self, 
-                    string_text: str, 
-                    color=Colors.red, 
-                    ending="\n") -> None:
+    def error_print(self, string_text: str, color=Colors.red, ending="\n") -> None:
         """
         Print that indicates ``ERROR``. Customized with the color Red \n
 
@@ -255,13 +237,11 @@ class Suite():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending) 
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def magenta_print(self, 
-                        string_text: str,
-                        color=Colors.magenta,
-                        ending="\n") -> None:
+    def magenta_print(
+        self, string_text: str, color=Colors.magenta, ending="\n"
+    ) -> None:
         """
         Print customized with the color Magenta \n
 
@@ -276,13 +256,9 @@ class Suite():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending) 
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def blue_print(self,
-                    string_text: str, 
-                    color=Colors.blue, 
-                    ending="\n") -> None:
+    def blue_print(self, string_text: str, color=Colors.blue, ending="\n") -> None:
         """
         Print customized with the color Blue \n
 
@@ -297,13 +273,11 @@ class Suite():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending)
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def print_call_fn(self, 
-                        string_text: str, 
-                        color=Colors.call_fn, 
-                        ending="\n") -> None:
+    def print_call_fn(
+        self, string_text: str, color=Colors.call_fn, ending="\n"
+    ) -> None:
         """
         Print customized for function called (log) \n
         Color: Magenta Light
@@ -319,13 +293,11 @@ class Suite():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending)
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def print_retur_fn(self, 
-                        string_text: str, 
-                        color=Colors.retur_fn, 
-                        ending="\n") -> None:
+    def print_retur_fn(
+        self, string_text: str, color=Colors.retur_fn, ending="\n"
+    ) -> None:
         """
         Print customized for function return (log) \n
         Color: Yellow Light
@@ -341,35 +313,33 @@ class Suite():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending)
-
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
     def __install_all_libs(self):
         """
         Metodo responsavel por instalar todas libs para uso avançado do RPA-Suite com todas funcionalidades incluindo OCR e agente de IA
         """
 
-        
-
         libs = [
-            'colorama',
-            'colorlog', 
-            'email_validator',
-            'loguru',
-            'openpyxl',
-            'pandas',
-            'pyautogui',
-            'selenium',
-            'typing',
-            'webdriver_manager'
+            "colorama",
+            "colorlog",
+            "email_validator",
+            "loguru",
+            "openpyxl",
+            "pandas",
+            "pyautogui",
+            "selenium",
+            "typing",
+            "webdriver_manager",
         ]
 
         for lib in libs:
             try:
-                subprocess.check_call([sys.executable, '-m', 'pip', 'install', lib])
-                self.success_print(f'Biblioteca {lib} instalada com sucesso!')
+                subprocess.check_call([sys.executable, "-m", "pip", "install", lib])
+                self.success_print(f"Biblioteca {lib} instalada com sucesso!")
 
             except subprocess.CalledProcessError:
-                self.error_print(f'Erro ao instalar biblioteca {lib}')
+                self.error_print(f"Erro ao instalar biblioteca {lib}")
+
 
 rpa = Suite()

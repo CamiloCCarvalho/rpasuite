@@ -8,9 +8,7 @@ import os, shutil
 from typing import Union
 
 
-
-class Directory():
-
+class Directory:
     """
     Class that provides utilities for directory management, including creating, deleting, and manipulating directories.
 
@@ -22,7 +20,7 @@ class Directory():
 
     Methods:
         create_temp_dir: Creates a temporary directory for file operations.
-        
+
     The Directory class is part of RPA Suite and can be accessed through the rpa object:
         >>> from rpa_suite import rpa
         >>> rpa.directory.create_temp_dir(path_to_create='my_folder', name_temp_dir='temp_dir')
@@ -43,7 +41,7 @@ class Directory():
 
     Métodos:
         create_temp_dir: Cria um diretório temporário para operações com arquivos.
-        
+
     A classe Directory é parte do RPA Suite e pode ser acessada através do objeto rpa:
         >>> from rpa_suite import rpa
         >>> rpa.directory.create_temp_dir(path_to_create='minha_pasta', name_temp_dir='temp_dir')
@@ -53,14 +51,14 @@ class Directory():
         name_temp_dir (str): O nome do diretório temporário a ser criado. O padrão é 'temp'.
     """
 
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
-    def create_temp_dir(self,
-                        path_to_create: str = 'default',
-                        name_temp_dir: str='temp',
-                        display_message: bool = False) -> dict[str, Union[bool, str, None]]:
-
+    def create_temp_dir(
+        self,
+        path_to_create: str = "default",
+        name_temp_dir: str = "temp",
+        display_message: bool = False,
+    ) -> dict[str, Union[bool, str, None]]:
         """
         Function responsible for creating a temporary directory to work with files and etc. \n
 
@@ -77,7 +75,7 @@ class Directory():
         >>> type:dict
             * 'success': bool - represents case the action was performed successfully
             * 'path_created': str - path of the directory that was created on the process
-            
+
         Description: pt-br
         ----------
         Função responsavel por criar diretório temporário para trabalhar com arquivos e etc. \n
@@ -96,16 +94,16 @@ class Directory():
             * 'success': bool - representa se ação foi realizada com sucesso
             * 'path_created': str - path do diretório que foi criado no processo
         """
-        
+
         # Local Variables
         result: dict = {
-            'success': bool,
-            'path_created': str,
+            "success": bool,
+            "path_created": str,
         }
-        
+
         try:
             # by 'default', defines path to local script execution path
-            if path_to_create == 'default':
+            if path_to_create == "default":
                 path_to_create: str = os.getcwd()
 
             # Build path to new dir
@@ -117,39 +115,45 @@ class Directory():
                 # Successefully created
                 os.makedirs(full_path, exist_ok=False)
 
-                result['success'] = True
-                result['path_created'] = fr'{full_path}'
+                result["success"] = True
+                result["path_created"] = rf"{full_path}"
 
-                if display_message: success_print(f"Directory:'{full_path}' successfully created.")
+                if display_message:
+                    success_print(f"Directory:'{full_path}' successfully created.")
 
             except FileExistsError:
-                result['success'] = False
-                result['path_created'] = None
-                if display_message: alert_print(f"Directory:'{full_path}' already exists.")
+                result["success"] = False
+                result["path_created"] = None
+                if display_message:
+                    alert_print(f"Directory:'{full_path}' already exists.")
 
             except PermissionError:
-                result['success'] = False
-                result['path_created'] = None
-                alert_print(f"Permission denied: Not possible to create Directory '{full_path}'.")
+                result["success"] = False
+                result["path_created"] = None
+                alert_print(
+                    f"Permission denied: Not possible to create Directory '{full_path}'."
+                )
 
         except Exception as e:
-            result['success'] = False
-            result['path_created'] = None
-            error_print(f'Error capturing current path to create temporary directory! Error: {str(e)}')
-            
+            result["success"] = False
+            result["path_created"] = None
+            error_print(
+                f"Error capturing current path to create temporary directory! Error: {str(e)}"
+            )
+
         finally:
             return result
 
-
-    def delete_temp_dir(self,
-                        path_to_delete: str = 'default',
-                        name_temp_dir: str='temp',
-                        delete_files: bool = False,
-                        display_message: bool = False) -> dict[str, Union[bool, str, None]]:
-
+    def delete_temp_dir(
+        self,
+        path_to_delete: str = "default",
+        name_temp_dir: str = "temp",
+        delete_files: bool = False,
+        display_message: bool = False,
+    ) -> dict[str, Union[bool, str, None]]:
         """
         Function responsible for deleting a temporary directory. \n
-        
+
         Parameters:
         ----------
         ``path_to_delete: str`` - should be a string with the full path pointing to the folder where the temporary folder should be deleted, if it is empty the ``default`` value will be used which will delete a folder in the current directory where the file containing this function was called.
@@ -163,7 +167,7 @@ class Directory():
         >>> type:dict
             * 'success': bool - represents case the action was performed successfully
             * 'path_deleted': str - path of the directory that was deleted on the process
-            
+
         Description: pt-br
         ----------
         Função responsavel por deletar diretório temporário. \n
@@ -185,13 +189,13 @@ class Directory():
 
         # Local Variables
         result: dict = {
-            'success': bool,
-            'path_deleted': str,
+            "success": bool,
+            "path_deleted": str,
         }
 
         try:
             # by 'default', defines path to local script execution path
-            if path_to_delete == 'default':
+            if path_to_delete == "default":
                 path_to_delete: str = os.getcwd()
 
             # Build path to new dir
@@ -212,24 +216,30 @@ class Directory():
                         # Delete the directory only
                         os.rmdir(full_path)
 
-                    result['success'] = True
-                    result['path_deleted'] = fr'{full_path}'
+                    result["success"] = True
+                    result["path_deleted"] = rf"{full_path}"
 
-                    if display_message: success_print(f"Directory:'{full_path}' successfully delete.")
+                    if display_message:
+                        success_print(f"Directory:'{full_path}' successfully delete.")
                 else:
-                    result['success'] = False
-                    result['path_deleted'] = None
-                    if display_message: alert_print(f"Directory:'{full_path}' don't exists.")
+                    result["success"] = False
+                    result["path_deleted"] = None
+                    if display_message:
+                        alert_print(f"Directory:'{full_path}' don't exists.")
 
             except PermissionError:
-                result['success'] = False
-                result['path_deleted'] = None
-                alert_print(f"Permission denied: Not possible to delete Directory '{full_path}'.")
+                result["success"] = False
+                result["path_deleted"] = None
+                alert_print(
+                    f"Permission denied: Not possible to delete Directory '{full_path}'."
+                )
 
         except Exception as e:
-            result['success'] = False
-            result['path_deleted'] = None
-            error_print(f'Error capturing current path to delete temporary directory! Error: {str(e)}')
-            
+            result["success"] = False
+            result["path_deleted"] = None
+            error_print(
+                f"Error capturing current path to delete temporary directory! Error: {str(e)}"
+            )
+
         finally:
             return result

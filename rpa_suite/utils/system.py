@@ -8,7 +8,6 @@ import sys, os
 
 
 def set_importable_dir(display_message: bool = False):
-    
     """
     Sets the directory to be importable by appending it to the system path.
 
@@ -32,11 +31,14 @@ def set_importable_dir(display_message: bool = False):
     ----------
         Nenhum
     """
-    
+
     try:
         sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-        if display_message: success_print(f'Successfully set the directory for importation!')
-        
+        if display_message:
+            success_print(f"Successfully set the directory for importation!")
+
     except Exception as e:
-        error_print(f'An error occurred while executing the function: {set_importable_dir.__name__}! Error: {str(e)}.')
+        error_print(
+            f"An error occurred while executing the function: {set_importable_dir.__name__}! Error: {str(e)}."
+        )

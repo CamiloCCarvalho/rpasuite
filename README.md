@@ -15,19 +15,21 @@
 [![License MIT](https://img.shields.io/github/license/docling-project/docling)](https://opensource.org/licenses/MIT)
 [![rpa-suite Actor](https://apify.com/actor-badge?actor=camiloccarvalho/rpasuite?fpr=rpa-suite)](https://apify.com/camiloccarvalho/rpasuite)
 
-
 ## O que é?
+
 **RPA Suite:** um conjunto abrangente de ferramentas projetadas para simplificar e otimizar o desenvolvimento de projetos de automação RPA com Python. Embora nossa suíte seja um conjunto de Ferramentas de RPA especializado, sua versatilidade a torna igualmente útil para uma ampla gama de projetos de desenvolvimento. Esta desenvolvendo com Selenium, Botcity ou Playwright? Experimente a RPA Suite e descubra como podemos facilitar seu projeto, ou qualquer projeto de Robôs de Software.
 
 <br>
 
 ## Documentação
+
 - **[Documentação no GitHub](https://github.com/CamiloCCarvalho/rpasuite/wiki)**
-Conta com guia de uso , instação e todas funcionalidades. 
+  Conta com guia de uso , instação e todas funcionalidades.
 
 <br>
 
 ## Sumário
+
 - [O que é?](#o-que-é)
 - [Documentação](#documentação)
 - [Sumário do conteudo](#sumário-do-conteudo)
@@ -39,7 +41,6 @@ Conta com guia de uso , instação e todas funcionalidades.
 - [Estrutura do módulo](#estrutura-do-módulo)
 - [Release](#release)
 - [Mais Sobre](#mais-sobre)
-
 
 ## Destaque
 
@@ -66,6 +67,7 @@ Nosso objetivo é se tornar a Biblioteca Python para RPA referência. Tornando o
 <br>
 
 ## Instalação
+
 Para **instalar** o projeto, utilize o comando:
 
 ```python
@@ -91,7 +93,6 @@ Feito isso já estará pronto para o uso:
 rpa.email.send_mail(...)
 ```
 
-
 > **⚠️ IMPORTANTE:**
 > Para **desinstalar** o projeto, utilize o comando abaixo:
 >
@@ -110,7 +111,6 @@ rpa.email.send_mail(...)
 
 <br>
 
-
 ## Exemplo
 
 Do módulo principal, importe a suite. Ela retorna uma instância do Objeto de classe Rpa_suite, onde possui variáveis apontando para todas funções dos submódulos:
@@ -128,6 +128,7 @@ rpa.clock.wait_for_exec(time, my_function, param1, param2)
 # Usando submódulo email para envio de email por SMTP comum
 rpa.email.send_smtp(...)
 ```
+
 <br>
 
 ## Dependências
@@ -148,7 +149,6 @@ No setup do nosso projeto já estão inclusas as dependências, só será necess
   - selenium
   - webdriver_manager
 
-
 <br>
 <hr>
 <br>
@@ -165,73 +165,85 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
 - **rpa_suite**
 
   **clock**
-    - **exec_at_hour** - Função que executa uma função no horário especificado "xx:yy", permitindo agendamento de tarefas com precisão.
-    - **wait_for_exec** - Função que aguarda um tempo em segundos antes de executar a função passada como argumento.
-    - **exec_and_wait** - Função que executa uma função e, em seguida, aguarda um tempo em segundos antes de continuar.
-  
+
+  - **exec_at_hour** - Função que executa uma função no horário especificado "xx:yy", permitindo agendamento de tarefas com precisão.
+  - **wait_for_exec** - Função que aguarda um tempo em segundos antes de executar a função passada como argumento.
+  - **exec_and_wait** - Função que executa uma função e, em seguida, aguarda um tempo em segundos antes de continuar.
+
   **date**
-    - **get_hms** - Função que retorna hora, minuto e segundo formatados como strings.
-    - **get_dmy** - Função que retorna dia, mês e ano formatados como strings.
-  
+
+  - **get_hms** - Função que retorna hora, minuto e segundo formatados como strings.
+  - **get_dmy** - Função que retorna dia, mês e ano formatados como strings.
+
   **email**
-    - **send_smtp** - Função para envio de emails via SMTP com suporte a anexos e mensagens HTML, configurável e personalizável.
-  
+
+  - **send_smtp** - Função para envio de emails via SMTP com suporte a anexos e mensagens HTML, configurável e personalizável.
+
   **file**
-    - **screen_shot** - Função para capturar screenshots, criando diretórios e arquivos com nomes e caminhos personalizáveis.
-    - **flag_create** - Função para criar arquivos de flag indicando execução de processos.
-    - **flag_delete** - Função para deletar arquivos de flag após a execução de processos.
-    - **count_files** - Função para contar arquivos em diretórios, com suporte a extensões específicas.
-  
+
+  - **screen_shot** - Função para capturar screenshots, criando diretórios e arquivos com nomes e caminhos personalizáveis.
+  - **flag_create** - Função para criar arquivos de flag indicando execução de processos.
+  - **flag_delete** - Função para deletar arquivos de flag após a execução de processos.
+  - **count_files** - Função para contar arquivos em diretórios, com suporte a extensões específicas.
+
   **directory**
-    - **create_temp_dir** - Função para criar diretórios temporários com nomes e caminhos personalizáveis.
-    - **delete_temp_dir** - Função para deletar diretórios temporários, com opção de remover arquivos contidos.
-  
+
+  - **create_temp_dir** - Função para criar diretórios temporários com nomes e caminhos personalizáveis.
+  - **delete_temp_dir** - Função para deletar diretórios temporários, com opção de remover arquivos contidos.
+
   **log**
-    - **config_logger** - Função para configurar logs com suporte a arquivos e streams, utilizando a biblioteca Loguru.
-    - **log_start_run_debug** - Função para registrar logs de início de execução em nível de depuração.
-    - **log_debug** - Função para registrar logs em nível de depuração.
-    - **log_info** - Função para registrar logs em nível informativo.
-    - **log_warning** - Função para registrar logs em nível de aviso.
-    - **log_error** - Função para registrar logs em nível de erro.
-    - **log_critical** - Função para registrar logs em nível crítico.
+
+  - **config_logger** - Função para configurar logs com suporte a arquivos e streams, utilizando a biblioteca Loguru.
+  - **log_start_run_debug** - Função para registrar logs de início de execução em nível de depuração.
+  - **log_debug** - Função para registrar logs em nível de depuração.
+  - **log_info** - Função para registrar logs em nível informativo.
+  - **log_warning** - Função para registrar logs em nível de aviso.
+  - **log_error** - Função para registrar logs em nível de erro.
+  - **log_critical** - Função para registrar logs em nível crítico.
 
   **printer**
-    - **success_print** - Função para imprimir mensagens de sucesso com destaque em verde.
-    - **alert_print** - Função para imprimir mensagens de alerta com destaque em amarelo.
-    - **info_print** - Função para imprimir mensagens informativas com destaque em ciano.
-    - **error_print** - Função para imprimir mensagens de erro com destaque em vermelho.
-  
+
+  - **success_print** - Função para imprimir mensagens de sucesso com destaque em verde.
+  - **alert_print** - Função para imprimir mensagens de alerta com destaque em amarelo.
+  - **info_print** - Função para imprimir mensagens informativas com destaque em ciano.
+  - **error_print** - Função para imprimir mensagens de erro com destaque em vermelho.
+
   **regex**
-    - **check_pattern_in_text** - Função para verificar a presença de padrões em textos, com suporte a case-sensitive.
-  
+
+  - **check_pattern_in_text** - Função para verificar a presença de padrões em textos, com suporte a case-sensitive.
+
   **validate**
-    - **emails** - Função para validar listas de emails, retornando listas de emails válidos e inválidos.
-    - **word** - Função para buscar palavras ou padrões específicos em textos, com suporte a contagem de ocorrências.
-  
+
+  - **emails** - Função para validar listas de emails, retornando listas de emails válidos e inválidos.
+  - **word** - Função para buscar palavras ou padrões específicos em textos, com suporte a contagem de ocorrências.
+
   **Browser**
-    - **start_browser** - Função para iniciar o navegador Chrome com suporte a depuração remota.
-    - **find_ele** - Função para localizar elementos na página utilizando estratégias de localização do Selenium.
-    - **get** - Função para navegar para URLs específicas.
-    - **close_browser** - Função para fechar o navegador e encerrar processos relacionados.
-  
+
+  - **start_browser** - Função para iniciar o navegador Chrome com suporte a depuração remota.
+  - **find_ele** - Função para localizar elementos na página utilizando estratégias de localização do Selenium.
+  - **get** - Função para navegar para URLs específicas.
+  - **close_browser** - Função para fechar o navegador e encerrar processos relacionados.
+
   **Parallel (ParallelRunner)**
-    - **run** - Função para iniciar um processo em paralelo.
-    - **is_running** - Função para capturar o status atual do processo que esta rodando em paralelo.
-    - **get_result** - Função para coletar o retorno da execução em paralelo junto com resultado da função ou funções que foram enviadas a este processo com retorno em forma de dict.
-    - **terminate** - Função para finalizar o processo paralelo mantendo apenas o processo principal do seu código, também é chamada de forma automatica esta função ao final de um procesos paralelo ou no final da função "get_result".
-  
+
+  - **run** - Função para iniciar um processo em paralelo.
+  - **is_running** - Função para capturar o status atual do processo que esta rodando em paralelo.
+  - **get_result** - Função para coletar o retorno da execução em paralelo junto com resultado da função ou funções que foram enviadas a este processo com retorno em forma de dict.
+  - **terminate** - Função para finalizar o processo paralelo mantendo apenas o processo principal do seu código, também é chamada de forma automatica esta função ao final de um procesos paralelo ou no final da função "get_result".
+
   **Asyn (AsyncRunner)**
-    - **run** - Função para iniciar a execução assíncrona de uma função mantendo o fluxo principal da aplicação.
-    - **is_running** - Função para verificar se a tarefa assíncrona ainda está em execução.
-    - **get_result** - Função para obter o resultado da execução assíncrona, incluindo tempo de execução e status, com suporte a timeout.
-    - **cancel** - Função para cancelar a tarefa assíncrona em execução.
+
+  - **run** - Função para iniciar a execução assíncrona de uma função mantendo o fluxo principal da aplicação.
+  - **is_running** - Função para verificar se a tarefa assíncrona ainda está em execução.
+  - **get_result** - Função para obter o resultado da execução assíncrona, incluindo tempo de execução e status, com suporte a timeout.
+  - **cancel** - Função para cancelar a tarefa assíncrona em execução.
 
 ## Release Notes
 
-### Versão: **Beta 1.5.3**
+### Versão: **Beta 1.5.4**
 
 - **Data de Lançamento:** *20/02/2024*
-- **Última Atualização:** *17/04/2025*
+- **Última Atualização:** 21/04/2025
 - **Status:** Em desenvolvimento
 
 Esta versão marca um grande avanço no desenvolvimento da RPA Suite, trazendo melhorias significativas na arquitetura, novas funcionalidades e maior simplicidade no uso. Confira as principais mudanças abaixo.
@@ -255,6 +267,6 @@ Esta versão marca um grande avanço no desenvolvimento da RPA Suite, trazendo m
 Para mais informações, visite os links abaixo:
 
 - **[Repositório no GitHub](https://github.com/CamiloCCarvalho/rpa_suite)**
-Explore o código-fonte, contribua com melhorias e acompanhe o desenvolvimento do projeto.
+  Explore o código-fonte, contribua com melhorias e acompanhe o desenvolvimento do projeto.
 - **[Página no PyPI](https://pypi.org/project/rpa-suite/)**
   Confira a documentação oficial, instale a biblioteca e veja as versões disponíveis.

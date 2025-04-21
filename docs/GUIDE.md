@@ -714,9 +714,112 @@ rpa.file.screen_shot()
 
 <br>
 
+## Log
+
+**Log** é um Objeto dedicado criação, registro e acompanhamento de logs. Sua estrutura é bastante simples conta com apenas 2 tipos de método, o primeiro para fazer a configuração, criando um diretório e arquivo para registro.
+
+O segundo tipo gerando os logs desejados. 
+
+Principais destaques: 
+  - Facilidade de realizar tudo com apenas 2 linhas de código, e quando o registro já existe não é substituido, facilitando a manutenção e continuidade de logs caso deseje usar como histórico.
+  - Conta com um método considerado "start" para registrar uma linha em branco no arquivo facilitando a divisão do arquivo por execuções.
+  - Registro com dados que facilitam a navegação por estruturas grandes de código apontando a ultima subpasta e o arquivo onde foi disparado o log.
+
+Abaixo todos métodos e argumentos disponiveis de **Log**:
+
+Metodo ``config_logger``:
+
+- Função por configurar um logger e apontar para o caminho do arquivo desejado, gerando assim os logs no arquivo e também registrando as mensagems no console, todas mensagens já são personalizadas para diferencia-las. Também conta com um filtro de palavras para excluir dados sensiveis se necessario. (Neste módulo estamos realizando ajustes constantemente para oferecer uma esperiencia mais completa)
+  Por ``default`` o caminho onde cria o diretório e arquivo é a raiz onde esta sendo executado ``'.'`` usando assim por padrão o caminho relativo, esta mesmo caminho é utilizado pelas funções de log para registra as mensagens no arquivo e também no console.
+
+> **⚠️ Importante:**
+> Garanta que seja executado o método config_logger antes de chamar os métodos de log para garantir que não haverá erros.
+
+- Argumentos:
+
+  - ``path_dir`` : ``str`` - Caminho para criar o diretório, por ``default`` o caminho do arquivo em execução.
+  - ``name_log_dir`` : ``str`` - Nome do diretório de logs, por ``default`` chama-se ``'Logs'``.
+  - ``name_file_log`` : ``str`` - NOme do arquivo de log, por ``default`` chama-se ``'log'`` com extensão fixa: ``.log``
+  - ``filter_words`` : ``list[str]`` - Lista de palavras que deseja filtrar para não aparecer no registro, use para dados sensiveis.
+
+<br>
+
+Metodos ``log_start_run_debug``, ``log_debug``, ``log_info``, ``log_warning``, ``log_error``, ``log_critical``:
+
+- Métodos responsaveis por gera um registro de log no arquivo e no console. Em especial o prieiro método ``log_start_run_debug`` adiciona uma linha vazia antes de registrar o conteudo, facilitando dividir o arquivo para encontrar pontos de inicio de execução. Todos os métodos são pré personalizados por seus leveis e também com cores para facilitar que sejam diferenciados entre si.
+
+> **⚠️ Importante:**
+> Garanta que seja executado o método config_logger antes de chamar os métodos de log para garantir que não haverá erros.
+
+- Argumentos:
+
+  - ``msg`` : ``str`` - Mensagem desejada no registro de log.
+
+<br>
+
+> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
+>
+> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
+>
+> `from rpa_suite.core import Log`
+
+<br>
+
+Exemplo de uso ``config_logger``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+# Acessando a instancia de 'Log' acessamos seu método que configura o logger, cria a pasta e também o arquivo de log
+rpa.log.config_logger()
+
+# Este método deve criar uma pasta no local atual da execução chamada Logs com arquivo 'log.log' disponibilizando assim que use as funções de log para registrar neste arquivo.
+
+# !IMPORTANT: garanta que instancie primeiramente no seu código config_logger para usar livremente as funções de log em qualquer etapa do seu projeto e qualquer arquivo, se os métodos de log forem chamados sem a configuração primeiro, apresentarão erro.
+
+>>> Diretório:'C:\Users\You\your_project\here\Logs' foi criado com sucesso.
+```
+
+
+<br>
+
+Exemplo de uso ``log_start_run_debug``, ``log_info``, ``log_warning``, ``log_error`` ,``log_critical``, ``log_debug``:
+
+```python
+# Importando a suite instanciada com todas funcionalidades
+from rpa_suite import rpa
+
+
+# !IMPORTANT: Garanta que ja tenha sido executado o método config_logger deste módulo anteriormente no seu projeto para poder capturar e apontar para o arquivo correto e gerar os logs.
+
+
+# Métodos de log disponíveis para uso, registra tanto no arquivo como também no console ja personalizado, além de gerar um espaço no arquivo para determinar o inicio da execução com log de start
+rpa.log.log_start_run_debug(f'Iniciando execução do script {__file__}')
+
+rpa.log.log_info(f'Executando tarefa exemplo 1')
+
+rpa.log.log_warning(f'Executando tarefa exemplo 2 com warning')
+
+rpa.log.log_error(f'Executando tarefa exemplo 3 com erro')
+
+rpa.log.log_critical(f'Executando tarefa exemplo 4 com erro crítico')
+
+rpa.log.log_debug(f'Executando tarefa exemplo 5 com debug')
+
+>>> 21.04.25.00:33 DEBUG    Iniciando execução do script c:\You\your_project\here\this_file.py
+>>> 21.04.25.00:33 INFO     Executando tarefa exemplo 1
+>>> 21.04.25.00:33 WARNING  Executando tarefa exemplo 2 com warning
+>>> 21.04.25.00:33 ERROR    Executando tarefa exemplo 3 com erro
+>>> 21.04.25.00:33 CRITICAL Executando tarefa exemplo 4 com erro crítico
+>>> 21.04.25.00:33 DEBUG    Executando tarefa exemplo 5 com debug
+```
+
+<br>
+
+
 ## Pendentes:
 - Modulos (pré instanciados):
-  - log
   - regex
   - validate
 

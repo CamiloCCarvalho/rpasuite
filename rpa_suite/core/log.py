@@ -20,7 +20,7 @@ class Filters:
                 string_words: list[str] = [str(word) for word in words]
                 for word in string_words:
                     if word in record["message"]:
-                        record["message"] = 'Log Alterado devido a palavra Filtrada!'
+                        record["message"] = "Log Alterado devido a palavra Filtrada!"
                         return True
         return True
 
@@ -49,7 +49,7 @@ class CustomFormatter:
             level=record["level"].name,
             filename=filename,
             lineno=lineno,
-            message=record["message"]
+            message=record["message"],
         )
         return log_msg
 
@@ -66,12 +66,18 @@ class Log:
     def __init__(self):
         self.logger = logger
 
-    def config_logger(self, path_dir: str = 'default', name_log_dir: str = 'Logs', name_file_log: str = 'log', filter_words: list[str] = None):
+    def config_logger(
+        self,
+        path_dir: str = "default",
+        name_log_dir: str = "Logs",
+        name_file_log: str = "log",
+        filter_words: list[str] = None,
+    ):
         try:
             self.path_dir = path_dir
             self.name_file_log = name_file_log
 
-            if self.path_dir == 'default':
+            if self.path_dir == "default":
                 self.path_dir = os.getcwd()
 
             full_path = os.path.join(self.path_dir, name_log_dir)
@@ -83,7 +89,9 @@ class Log:
             except FileExistsError:
                 alert_print(f"Diretório:'{self.full_path}' já existe.")
             except PermissionError:
-                alert_print(f"Permissão negada: não é possível criar o diretório '{self.full_path}'.")
+                alert_print(
+                    f"Permissão negada: não é possível criar o diretório '{self.full_path}'."
+                )
 
             new_filter = None
             if filter_words is not None:
@@ -98,7 +106,9 @@ class Log:
             formatter = CustomFormatter()
 
             if new_filter:
-                self.logger.add(file_handler, filter=new_filter, level="DEBUG", format=log_format)
+                self.logger.add(
+                    file_handler, filter=new_filter, level="DEBUG", format=log_format
+                )
             else:
                 self.logger.add(file_handler, level="DEBUG", format=log_format)
 
@@ -107,7 +117,9 @@ class Log:
             return file_handler
 
         except Exception as e:
-            error_print(f'Houve um erro durante a execução da função: {self.config_logger.__name__}! Error: {str(e)}.')
+            error_print(
+                f"Houve um erro durante a execução da função: {self.config_logger.__name__}! Error: {str(e)}."
+            )
             return None
 
     def _log(self, level: str, msg: str):
@@ -120,15 +132,19 @@ class Log:
             lineno = frame.f_lineno
             self.logger.bind(filename=filename, lineno=lineno).log(level, msg)
         except Exception as e:
-            error_print(f'Erro durante a função de log! Error: {str(e)}')
+            error_print(f"Erro durante a função de log! Error: {str(e)}")
 
     def log_start_run_debug(self, msg_start_loggin: str) -> None:
         try:
             with open(self.file_handler, "a") as log_file:
-                log_file.write("\n")  # Add a blank line before logging the start message
+                log_file.write(
+                    "\n"
+                )  # Add a blank line before logging the start message
             self._log("DEBUG", msg_start_loggin)
         except Exception as e:
-            error_print(f'Erro fn: {self.log_start_run_debug.__name__} ao tentar acessar o arquivo de log Confira se foi criado a configuração de log correta com a função config_logger e se a pasta e arquivo estão nos diretório desejado! Error: {str(e)}.')
+            error_print(
+                f"Erro fn: {self.log_start_run_debug.__name__} ao tentar acessar o arquivo de log Confira se foi criado a configuração de log correta com a função config_logger e se a pasta e arquivo estão nos diretório desejado! Error: {str(e)}."
+            )
 
     def log_debug(self, msg: str) -> None:
         self._log("DEBUG", msg)

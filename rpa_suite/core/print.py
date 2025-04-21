@@ -5,22 +5,21 @@ from colorama import Fore
 
 
 # Windows bash colors
-class Colors():
-    black     = f'{Fore.BLACK}'
-    blue      = f'{Fore.BLUE}'
-    green     = f'{Fore.GREEN}'
-    cyan      = f'{Fore.CYAN}'
-    red       = f'{Fore.RED}'
-    magenta   = f'{Fore.MAGENTA}'
-    yellow    = f'{Fore.YELLOW}'
-    white     = f'{Fore.WHITE}'
-    default   = f'{Fore.WHITE}'
-    call_fn   = f'{Fore.LIGHTMAGENTA_EX}'
-    retur_fn  = f'{Fore.LIGHTYELLOW_EX}'
+class Colors:
+    black = f"{Fore.BLACK}"
+    blue = f"{Fore.BLUE}"
+    green = f"{Fore.GREEN}"
+    cyan = f"{Fore.CYAN}"
+    red = f"{Fore.RED}"
+    magenta = f"{Fore.MAGENTA}"
+    yellow = f"{Fore.YELLOW}"
+    white = f"{Fore.WHITE}"
+    default = f"{Fore.WHITE}"
+    call_fn = f"{Fore.LIGHTMAGENTA_EX}"
+    retur_fn = f"{Fore.LIGHTYELLOW_EX}"
 
 
-class Print():
-    
+class Print:
     """
     Class that provides methods for formatted printing in the console, allowing for different types of messages to be displayed with specific colors.
 
@@ -35,7 +34,7 @@ class Print():
     ----------
         >>> from rpa_suite import rpa
         >>> rpa.alert_print('Hello World')
-    
+
     pt-br
     ----
 
@@ -53,16 +52,12 @@ class Print():
     >>> from rpa_suite import rpa
     >>> rpa.alert_print('Hello World')
     """
+
     colors: Colors = Colors
-    
-    def __init__(self):
-        ...
-    
-    
-    def success_print(self,
-                    string_text: str,
-                    color=Colors.green,
-                    ending="\n") -> None:
+
+    def __init__(self): ...
+
+    def success_print(self, string_text: str, color=Colors.green, ending="\n") -> None:
         """
         Print that indicates ``SUCCESS``. Customized with the color Green \n
 
@@ -78,13 +73,9 @@ class Print():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending) 
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def alert_print(self,
-                    string_text: str,
-                    color=Colors.yellow,
-                    ending="\n") -> None:
+    def alert_print(self, string_text: str, color=Colors.yellow, ending="\n") -> None:
         """
         Print that indicates ``ALERT``. Customized with the color Yellow \n
 
@@ -99,13 +90,9 @@ class Print():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending) 
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def info_print(self,
-                    string_text: str,
-                    color=Colors.cyan,
-                    ending="\n") -> None:
+    def info_print(self, string_text: str, color=Colors.cyan, ending="\n") -> None:
         """
         Print that indicates ``INFORMATION``. Customized with the color Cyan \n
 
@@ -120,13 +107,9 @@ class Print():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending) 
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def error_print(self, 
-                    string_text: str, 
-                    color=Colors.red, 
-                    ending="\n") -> None:
+    def error_print(self, string_text: str, color=Colors.red, ending="\n") -> None:
         """
         Print that indicates ``ERROR``. Customized with the color Red \n
 
@@ -141,13 +124,11 @@ class Print():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending) 
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def magenta_print(self, 
-                        string_text: str,
-                        color=Colors.magenta,
-                        ending="\n") -> None:
+    def magenta_print(
+        self, string_text: str, color=Colors.magenta, ending="\n"
+    ) -> None:
         """
         Print customized with the color Magenta \n
 
@@ -162,13 +143,9 @@ class Print():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending) 
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def blue_print(self,
-                    string_text: str, 
-                    color=Colors.blue, 
-                    ending="\n") -> None:
+    def blue_print(self, string_text: str, color=Colors.blue, ending="\n") -> None:
         """
         Print customized with the color Blue \n
 
@@ -183,13 +160,11 @@ class Print():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending)
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def print_call_fn(self, 
-                        string_text: str, 
-                        color=Colors.call_fn, 
-                        ending="\n") -> None:
+    def print_call_fn(
+        self, string_text: str, color=Colors.call_fn, ending="\n"
+    ) -> None:
         """
         Print customized for function called (log) \n
         Color: Magenta Light
@@ -205,13 +180,11 @@ class Print():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending)
+        print(f"{color}{string_text}{Colors.default}", end=ending)
 
-
-    def print_retur_fn(self, 
-                        string_text: str, 
-                        color=Colors.retur_fn, 
-                        ending="\n") -> None:
+    def print_retur_fn(
+        self, string_text: str, color=Colors.retur_fn, ending="\n"
+    ) -> None:
         """
         Print customized for function return (log) \n
         Color: Yellow Light
@@ -227,5 +200,4 @@ class Print():
         ----------
             >>> type:None
         """
-        print(f'{color}{string_text}{Colors.default}', end=ending)
-
+        print(f"{color}{string_text}{Colors.default}", end=ending)

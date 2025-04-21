@@ -12,20 +12,19 @@ from email.mime.base import MIMEBase
 from email import encoders
 
 
-class Email():
-    
+class Email:
     """
     Class that provides utilities for sending emails via SMTP protocol.
-    
+
     This class offers functionalities for:
         - Sending emails with attachments
         - HTML message formatting
         - SMTP server configuration
         - Email validation
-        
+
     Methods:
         send_smtp: Sends an email through specified SMTP server
-        
+
     The Email class is part of RPA Suite and can be accessed through the rpa object:
         >>> from rpa_suite import rpa
         >>> rpa.email.send_smtp(
@@ -50,16 +49,16 @@ class Email():
     pt-br
     ----------
     Classe que fornece utilitários para envio de emails via protocolo SMTP.
-    
+
     Esta classe oferece funcionalidades para:
         - Envio de emails com anexos
         - Formatação de mensagens em HTML
         - Configuração de servidor SMTP
         - Validação de email
-        
+
     Métodos:
         send_smtp: Envia um email através do servidor SMTP especificado
-        
+
     A classe Email é parte do RPA Suite e pode ser acessada através do objeto rpa:
         >>> from rpa_suite import rpa
         >>> rpa.email.send_smtp(
@@ -71,80 +70,76 @@ class Email():
         ... )
     """
 
+    smtp_server: str = ("smtp.hostinger.com",)
+    smtp_port: str = (465,)
+    email_user: str = ("your_email@email.com",)
+    email_password: str = ("password",)
+    email_to: str = ("to@email.com",)
+    attachments: list[str] = ([],)
+    subject_title: str = ("Test title",)
+    body_message: str = "<p>Testing message body</p>"
+    auth_tls: bool = (False,)
 
-    smtp_server:str = "smtp.hostinger.com",
-    smtp_port:str = 465,
-    email_user:str = "your_email@email.com",
-    email_password:str = "password",
-    email_to: str = "to@email.com",
-    attachments: list[str] = [],
-    subject_title: str = 'Test title',
-    body_message: str = '<p>Testing message body</p>'
-    auth_tls: bool = False,
-
-
-    def __init__(self):
-        ...
+    def __init__(self): ...
 
     def send_smtp(
         self,
-        email_user:str,
-        email_password:str,
+        email_user: str,
+        email_password: str,
         email_to: str,
-        subject_title: str = 'Test title',
-        body_message: str = '<p>Testing message body</p>',
+        subject_title: str = "Test title",
+        body_message: str = "<p>Testing message body</p>",
         attachments: list[str] = [],
-        smtp_server:str = "smtp.hostinger.com",
-        smtp_port:str = 465,
+        smtp_server: str = "smtp.hostinger.com",
+        smtp_port: str = 465,
         auth_tls: bool = False,
         display_message: bool = True,
-        ):
-
+    ):
         """
         Sends an email using the specified SMTP server.
 
         Args:
-            smtp_server (str, optional): Address of the SMTP server. 
+            smtp_server (str, optional): Address of the SMTP server.
                 Default: "smtp.hostinger.com".
-            smtp_port (str, optional): Port of the SMTP server. 
+            smtp_port (str, optional): Port of the SMTP server.
                 Default: 465.
-            email_user (str, optional): User (email) for authentication on the SMTP server. 
+            email_user (str, optional): User (email) for authentication on the SMTP server.
                 Default: "example@email.com".
-            email_password (str, optional): Password for authentication on the SMTP server. 
+            email_password (str, optional): Password for authentication on the SMTP server.
                 Default: "example123".
-            email_to (str, optional): Email address of the recipient. 
+            email_to (str, optional): Email address of the recipient.
                 Default: "person@email.com".
-            attachments (list[str], optional): List of file paths to attach to the email. 
+            attachments (list[str], optional): List of file paths to attach to the email.
                 Default: [].
-            subject_title (str, optional): Title (subject) of the email. 
+            subject_title (str, optional): Title (subject) of the email.
                 Default: 'test title'.
-            body_message (str, optional): Body of the email message, in HTML format. 
+            body_message (str, optional): Body of the email message, in HTML format.
                 Default: '<p>test message</p>'.
 
         Returns:
             None: This function does not explicitly return any value, but prints success or failure messages when sending the email.
-        
+
         pt-br
         ------
-        
+
         Envia um email usando o servidor SMTP especificado.
 
         Args:
-            smtp_server (str, opcional): Endereço do servidor SMTP. 
+            smtp_server (str, opcional): Endereço do servidor SMTP.
                 Padrão: "smtp.hostinger.com".
-            smtp_port (str, opcional): Porta do servidor SMTP. 
+            smtp_port (str, opcional): Porta do servidor SMTP.
                 Padrão: 465.
-            email_user (str, opcional): Usuário (email) para autenticação no servidor SMTP. 
+            email_user (str, opcional): Usuário (email) para autenticação no servidor SMTP.
                 Padrão: "example@email.com".
-            email_password (str, opcional): Senha para autenticação no servidor SMTP. 
+            email_password (str, opcional): Senha para autenticação no servidor SMTP.
                 Padrão: "example123".
-            email_to (str, opcional): Endereço de email do destinatário. 
+            email_to (str, opcional): Endereço de email do destinatário.
                 Padrão: "person@email.com".
-            attachments (list[str], opcional): Lista de caminhos de arquivos para anexar ao email. 
+            attachments (list[str], opcional): Lista de caminhos de arquivos para anexar ao email.
                 Padrão: [].
-            subject_title (str, opcional): Título (assunto) do email. 
+            subject_title (str, opcional): Título (assunto) do email.
                 Padrão: 'título de teste'.
-            body_message (str, opcional): Corpo da mensagem do email, em formato HTML. 
+            body_message (str, opcional): Corpo da mensagem do email, em formato HTML.
                 Padrão: '<p>mensagem de teste</p>'.
 
         Returns:
@@ -164,13 +159,17 @@ class Email():
 
             # Criando a mensagem
             msg = MIMEMultipart()
-            msg['From'] = self.email_user
-            msg['To'] = ', '.join(self.email_to) if isinstance(self.email_to, list) else self.email_to
-            msg['Subject'] = str(self.subject_title)
+            msg["From"] = self.email_user
+            msg["To"] = (
+                ", ".join(self.email_to)
+                if isinstance(self.email_to, list)
+                else self.email_to
+            )
+            msg["Subject"] = str(self.subject_title)
 
             # Corpo do e-mail
             body = str(self.body_message)
-            msg.attach(MIMEText(body, 'html'))
+            msg.attach(MIMEText(body, "html"))
 
             # Anexos (opcional)
             if self.attachments:
@@ -191,7 +190,9 @@ class Email():
                             msg.attach(part)
 
                     except Exception as e:
-                        error_print(f"Erro ao anexar o arquivo {attachment_path}: {str(e)}")
+                        error_print(
+                            f"Erro ao anexar o arquivo {attachment_path}: {str(e)}"
+                        )
 
             try:
                 if self.auth_tls:
@@ -206,7 +207,8 @@ class Email():
 
                 # Enviando o e-mail
                 server.sendmail(self.email_user, self.email_to, msg.as_string())
-                if display_message: success_print("E-mail enviado com sucesso!")
+                if display_message:
+                    success_print("E-mail enviado com sucesso!")
 
                 # Encerrando a conexão
                 server.quit()

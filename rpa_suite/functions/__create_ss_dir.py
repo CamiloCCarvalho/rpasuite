@@ -8,9 +8,9 @@ import os
 from typing import Union
 
 
-
-def __create_ss_dir(path_to_create: str = 'default', name_ss_dir: str='screenshots') -> dict[str, Union[bool, str, None]]:
-
+def __create_ss_dir(
+    path_to_create: str = "default", name_ss_dir: str = "screenshots"
+) -> dict[str, Union[bool, str, None]]:
     """
     Function responsible for creating a screenshots directory to work with your screenshot files. \n
 
@@ -25,7 +25,7 @@ def __create_ss_dir(path_to_create: str = 'default', name_ss_dir: str='screensho
     >>> type:dict
         * 'success': bool - represents case the action was performed successfully
         * 'path_created': str - path of the directory that was created on the process
-        
+
     Description: pt-br
     ----------
     Função responsavel por criar diretório de screenshots para trabalhar com seus arquivos de sreenshot. \n
@@ -42,16 +42,16 @@ def __create_ss_dir(path_to_create: str = 'default', name_ss_dir: str='screensho
         * 'success': bool - representa se ação foi realizada com sucesso
         * 'path_created': str - path do diretório que foi criado no processo
     """
-    
+
     # Local Variables
     result: dict = {
-        'success': bool,
-        'path_created': str,
+        "success": bool,
+        "path_created": str,
     }
-    
+
     try:
         # by 'default', defines path to local script execution path
-        if path_to_create == 'default':
+        if path_to_create == "default":
             path_to_create: str = os.getcwd()
 
         # Build path to new dir
@@ -63,25 +63,29 @@ def __create_ss_dir(path_to_create: str = 'default', name_ss_dir: str='screensho
             # Successefully created
             os.makedirs(full_path, exist_ok=False)
 
-            result['success'] = True
-            result['path_created'] = fr'{full_path}'
+            result["success"] = True
+            result["path_created"] = rf"{full_path}"
 
             success_print(f"Diretório:'{full_path}' foi criado com sucesso.")
 
         except FileExistsError:
-            result['success'] = False
-            result['path_created'] = full_path
+            result["success"] = False
+            result["path_created"] = full_path
             # alert_print(f"Diretório:'{full_path}' já existe.")
 
         except PermissionError:
-            result['success'] = False
-            result['path_created'] = None
-            alert_print(f"Permissão negada: não é possível criar o diretório '{full_path}'.")
+            result["success"] = False
+            result["path_created"] = None
+            alert_print(
+                f"Permissão negada: não é possível criar o diretório '{full_path}'."
+            )
 
     except Exception as e:
-        result['success'] = False
-        result['path_created'] = None
-        error_print(f'Error capturing current path to create screenshots directory! Error: {str(e)}')
-        
+        result["success"] = False
+        result["path_created"] = None
+        error_print(
+            f"Error capturing current path to create screenshots directory! Error: {str(e)}"
+        )
+
     finally:
         return result

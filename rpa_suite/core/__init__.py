@@ -36,11 +36,12 @@ from .parallel import ParallelRunner
 from .asyncrun import AsyncRunner
 
 
-
 # On this case, we are importing the Browser class only if the selenium and webdriver_manager modules are installed.
 # This is useful to avoid unnecessary imports and dependencies if the user does not need the Browser functionality.
 import importlib.util
 
 # from .browser import Browser
-if importlib.util.find_spec("selenium") and importlib.util.find_spec("webdriver_manager"):
+if importlib.util.find_spec("selenium") and importlib.util.find_spec(
+    "webdriver_manager"
+):
     from .browser import Browser
