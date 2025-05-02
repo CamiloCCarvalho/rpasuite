@@ -60,6 +60,8 @@ Módulos disponíveis:
     ``Browser``: Objeto de Automação de Navegadores (necessario Selenium e Webdriver_Manager)
 """
 
+__version__ = '1.5.5'
+
 # allows importing the rpa_suite module without the package name
 from .suite import rpa
 

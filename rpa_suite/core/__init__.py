@@ -45,3 +45,7 @@ if importlib.util.find_spec("selenium") and importlib.util.find_spec(
     "webdriver_manager"
 ):
     from .browser import Browser
+
+
+__version__ = '1.5.5'
+

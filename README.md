@@ -13,11 +13,10 @@
 [![Imports: pyautogui](https://img.shields.io/badge/%20imports-pyautogui-%231674b1?style=flat&labelColor=ef8336)](https://github.com/asweigart/pyautogui)
 [![Imports: loguru](https://img.shields.io/badge/%20imports-loguru-%231674b1?style=flat&labelColor=ef8336)](https://github.com/Delgan/loguru)
 [![License MIT](https://img.shields.io/github/license/docling-project/docling)](https://opensource.org/licenses/MIT)
-[![rpa-suite Actor](https://apify.com/actor-badge?actor=camiloccarvalho/rpasuite?fpr=rpa-suite)](https://apify.com/camiloccarvalho/rpasuite)
 
 ## O que é?
 
-**RPA Suite:** um conjunto abrangente de ferramentas projetadas para simplificar e otimizar o desenvolvimento de projetos de automação RPA com Python. Embora nossa suíte seja um conjunto de Ferramentas de RPA especializado, sua versatilidade a torna igualmente útil para uma ampla gama de projetos de desenvolvimento. Esta desenvolvendo com Selenium, Botcity ou Playwright? Experimente a RPA Suite e descubra como podemos facilitar seu projeto, ou qualquer projeto de Robôs de Software.
+**RPA Suite:** um conjunto abrangente de ferramentas projetadas para simplificar e otimizar o desenvolvimento de projetos de automação RPA com Python. Embora nossa suíte seja um conjunto de Ferramentas de RPA especializado, sua versatilidade a torna igualmente útil para uma ampla gama de projetos de desenvolvimento. Esta desenvolvendo com Selenium ou Botcity? Experimente a RPA Suite e descubra como podemos facilitar seu projeto e qualquer projeto de Robôs de Software.
 
 <br>
 
@@ -240,10 +239,10 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
 
 ## Release Notes
 
-### Versão: **Beta 1.5.4**
+### Versão: **Beta 1.5.5**
 
 - **Data de Lançamento:** *20/02/2024*
-- **Última Atualização:** 21/04/2025
+- **Última Atualização:** 02/05/2025
 - **Status:** Em desenvolvimento
 
 Esta versão marca um grande avanço no desenvolvimento da RPA Suite, trazendo melhorias significativas na arquitetura, novas funcionalidades e maior simplicidade no uso. Confira as principais mudanças abaixo.

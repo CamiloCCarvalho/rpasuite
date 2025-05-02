@@ -9,3 +9,5 @@ pt-br
 O módulo de utilitários da rpa-suite fornece uma coleção de funções e classes utilitárias que facilitam diversas tarefas na automação de processos. Inclui métodos auxiliares para registro de log, manipulação de arquivos e outras operações comuns que aprimoram a funcionalidade e a usabilidade da RPA Suite.
 
 """
+
+__version__ = '1.5.5'
