@@ -42,7 +42,7 @@ class Browser:
             Finds a single element on the page using the specified locator strategy.
         get(url: str, display_message: bool = False):
             Navigates the browser to the specified URL.
-        _close_all_chrome():
+        _close_all_browsers():
             Closes all Chrome processes forcefully.
         close_browser(display_message: bool = False):
             Closes the browser instance and terminates the associated Chrome processes.
@@ -74,7 +74,7 @@ class Browser:
             Localiza um único elemento na página usando a estratégia de localização especificada.
         get(url: str, display_message: bool = False):
             Navega o navegador para a URL especificada.
-        _close_all_chrome():
+        _close_all_browsers():
             Fecha todos os processos do Chrome de forma forçada.
         close_browser(display_message: bool = False):
             Fecha a instância do navegador e termina os processos associados do Chrome.
@@ -84,12 +84,12 @@ class Browser:
     port: int = None
     path_driver = None
 
-    def __init__(self, port: int = 9393, close_all_chrome_on_this_port: bool = False):
+    def __init__(self, port: int = 9393, close_browser_on_this_port: bool = False):
         self.port = port
         self.path_driver = ChromeDriverManager().install()
 
-        if close_all_chrome_on_this_port:
-            self._close_all_chrome()
+        if close_browser_on_this_port:
+            self._close_all_browsers()
         ...
 
     def configure_browser(self) -> None:
@@ -168,7 +168,7 @@ class Browser:
                     if response.status_code == 200:
                         break  # O Chrome está aberto
                 except requests.ConnectionError:
-                    sleep(1)  # Espera um segundo antes de tentar novamente
+                    sleep(0.3)  # Espera um segundo antes de tentar novamente
 
             # Inicializa o Chrome com as opções
             self.configure_browser()
@@ -199,7 +199,7 @@ class Browser:
         """
 
         try:
-            sleep(2)
+            sleep(0.9)
             element = WebDriverWait(self.driver, timeout).until(
                 EC.presence_of_element_located((by, value))
             )
@@ -285,7 +285,7 @@ class Browser:
                 pass
 
             # Aguarda um momento para o processo ser liberado
-            sleep(1)
+            sleep(0.6)
 
             # Força o fechamento do processo específico do Chrome
             os.system(

@@ -239,10 +239,10 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
 
 ## Release Notes
 
-### Versão: **Beta 1.5.5**
+### Versão: **Beta 1.5.6**
 
 - **Data de Lançamento:** *20/02/2024*
-- **Última Atualização:** 02/05/2025
+- **Última Atualização:** 27/05/2025
 - **Status:** Em desenvolvimento
 
 Esta versão marca um grande avanço no desenvolvimento da RPA Suite, trazendo melhorias significativas na arquitetura, novas funcionalidades e maior simplicidade no uso. Confira as principais mudanças abaixo.
