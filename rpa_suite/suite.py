@@ -16,7 +16,7 @@ from .core.asyncrun import AsyncRunner
 
 # imports external
 from colorama import Fore
-import pkg_resources
+from importlib.metadata import version
 
 # imports third-party
 import subprocess
@@ -162,7 +162,10 @@ class Suite:
 
     # VARIABLES INTERNAL
     try:
-        __version__ = pkg_resources.get_distribution("rpa_suite").version
+        # old: __version__ = pkg_resources.get_distribution("rpa_suite").version
+        
+        __version__ = version("package_name")
+        
     except Exception:
         __version__ = "unknown"
 

@@ -148,3 +148,9 @@ class KeepSessionActive:
             ctypes.windll.kernel32.SetThreadExecutionState(self.ES_CONTINUOUS)
         except Exception as e:
             error_print(f"Erro ao restaurar estado de execução: {str(e)}")
+
+
+
+class Tools(Utils):
+    
+    KeepSessionActive = KeepSessionActive

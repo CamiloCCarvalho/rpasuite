@@ -37,13 +37,10 @@ class CustomHandler:
 
 class CustomFormatter:
     def format(self, record):
-        frame = inspect.currentframe().f_back
-        full_path_filename = frame.f_code.co_filename
-        filename = os.path.basename(full_path_filename)
-        foldername = os.path.basename(os.path.dirname(full_path_filename))
-        filename = os.path.join(foldername, filename)
-        lineno = frame.f_lineno
-        format_string = "<green>{time:DD.MM.YY.HH:mm}</green> <level>{level: <8}</level> <level>{message}</level>\n"
+        # Use the info from record["extra"] which is set in Log._log to the caller's file and line
+        filename = record["extra"].get("filename", "")
+        lineno = record["extra"].get("lineno", "")
+        format_string = "<green>{time:DD.MM.YY.HH:mm}</green> <level>{level: <8}</level> <green>{filename}</green>:<cyan>{lineno: <4}</cyan> <level>{message}</level>\n"
         log_msg = format_string.format(
             time=record["time"],
             level=record["level"].name,
@@ -101,7 +98,7 @@ class Log:
             file_handler = os.path.join(self.full_path, f"{self.name_file_log}.log")
             self.logger.remove()
 
-            log_format = "<green>{time:DD.MM.YY.HH:mm}</green> <level>{level: <8}</level> <green>{extra[filename]}</green>:{extra[lineno]: <4} <level>{message}</level>"
+            log_format = "<green>{time:DD.MM.YY.HH:mm}</green> <level>{level: <8}</level> <green>{extra[filename]}</green>:<cyan>{extra[lineno]: <4}</cyan> <level>{message}</level>"
 
             formatter = CustomFormatter()
 
@@ -123,14 +120,36 @@ class Log:
             return None
 
     def _log(self, level: str, msg: str):
+        """
+        docstring
+        """
         try:
-            frame = inspect.currentframe().f_back
+            # Find the first frame that's not from this log.py file
+            frame = inspect.currentframe()
+            current_file = os.path.normpath(__file__)
+            
+            while frame:
+                frame = frame.f_back
+                if frame and os.path.normpath(frame.f_code.co_filename) != current_file:
+                    break
+            
+            if not frame:
+                # Fallback if we can't find external caller
+                frame = inspect.currentframe().f_back.f_back
+                
             full_path_filename = frame.f_code.co_filename
-            filename = os.path.basename(full_path_filename)
-            foldername = os.path.basename(os.path.dirname(full_path_filename))
-            filename = os.path.join(foldername, filename)
+
+            # Normalize path to use os.sep
+            full_path_filename = os.path.normpath(full_path_filename)
+
+            # Get the last two components: parent folder and filename
+            parent_folder = os.path.basename(os.path.dirname(full_path_filename))
+            file_name = os.path.basename(full_path_filename)
+            display_filename = f"{parent_folder}/{file_name}"
+
             lineno = frame.f_lineno
-            self.logger.bind(filename=filename, lineno=lineno).log(level, msg)
+
+            self.logger.bind(filename=display_filename, lineno=lineno).log(level, msg)
         except Exception as e:
             error_print(f"Erro durante a função de log! Error: {str(e)}")
 
