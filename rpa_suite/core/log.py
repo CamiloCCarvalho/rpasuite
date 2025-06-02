@@ -66,9 +66,10 @@ class Log:
     def config_logger(
         self,
         path_dir: str = "default",
-        name_log_dir: str = "Logs",
+        name_log_dir: str = "logs",
         name_file_log: str = "log",
         filter_words: list[str] = None,
+        display_message: bool = False,
     ):
         try:
             self.path_dir = path_dir
@@ -82,9 +83,9 @@ class Log:
 
             try:
                 os.makedirs(self.full_path, exist_ok=True)
-                success_print(f"Diretório:'{self.full_path}' foi criado com sucesso.")
+                if display_message: success_print(f"Diretório:'{self.full_path}' foi criado com sucesso.")
             except FileExistsError:
-                alert_print(f"Diretório:'{self.full_path}' já existe.")
+                if display_message: alert_print(f"Diretório:'{self.full_path}' já existe.")
             except PermissionError:
                 alert_print(
                     f"Permissão negada: não é possível criar o diretório '{self.full_path}'."
@@ -121,7 +122,7 @@ class Log:
 
     def _log(self, level: str, msg: str):
         """
-        docstring
+        Method to generete logs used from self.
         """
         try:
             # Find the first frame that's not from this log.py file

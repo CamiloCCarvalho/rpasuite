@@ -4,7 +4,7 @@
 from rpa_suite.functions._printer import error_print, success_print
 
 # imports third-party
-import sys, os, ctypes, traceback
+import sys, os, ctypes
 
 
 class Utils:
@@ -23,7 +23,7 @@ class Utils:
         try:
             pass
         except Exception as e:
-            error_print(f"Erro durante a inicialização da classe Utils: {str(e)}")
+            error_print(f"Erro durante a inicialização da classe Utils: {str(e)}.")
 
 
     def set_importable_dir(self, display_message: bool = False) -> None:
@@ -56,7 +56,7 @@ class Utils:
 
         except Exception as e:
             error_print(
-                f"Erro ao configurar diretório importável: {str(e)}"
+                f"Erro ao configurar diretório importável: {str(e)}."
             )
 
 
@@ -95,7 +95,7 @@ class KeepSessionActive:
             self.ES_SYSTEM_REQUIRED = 0x00000001
             self.ES_DISPLAY_REQUIRED = 0x00000002
         except Exception as e:
-            error_print(f"Erro ao inicializar KeepSessionActive: {str(e)}")
+            error_print(f"Erro ao inicializar KeepSessionActive: {str(e)}.")
     
 
     def __enter__(self) -> None:
@@ -120,7 +120,7 @@ class KeepSessionActive:
             )
             return self
         except Exception as e:
-            error_print(f"Erro ao configurar estado de execução: {str(e)}")
+            error_print(f"Erro ao configurar estado de execução: {str(e)}.")
             return self
     
 
@@ -147,10 +147,12 @@ class KeepSessionActive:
         try:
             ctypes.windll.kernel32.SetThreadExecutionState(self.ES_CONTINUOUS)
         except Exception as e:
-            error_print(f"Erro ao restaurar estado de execução: {str(e)}")
-
-
+            error_print(f"Erro ao restaurar estado de execução: {str(e)}.")
 
 class Tools(Utils):
-    
-    KeepSessionActive = KeepSessionActive
+    """
+    Classe utilitária para gerenciamento de configurações de sistema e diretórios.
+
+    Fornece métodos para manipulação de caminhos de importação e configurações do sistema.
+    """
+    keep_session_active: KeepSessionActive = KeepSessionActive
