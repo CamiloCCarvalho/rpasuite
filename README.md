@@ -239,23 +239,25 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
 
 ## Release Notes
 
-### Versão: **Beta 1.5.8**
+### Versão: **Beta 1.5.9**
 
 - **Data de Lançamento:** *20/02/2024*
-- **Última Atualização:** 02/06/2025
+- **Última Atualização:** 06/06/2025
 - **Status:** Em desenvolvimento
 
 Esta versão marca um grande avanço no desenvolvimento da RPA Suite, trazendo melhorias significativas na arquitetura, novas funcionalidades e maior simplicidade no uso. Confira as principais mudanças abaixo.
 
 ### Notas da atualização:
 
-- Submódulos agora são objetos internos do objeto principal `Suite`, acessíveis via `rpa.modulo.function()` ou diretamente pelo submódulo.
-- Estrutura reformulada para maior simplicidade, com pastas `core` (núcleo) e `utils` (ferramentas utilitárias).
-- Novo submódulo `ParallelRunner` (`Parallel`) para execução de processos em paralelo com suporte a timeout e recuperação de resultados.
-- Novo submódulo `AsyncRunner` (`Asyn`) para facilitar o uso de funções assíncronas com menos código.
-- Adicionado suporte à automação de navegadores (inicialmente apenas Chrome).
-- Melhorias nas descrições e adição de docstrings em todas as funções e objetos.
-- Submódulo de logs unificado com Loguru, agora com suporte a configuração de diretórios, nomes de arquivos e streams para console e arquivo.
+- Atualização de Linters e Formatters
+  - black
+  - pylint
+  - bandit
+  - flake8
+  - isort
+  - pyupgrade
+  - detect-secrets
+  - autoflake
 
 
 ## Mais Sobre

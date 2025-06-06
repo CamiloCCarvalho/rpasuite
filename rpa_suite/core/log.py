@@ -3,12 +3,14 @@
 # imports internal
 from rpa_suite.functions._printer import error_print, alert_print, success_print
 
-# imports external
+# imports third party
 from loguru import logger
 
-# imports third-party
+# imports standard
 from typing import Optional as Op
-import sys, os, inspect
+import sys
+import os
+import inspect
 
 
 class Filters:
@@ -83,13 +85,13 @@ class Log:
 
             try:
                 os.makedirs(self.full_path, exist_ok=True)
-                if display_message: success_print(f"Diretório:'{self.full_path}' foi criado com sucesso.")
+                if display_message:
+                    success_print(f"Diretório:'{self.full_path}' foi criado com sucesso.")
             except FileExistsError:
-                if display_message: alert_print(f"Diretório:'{self.full_path}' já existe.")
+                if display_message:
+                    alert_print(f"Diretório:'{self.full_path}' já existe.")
             except PermissionError:
-                alert_print(
-                    f"Permissão negada: não é possível criar o diretório '{self.full_path}'."
-                )
+                alert_print(f"Permissão negada: não é possível criar o diretório '{self.full_path}'.")
 
             new_filter = None
             if filter_words is not None:
@@ -104,9 +106,7 @@ class Log:
             formatter = CustomFormatter()
 
             if new_filter:
-                self.logger.add(
-                    file_handler, filter=new_filter, level="DEBUG", format=log_format
-                )
+                self.logger.add(file_handler, filter=new_filter, level="DEBUG", format=log_format)
             else:
                 self.logger.add(file_handler, level="DEBUG", format=log_format)
 
@@ -115,9 +115,7 @@ class Log:
             return file_handler
 
         except Exception as e:
-            error_print(
-                f"Houve um erro durante a execução da função: {self.config_logger.__name__}! Error: {str(e)}."
-            )
+            error_print(f"Houve um erro durante a execução da função: {self.config_logger.__name__}! Error: {str(e)}.")
             return None
 
     def _log(self, level: str, msg: str):
@@ -128,16 +126,16 @@ class Log:
             # Find the first frame that's not from this log.py file
             frame = inspect.currentframe()
             current_file = os.path.normpath(__file__)
-            
+
             while frame:
                 frame = frame.f_back
                 if frame and os.path.normpath(frame.f_code.co_filename) != current_file:
                     break
-            
+
             if not frame:
                 # Fallback if we can't find external caller
                 frame = inspect.currentframe().f_back.f_back
-                
+
             full_path_filename = frame.f_code.co_filename
 
             # Normalize path to use os.sep
@@ -157,9 +155,7 @@ class Log:
     def log_start_run_debug(self, msg_start_loggin: str) -> None:
         try:
             with open(self.file_handler, "a") as log_file:
-                log_file.write(
-                    "\n"
-                )  # Add a blank line before logging the start message
+                log_file.write("\n")  # Add a blank line before logging the start message
             self._log("DEBUG", msg_start_loggin)
         except Exception as e:
             error_print(

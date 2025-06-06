@@ -1,3 +1,7 @@
+setuptools>=67.8.0
+wheel
+pyperclip
+pywin32
 colorama>=0.4.6
 colorlog>=6.8.0
 email_validator>=2.1.0
@@ -8,4 +12,17 @@ pyautogui>=0.9.54
 selenium>=4.16.0
 typing>=3.7.4.3
 webdriver_manager>=4.0.1
-setuptools>=67.8.0
+
+
+# Linters e formatters
+pre-commit
+black
+pylint
+bandit
+opencv-python
+pillow
+pyupgrade
+detect-secrets
+flake8
+isort
+bandit

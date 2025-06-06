@@ -1,16 +1,16 @@
 # rpa_suite/core/file.py
 
-# imports internal
-from rpa_suite.functions._printer import error_print, success_print, alert_print
-from rpa_suite.functions.__create_ss_dir import __create_ss_dir as create_ss_dir
-
-# imports external
-from colorama import Fore
-
-# imports third-party
+# imports standard
 import os, time
 from datetime import datetime
 from typing import Dict, List, Union
+
+# imports third party
+from colorama import Fore
+
+# imports internal
+from rpa_suite.functions._printer import error_print, success_print, alert_print
+from rpa_suite.functions.__create_ss_dir import __create_ss_dir as create_ss_dir
 
 
 class File:
@@ -138,9 +138,7 @@ class File:
 
             if save_with_date:  # use date on file name
                 image = pyautogui.screenshot()
-                file_name = (
-                    f'{file_name}_{datetime.today().strftime("%d_%m_%Y-%H_%M_%S")}.png'
-                )
+                file_name = f'{file_name}_{datetime.today().strftime("%d_%m_%Y-%H_%M_%S")}.png'
                 path_file_screenshoted = os.path.join(path_dir, file_name)
 
                 image.save(path_file_screenshoted)
@@ -164,9 +162,7 @@ class File:
 
         except Exception as e:
 
-            error_print(
-                f"Error to execute function:{self.screen_shot.__name__}! Error: {str(e)}"
-            )
+            error_print(f"Error to execute function:{self.screen_shot.__name__}! Error: {str(e)}")
             return None
 
     def flag_create(
@@ -180,7 +176,7 @@ class File:
         """
 
         try:
-            if path_to_create == None:
+            if path_to_create is None:
                 path_origin: str = os.getcwd()
                 full_path_with_name = rf"{path_origin}/{name_file}"
             else:
@@ -206,7 +202,7 @@ class File:
 
         try:
 
-            if path_to_delete == None:
+            if path_to_delete is None:
                 path_origin: str = os.getcwd()
                 full_path_with_name = rf"{path_origin}/{name_file}"
             else:
@@ -264,21 +260,18 @@ class File:
 
         # Process
         try:
-            for dir in dir_to_count:
-                for _, _, files in os.walk(dir):
+            for directory in dir_to_count:
+                for _, _, files in os.walk(directory):
                     for file in files:
                         if type_extension == "*" or file.endswith(f".{type_extension}"):
                             result["qt"] += 1
             result["success"] = True
 
             if display_message:
-                success_print(
-                    f'Function: {self.count_files.__name__} counted {result["qt"]} files.'
-                )
+                success_print(f'Function: {self.count_files.__name__} counted {result["qt"]} files.')
 
         except Exception as e:
             result["success"] = False
             error_print(f"Error when trying to count files! Error: {str(e)}")
 
-        finally:
-            return result
+        return result

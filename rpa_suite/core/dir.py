@@ -1,11 +1,12 @@
 # rpa_suite/core/dir.py
 
+# imports standard
+import os
+import shutil
+from typing import Union
+
 # imports internal
 from rpa_suite.functions._printer import error_print, alert_print, success_print
-
-# imports third-party
-import os, shutil
-from typing import Union
 
 
 class Directory:
@@ -51,7 +52,12 @@ class Directory:
         name_temp_dir (str): O nome do diretório temporário a ser criado. O padrão é 'temp'.
     """
 
-    def __init__(self): ...
+    def __init__(self): 
+        """
+        Função construtora da Classe que fornece utilitários para gerenciamento de:\n
+        diretórios, incluindo criação, exclusão e manipulação de diretórios.
+        """
+        ...
 
     def create_temp_dir(
         self,
@@ -130,19 +136,14 @@ class Directory:
             except PermissionError:
                 result["success"] = False
                 result["path_created"] = None
-                alert_print(
-                    f"Permission denied: Not possible to create Directory '{full_path}'."
-                )
+                alert_print(f"Permission denied: Not possible to create Directory '{full_path}'.")
 
         except Exception as e:
             result["success"] = False
             result["path_created"] = None
-            error_print(
-                f"Error capturing current path to create temporary directory! Error: {str(e)}"
-            )
+            error_print(f"Error capturing current path to create temporary directory! Error: {str(e)}")
 
-        finally:
-            return result
+        return result
 
     def delete_temp_dir(
         self,
@@ -230,16 +231,11 @@ class Directory:
             except PermissionError:
                 result["success"] = False
                 result["path_deleted"] = None
-                alert_print(
-                    f"Permission denied: Not possible to delete Directory '{full_path}'."
-                )
+                alert_print(f"Permission denied: Not possible to delete Directory '{full_path}'.")
 
         except Exception as e:
             result["success"] = False
             result["path_deleted"] = None
-            error_print(
-                f"Error capturing current path to delete temporary directory! Error: {str(e)}"
-            )
+            error_print(f"Error capturing current path to delete temporary directory! Error: {str(e)}.")
 
-        finally:
-            return result
+        return result

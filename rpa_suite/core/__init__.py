@@ -41,11 +41,8 @@ from .asyncrun import AsyncRunner
 import importlib.util
 
 # from .browser import Browser
-if importlib.util.find_spec("selenium") and importlib.util.find_spec(
-    "webdriver_manager"
-):
+if importlib.util.find_spec("selenium") and importlib.util.find_spec("webdriver_manager"):
     from .browser import Browser
 
 
-__version__ = '1.5.5'
-
+__version__ = "1.5.5"

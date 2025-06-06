@@ -1,9 +1,11 @@
 # rpa_suite/core/browser.py
 
-# imports internal
-from rpa_suite.functions._printer import error_print, alert_print, success_print
+# imports standard
+from time import sleep
+import os
+import requests
 
-# imports external
+# imports third party
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -11,9 +13,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-# imports third-party
-from time import sleep
-import os, requests
+# imports internal
+from rpa_suite.functions._printer import error_print, alert_print, success_print
 
 
 class Browser:
@@ -107,9 +108,7 @@ class Browser:
             # Use the absolute path from comment
 
             options = Options()
-            options.add_experimental_option(
-                "debuggerAddress", f"127.0.0.1:{str(self.port)}"
-            )
+            options.add_experimental_option("debuggerAddress", f"127.0.0.1:{str(self.port)}")
 
             # Additional configs
             options.add_argument("--start-maximized")
@@ -117,9 +116,7 @@ class Browser:
 
             # Verifica se o caminho do driver está correto
             if not os.path.exists(self.path_driver):
-                raise FileNotFoundError(
-                    f"O caminho do driver não foi encontrado: {self.path_driver}"
-                )
+                raise FileNotFoundError(f"O caminho do driver não foi encontrado: {self.path_driver}")
 
             # Create driver with options and chromedriver path
             self.driver = webdriver.Chrome(
@@ -129,13 +126,9 @@ class Browser:
             )
 
         except Exception as e:
-            error_print(
-                f"Erro durante a função: {self.configure_browser.__name__}! Error: {str(e)}."
-            )
+            error_print(f"Erro durante a função: {self.configure_browser.__name__}! Error: {str(e)}.")
 
-    def start_browser(
-        self, close_chrome_on_this_port: bool = True, display_message: bool = False
-    ):
+    def start_browser(self, close_chrome_on_this_port: bool = True, display_message: bool = False):
         """
         Starts a Chrome browser instance with remote debugging enabled.
         Args:
@@ -200,17 +193,13 @@ class Browser:
 
         try:
             sleep(0.9)
-            element = WebDriverWait(self.driver, timeout).until(
-                EC.presence_of_element_located((by, value))
-            )
+            element = WebDriverWait(self.driver, timeout).until(EC.presence_of_element_located((by, value)))
             return element
 
         except Exception as e:
 
             if display_message:
-                error_print(
-                    f"Erro durante a função: {self.find_ele.__name__}! Error: {str(e)}."
-                )
+                error_print(f"Erro durante a função: {self.find_ele.__name__}! Error: {str(e)}.")
                 return None
             else:
                 return None
@@ -303,29 +292,25 @@ class Browser:
                     f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" /t >nul 2>&1'
                 )
                 if display_message:
-                    alert_print(f"Browser: Fechado via força!")
+                    alert_print("Browser: Fechado via força!")
 
             else:
                 if display_message:
-                    success_print(f"Browser: Fechado com sucesso!")
+                    success_print("Browser: Fechado com sucesso!")
 
         except Exception as e:
 
             try:
                 if display_message:
-                    alert_print(
-                        f"Erro ao fechar navegador: {str(e)}, Tentando meio mais forte!"
-                    )
+                    alert_print(f"Erro ao fechar navegador: {str(e)}, Tentando meio mais forte!")
 
                 # Último recurso - mata todos os processos do Chrome (use com cautela)
                 os.system(
                     f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" /t >nul 2>&1'
                 )
                 if display_message:
-                    alert_print(f"Browser: Fechado via força extrema!")
+                    alert_print("Browser: Fechado via força extrema!")
 
             except Exception as error_ultimate:
                 if display_message:
-                    error_print(
-                        f"Falha crítica ao tentar fechar o navegador! Error: {str(error_ultimate)}!"
-                    )
+                    error_print(f"Falha crítica ao tentar fechar o navegador! Error: {str(error_ultimate)}!")

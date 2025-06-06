@@ -1,12 +1,12 @@
 # rpa_suite/core/clock.py
 
-# imports internal
-from rpa_suite.functions._printer import error_print, success_print
-
-# imports third-party
+# imports standard
 import time
 from typing import Callable, Any
 from datetime import datetime as dt
+
+# imports internal
+from rpa_suite.functions._printer import error_print, success_print
 
 
 class Clock:
@@ -111,7 +111,7 @@ class Clock:
             minutes = str(now.minute) if now.minute >= 10 else f"0{now.minute}"
             moment_now = f"{hours}:{minutes}"
 
-            if hour_to_exec == None:
+            if hour_to_exec is None:
 
                 # Process
                 while run:
@@ -140,9 +140,7 @@ class Clock:
                             run = False
                             result["tried"] = not run
                             result["success"] = True
-                            success_print(
-                                f"{fn_to_exec.__name__}: Successfully executed!"
-                            )
+                            success_print(f"{fn_to_exec.__name__}: Successfully executed!")
                             break
 
                         except Exception as e:
@@ -157,9 +155,7 @@ class Clock:
                         time.sleep(30)
                         now = dt.now()
                         hours = str(now.hour) if now.hour >= 10 else f"0{now.hour}"
-                        minutes = (
-                            str(now.minute) if now.minute >= 10 else f"0{now.minute}"
-                        )
+                        minutes = str(now.minute) if now.minute >= 10 else f"0{now.minute}"
                         moment_now = f"{hours}:{minutes}"
 
             return result
@@ -167,14 +163,10 @@ class Clock:
         except Exception as e:
 
             result["success"] = False
-            error_print(
-                f"An error occurred on function from executing: {self.exec_at_hour.__name__}. Error: {str(e)}"
-            )
+            error_print(f"An error occurred on function from executing: {self.exec_at_hour.__name__}. Error: {str(e)}")
             return result
 
-    def wait_for_exec(
-        self, wait_time: int, fn_to_exec: Callable[..., Any], *args, **kwargs
-    ) -> dict[str, bool]:
+    def wait_for_exec(self, wait_time: int, fn_to_exec: Callable[..., Any], *args, **kwargs) -> dict[str, bool]:
         """
         Timer function, wait for a value in ``seconds`` to execute the function of the argument.
 
@@ -226,9 +218,7 @@ class Clock:
             time.sleep(wait_time)
             fn_to_exec(*args, **kwargs)
             result["success"] = True
-            success_print(
-                f"Function: {self.wait_for_exec.__name__} executed the function: {fn_to_exec.__name__}."
-            )
+            success_print(f"Function: {self.wait_for_exec.__name__} executed the function: {fn_to_exec.__name__}.")
 
         except Exception as e:
             result["success"] = False
@@ -238,9 +228,7 @@ class Clock:
 
         return result
 
-    def exec_and_wait(
-        self, wait_time: int, fn_to_exec: Callable[..., Any], *args, **kwargs
-    ) -> dict[str, bool]:
+    def exec_and_wait(self, wait_time: int, fn_to_exec: Callable[..., Any], *args, **kwargs) -> dict[str, bool]:
         """
         Timer function, executes a function and waits for the time in ``seconds``
 
@@ -292,9 +280,7 @@ class Clock:
             fn_to_exec(*args, **kwargs)
             time.sleep(wait_time)
             result["success"] = True
-            success_print(
-                f"Function: {self.wait_for_exec.__name__} executed the function: {fn_to_exec.__name__}."
-            )
+            success_print(f"Function: {self.wait_for_exec.__name__} executed the function: {fn_to_exec.__name__}.")
 
         except Exception as e:
             result["success"] = False

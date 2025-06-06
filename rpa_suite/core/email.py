@@ -1,15 +1,15 @@
 # rpa_suite/core/email.py
 
-# imports internal
-from rpa_suite.functions._printer import alert_print, error_print, success_print
-
-# imports third-party
+# imports standard
+import os
 import smtplib
-from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
+
+# imports internal
+from rpa_suite.functions._printer import alert_print, error_print, success_print
 
 
 class Email:
@@ -117,7 +117,8 @@ class Email:
                 Default: '<p>test message</p>'.
 
         Returns:
-            None: This function does not explicitly return any value, but prints success or failure messages when sending the email.
+            None: This function does not explicitly return any value,\n
+            but prints success or failure messages when sending the email.
 
         pt-br
         ------
@@ -160,11 +161,7 @@ class Email:
             # Criando a mensagem
             msg = MIMEMultipart()
             msg["From"] = self.email_user
-            msg["To"] = (
-                ", ".join(self.email_to)
-                if isinstance(self.email_to, list)
-                else self.email_to
-            )
+            msg["To"] = ", ".join(self.email_to) if isinstance(self.email_to, list) else self.email_to
             msg["Subject"] = str(self.subject_title)
 
             # Corpo do e-mail
@@ -173,10 +170,6 @@ class Email:
 
             # Anexos (opcional)
             if self.attachments:
-                from email.mime.base import MIMEBase
-                from email import encoders
-                import os
-
                 for attachment_path in self.attachments:
                     try:
                         with open(attachment_path, "rb") as attachment:
@@ -190,9 +183,7 @@ class Email:
                             msg.attach(part)
 
                     except Exception as e:
-                        error_print(
-                            f"Erro ao anexar o arquivo {attachment_path}: {str(e)}"
-                        )
+                        error_print(f"Erro ao anexar o arquivo {attachment_path}: {str(e)}")
 
             try:
                 if self.auth_tls:

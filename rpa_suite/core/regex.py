@@ -1,10 +1,10 @@
 # rpa_suite/core/regex.py
 
+# imports standard
+import re
+
 # imports internal
 from rpa_suite.functions._printer import error_print, success_print
-
-# imports third-party
-import re
 
 
 class Regex:

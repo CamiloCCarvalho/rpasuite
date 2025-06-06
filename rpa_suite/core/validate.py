@@ -1,10 +1,10 @@
 # rpa_suite/core/mail_validator.py
 
+# imports third party
+import email_validator
+
 # imports internal
 from rpa_suite.functions._printer import error_print, success_print
-
-# imports external
-import email_validator
 
 
 class Validate:
@@ -200,15 +200,11 @@ class Validate:
                     else:
                         words_lowercase = [word.lower() for word in origin_words]
                         searched_word_lower = searched_word.lower()
-                        result["number_occurrences"] = words_lowercase.count(
-                            searched_word_lower
-                        )
+                        result["number_occurrences"] = words_lowercase.count(searched_word_lower)
                         result["is_found"] = result["number_occurrences"] > 0
 
                 except Exception as e:
-                    return error_print(
-                        f"Unable to complete the search: {searched_word}. Error: {str(e)}"
-                    )
+                    return error_print(f"Unable to complete the search: {searched_word}. Error: {str(e)}")
 
             elif search_by == "string":
                 try:
@@ -218,20 +214,14 @@ class Validate:
                     else:
                         origin_text_lower = origin_text.lower()
                         searched_word_lower = searched_word.lower()
-                        result["number_occurrences"] = origin_text_lower.count(
-                            searched_word_lower
-                        )
+                        result["number_occurrences"] = origin_text_lower.count(searched_word_lower)
                         result["is_found"] = result["number_occurrences"] > 0
 
                 except Exception as e:
-                    return error_print(
-                        f"Unable to complete the search: {searched_word}. Error: {str(e)}"
-                    )
+                    return error_print(f"Unable to complete the search: {searched_word}. Error: {str(e)}")
 
         except Exception as e:
-            return error_print(
-                f"Unable to search for: {searched_word}. Error: {str(e)}"
-            )
+            return error_print(f"Unable to search for: {searched_word}. Error: {str(e)}")
 
         # Postprocessing
         if result["is_found"]:

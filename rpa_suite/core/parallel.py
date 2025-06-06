@@ -1,6 +1,6 @@
 # rpa_suite/core/parallel.py
 
-# imports third-party
+# imports standard
 from multiprocessing import Process, Manager
 from typing import Any, Callable, Dict, Optional, TypeVar, Generic
 import time
@@ -177,9 +177,7 @@ class ParallelRunner(Generic[T]):
             return False
         return self._process.is_alive()
 
-    def get_result(
-        self, timeout: Optional[float] = 60, terminate_on_timeout: bool = True
-    ) -> Dict[str, Any]:
+    def get_result(self, timeout: Optional[float] = 60, terminate_on_timeout: bool = True) -> Dict[str, Any]:
         """
         Retrieves the result of the parallel execution.
 
@@ -234,27 +232,19 @@ class ParallelRunner(Generic[T]):
 
         # Debug - mostra o dicionário compartilhado
         if self.display_message:
-            print(
-                f"[Processo Principal] Dicionário compartilhado: {dict(self._result_dict)}"
-            )
+            print(f"[Processo Principal] Dicionário compartilhado: {dict(self._result_dict)}")
 
         # Verifica se o processo terminou ou se atingiu o timeout
         if self._process.is_alive():
             if terminate_on_timeout:
                 self._process.terminate()
-                self._process.join(
-                    timeout=1
-                )  # Pequeno timeout para garantir que o processo termine
+                self._process.join(timeout=1)  # Pequeno timeout para garantir que o processo termine
                 result["terminated"] = True
                 result["success"] = False
-                result["error"] = (
-                    f"Operação cancelada por timeout após {execution_time:.2f} segundos"
-                )
+                result["error"] = f"Operação cancelada por timeout após {execution_time:.2f} segundos"
             else:
                 result["success"] = False
-                result["error"] = (
-                    f"Operação ainda em execução após {execution_time:.2f} segundos"
-                )
+                result["error"] = f"Operação ainda em execução após {execution_time:.2f} segundos"
         else:
             # Processo terminou normalmente - verificamos o status
             status = self._result_dict.get("status", "unknown")
@@ -266,9 +256,7 @@ class ParallelRunner(Generic[T]):
                     result["result"] = self._result_dict["result"]
                 else:
                     result["success"] = False
-                    result["error"] = (
-                        "Resultado não encontrado no dicionário compartilhado"
-                    )
+                    result["error"] = "Resultado não encontrado no dicionário compartilhado"
             else:
                 result["success"] = False
                 result["error"] = self._result_dict.get("error", "Erro desconhecido")
@@ -276,9 +264,7 @@ class ParallelRunner(Generic[T]):
                     result["traceback"] = self._result_dict["traceback"]
 
         # Finaliza o Manager se o processo terminou e não estamos mais esperando resultado
-        if not self._process.is_alive() and (
-            result.get("success", False) or result.get("terminated", False)
-        ):
+        if not self._process.is_alive() and (result.get("success", False) or result.get("terminated", False)):
             self._cleanup()
 
         return result

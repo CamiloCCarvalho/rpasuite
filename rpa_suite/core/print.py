@@ -1,6 +1,6 @@
 # rpa_suite/core/print.py
 
-# imports external
+# imports third party
 from colorama import Fore
 
 
@@ -126,9 +126,7 @@ class Print:
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
-    def magenta_print(
-        self, string_text: str, color=Colors.magenta, ending="\n"
-    ) -> None:
+    def magenta_print(self, string_text: str, color=Colors.magenta, ending="\n") -> None:
         """
         Print customized with the color Magenta \n
 
@@ -162,9 +160,7 @@ class Print:
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
-    def print_call_fn(
-        self, string_text: str, color=Colors.call_fn, ending="\n"
-    ) -> None:
+    def print_call_fn(self, string_text: str, color=Colors.call_fn, ending="\n") -> None:
         """
         Print customized for function called (log) \n
         Color: Magenta Light
@@ -182,9 +178,7 @@ class Print:
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
-    def print_retur_fn(
-        self, string_text: str, color=Colors.retur_fn, ending="\n"
-    ) -> None:
+    def print_retur_fn(self, string_text: str, color=Colors.retur_fn, ending="\n") -> None:
         """
         Print customized for function return (log) \n
         Color: Yellow Light

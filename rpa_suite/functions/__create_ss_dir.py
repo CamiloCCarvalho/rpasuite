@@ -76,16 +76,12 @@ def __create_ss_dir(
         except PermissionError:
             result["success"] = False
             result["path_created"] = None
-            alert_print(
-                f"Permissão negada: não é possível criar o diretório '{full_path}'."
-            )
+            alert_print(f"Permissão negada: não é possível criar o diretório '{full_path}'.")
 
     except Exception as e:
         result["success"] = False
         result["path_created"] = None
-        error_print(
-            f"Error capturing current path to create screenshots directory! Error: {str(e)}"
-        )
+        error_print(f"Error capturing current path to create screenshots directory! Error: {str(e)}")
 
     finally:
         return result

@@ -153,9 +153,7 @@ class Suite:
     import importlib.util
 
     # from .browser import Browser
-    if importlib.util.find_spec("selenium") and importlib.util.find_spec(
-        "webdriver_manager"
-    ):
+    if importlib.util.find_spec("selenium") and importlib.util.find_spec("webdriver_manager"):
         from .core.browser import Browser
 
         browser: Browser = Browser
@@ -163,9 +161,9 @@ class Suite:
     # VARIABLES INTERNAL
     try:
         # old: __version__ = pkg_resources.get_distribution("rpa_suite").version
-        
+
         __version__ = version("package_name")
-        
+
     except Exception:
         __version__ = "unknown"
 
@@ -242,9 +240,7 @@ class Suite:
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
-    def magenta_print(
-        self, string_text: str, color=Colors.magenta, ending="\n"
-    ) -> None:
+    def magenta_print(self, string_text: str, color=Colors.magenta, ending="\n") -> None:
         """
         Print customized with the color Magenta \n
 
@@ -278,9 +274,7 @@ class Suite:
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
-    def print_call_fn(
-        self, string_text: str, color=Colors.call_fn, ending="\n"
-    ) -> None:
+    def print_call_fn(self, string_text: str, color=Colors.call_fn, ending="\n") -> None:
         """
         Print customized for function called (log) \n
         Color: Magenta Light
@@ -298,9 +292,7 @@ class Suite:
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
-    def print_retur_fn(
-        self, string_text: str, color=Colors.retur_fn, ending="\n"
-    ) -> None:
+    def print_retur_fn(self, string_text: str, color=Colors.retur_fn, ending="\n") -> None:
         """
         Print customized for function return (log) \n
         Color: Yellow Light
