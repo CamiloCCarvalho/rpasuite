@@ -36,13 +36,16 @@ from .parallel import ParallelRunner
 from .asyncrun import AsyncRunner
 
 
-# On this case, we are importing the Browser class only if the selenium and webdriver_manager modules are installed.
-# This is useful to avoid unnecessary imports and dependencies if the user does not need the Browser functionality.
+# On this case, we are importing the (Browser|Iris) class only if the (selenium and webdriver_manager| docling) modules are installed.
+# This is useful to avoid unnecessary imports and dependencies if the user does not need the (Browser|Iris) functionality.
 import importlib.util
 
 # from .browser import Browser
 if importlib.util.find_spec("selenium") and importlib.util.find_spec("webdriver_manager"):
     from .browser import Browser
 
+# from .iris import Iris
+if importlib.util.find_spec("docling"):
+    from .iris import Iris
 
-__version__ = "1.5.5"
+__version__ = "1.6.1"

@@ -155,7 +155,8 @@ class Suite:
     Parallel: ParallelRunner = ParallelRunner
     Asyn: AsyncRunner = AsyncRunner
 
-    # On this case, we are importing the (Browser | Iris) class only if the selenium and webdriver_manager modules are installed.
+
+    # On this case, we are importing the (Browser | Iris) class only if the (selenium and webdriver_manager| docling) modules are installed.
     # This is useful to avoid unnecessary imports and dependencies if the user does not need the (Browser | Iris) functionality.
     import importlib.util
 
@@ -334,7 +335,7 @@ class Suite:
             "setuptools",
             "wheel",
             "pyperclip",
-            "pywin32"
+            "pywin32",
             "colorama",
             "colorlog",
             "email_validator",

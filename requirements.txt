@@ -26,3 +26,6 @@ detect-secrets
 flake8
 isort
 bandit
+
+# to package
+twine

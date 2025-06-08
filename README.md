@@ -141,12 +141,12 @@ No setup do nosso projeto já estão inclusas as dependências, só será necess
 - pillow
 - pyautogui
 - typing
-- setuptools
 
-  opcionalmente para automação de navegador:
+  opcionalmente para usar todas funcionalidades:
 
   - selenium
   - webdriver_manager
+  - docling
 
 <br>
 <hr>
@@ -240,14 +240,12 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
   **Iris (OCR-IA)**
 
   - **read_document** - Reads and converts a document to the specified format.
-  - **read_multiple_documents** - Reads and converts multiple documents.
-  - **get_supported_extensions** - Returns the list of supported file extensions
-  - **is_file_supported** - Checks if a file is supported by the class.
 
+<br>
 
 ## Release Notes
 
-### Versão: **Beta 1.6.0**
+### Versão: **Beta 1.6.1**
 
 - **Data de Lançamento:** *20/02/2024*
 - **Última Atualização:** 08/06/2025
