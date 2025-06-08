@@ -27,7 +27,10 @@ Available modules:
     ``printer``: Functions for formatted output
     ``regex``: Operations with regular expressions
     ``validate``: Data validation functions
+    ``ParallelRunner``: Object ParallelRunner functions to run in parallel
+    ``AsyncRunner``: Object AsyncRunner functions to run in Assyncronous
     ``Browser``: Object Browser automation functions (neeeds Selenium and Webdriver_Manager)
+    ``Iris``: Object Iris automation functions to convert documents with OCR + IA based on ``docling``
 
 pt-br
 -----
@@ -57,10 +60,13 @@ Módulos disponíveis:
     ``printer``: Funções para output formatado
     ``regex``: Operações com expressões regulares
     ``validate``: Funções de validação de dados
+    ``ParallelRunner``: Objeto ParallelRunner funções para rodar processos em paralelo
+    ``AsyncRunner``: Objeto AsyncRunner funções para rodar processos em assincronicidade
     ``Browser``: Objeto de Automação de Navegadores (necessario Selenium e Webdriver_Manager)
+    ``Iris``: Objeto Iris Automação de funções para converter documentos com OCR + IA baseado em ``docling``
 """
 
-__version__ = "1.5.5"
+__version__ = "1.5.9"
 
 # allows importing the rpa_suite module without the package name
 from .suite import rpa

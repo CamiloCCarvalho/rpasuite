@@ -13,7 +13,6 @@ from .core.validate import Validate
 from .core.parallel import ParallelRunner
 from .core.asyncrun import AsyncRunner
 
-
 # imports external
 from colorama import Fore
 from importlib.metadata import version
@@ -104,6 +103,10 @@ class Suite:
         ``printer``: Functions for formatted output
         ``regex``: Operations with regular expressions
         ``validate``: Data validation functions
+        ``ParallelRunner``: Object ParallelRunner functions to run in parallel
+        ``AsyncRunner``: Object AsyncRunner functions to run in Assyncronous
+        ``Browser``: Object Browser automation functions (neeeds Selenium and Webdriver_Manager)
+        ``Iris``: Object Iris automation functions to convert documents with OCR + IA based on ``docling``
 
     pt-br
     -----
@@ -133,6 +136,10 @@ class Suite:
         ``printer``: Funções para output formatado
         ``regex``: Operações com expressões regulares
         ``validate``: Funções de validação de dados
+        ``ParallelRunner``: Objeto ParallelRunner funções para rodar processos em paralelo
+        ``AsyncRunner``: Objeto AsyncRunner funções para rodar processos em assincronicidade
+        ``Browser``: Objeto de Automação de Navegadores (necessario Selenium e Webdriver_Manager)
+        ``Iris``: Objeto Iris Automação de funções para converter documentos com OCR + IA baseado em ``docling``
     """
 
     # SUBMODULES
@@ -148,8 +155,8 @@ class Suite:
     Parallel: ParallelRunner = ParallelRunner
     Asyn: AsyncRunner = AsyncRunner
 
-    # On this case, we are importing the Browser class only if the selenium and webdriver_manager modules are installed.
-    # This is useful to avoid unnecessary imports and dependencies if the user does not need the Browser functionality.
+    # On this case, we are importing the (Browser | Iris) class only if the selenium and webdriver_manager modules are installed.
+    # This is useful to avoid unnecessary imports and dependencies if the user does not need the (Browser | Iris) functionality.
     import importlib.util
 
     # from .browser import Browser
@@ -158,6 +165,12 @@ class Suite:
 
         browser: Browser = Browser
 
+    # from .iris import Iris
+    if importlib.util.find_spec("docling"):
+        from .core.iris import Iris
+
+        iris: Iris = Iris
+        
     # VARIABLES INTERNAL
     try:
         # old: __version__ = pkg_resources.get_distribution("rpa_suite").version
@@ -312,10 +325,16 @@ class Suite:
 
     def __install_all_libs(self):
         """
+        Method responsible for installing all libraries for advanced use of RPA-Suite, including all features such as OCR and AI agent.
+        ----------
         Metodo responsavel por instalar todas libs para uso avançado do RPA-Suite com todas funcionalidades incluindo OCR e agente de IA
         """
 
         libs = [
+            "setuptools",
+            "wheel",
+            "pyperclip",
+            "pywin32"
             "colorama",
             "colorlog",
             "email_validator",
@@ -326,15 +345,16 @@ class Suite:
             "selenium",
             "typing",
             "webdriver_manager",
+            "docling",
         ]
 
         for lib in libs:
             try:
                 subprocess.check_call([sys.executable, "-m", "pip", "install", lib])
-                self.success_print(f"Biblioteca {lib} instalada com sucesso!")
+                self.success_print(f"Suite RPA: Library {lib} installed successfully!")
 
             except subprocess.CalledProcessError:
-                self.error_print(f"Erro ao instalar biblioteca {lib}")
+                self.error_print(f"Suite RPA: Error installing library {lib}")
 
 
 rpa = Suite()

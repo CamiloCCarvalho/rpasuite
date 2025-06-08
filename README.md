@@ -237,19 +237,33 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
   - **get_result** - Função para obter o resultado da execução assíncrona, incluindo tempo de execução e status, com suporte a timeout.
   - **cancel** - Função para cancelar a tarefa assíncrona em execução.
 
+  **Iris (OCR-IA)**
+
+  - **read_document** - Reads and converts a document to the specified format.
+  - **read_multiple_documents** - Reads and converts multiple documents.
+  - **get_supported_extensions** - Returns the list of supported file extensions
+  - **is_file_supported** - Checks if a file is supported by the class.
+
+
 ## Release Notes
 
-### Versão: **Beta 1.5.9**
+### Versão: **Beta 1.6.0**
 
 - **Data de Lançamento:** *20/02/2024*
-- **Última Atualização:** 06/06/2025
+- **Última Atualização:** 08/06/2025
 - **Status:** Em desenvolvimento
 
 Esta versão marca um grande avanço no desenvolvimento da RPA Suite, trazendo melhorias significativas na arquitetura, novas funcionalidades e maior simplicidade no uso. Confira as principais mudanças abaixo.
 
-### Notas da atualização:
+### Notas:
+- atualização 1.6.0 
+  - Adição Módulo: Iris (OCR-IA)
+  - Feat.: leitura de documento (aceita multiplos formatos)
+  - Feat.: leitura em lote (multiplos docmumentos em uma unica chamada)
+  - Melhoria de docstrings
 
-- Atualização de Linters e Formatters
+- atualização 1.5.9 
+  - Atualização de Linters e Formatters
   - black
   - pylint
   - bandit
