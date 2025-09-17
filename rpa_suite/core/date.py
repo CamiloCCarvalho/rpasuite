@@ -5,9 +5,10 @@ import datetime as dt
 from typing import Optional as Op
 from typing import Tuple
 
-# imports internal
-from rpa_suite.functions._printer import error_print
-
+class DateError(Exception):
+    """Custom exception for Date errors."""
+    def __init__(self, message):
+        super().__init__(f'DateError: {message}')
 
 class Date:
     """
@@ -42,7 +43,39 @@ class Date:
         >>> hora, minuto, segundo = rpa.date.get_hms()
     """
 
-    def __init__(self): ...
+    def __init__(self) -> None: 
+        """
+        Class that provides utilities for date manipulation and formatting.
+
+        This class offers functionalities for:
+            - Getting current time components (hours, minutes, seconds)
+            - Date formatting and manipulation
+            - Date validation and conversion
+
+        Methods:
+            get_hms: Returns current time as tuple of hour, minute, second
+
+        The Date class is part of RPA Suite and can be accessed through the rpa object:
+            >>> from rpa_suite import rpa
+            >>> hour, minute, second = rpa.date.get_hms()
+
+        pt-br
+        ----------
+        Classe que fornece utilitários para manipulação e formatação de datas.
+
+        Esta classe oferece funcionalidades para:
+            - Obtenção de componentes do tempo atual (horas, minutos, segundos)
+            - Formatação e manipulação de datas
+            - Validação e conversão de datas
+
+        Métodos:
+            get_hms: Retorna o horário atual como tupla de hora, minuto, segundo
+
+        A classe Date é parte do RPA Suite e pode ser acessada através do objeto rpa:
+            >>> from rpa_suite import rpa
+            >>> hora, minuto, segundo = rpa.date.get_hms()
+        """
+        pass
 
     def get_hms(self) -> Tuple[Op[str], Op[str], Op[str]]:
         """
@@ -106,13 +139,9 @@ class Date:
                 return hours, minutes, seconds
 
             except Exception as e:
-
-                error_print(f"Unable to capture the time. Error: {str(e)}")
-                return None, None, None
-
+                raise e from e
         except Exception as e:
-            error_print(f"Error function: {self.get_hms.__name__}! Error: {str(e)}.")
-            return None, None, None
+            DateError(f"Error function: {self.get_hms.__name__}! {str(e)}.") from e
 
     def get_dmy(self) -> Tuple[Op[str], Op[str], Op[str]]:
         """
@@ -160,10 +189,6 @@ class Date:
                 return day_got, month_got, year_got
 
             except Exception as e:
-
-                error_print(f"Unable to capture the time. Error: {str(e)}")
-                return None, None, None
-
+                raise e from e
         except Exception as e:
-            error_print(f"Erro function: {self.get_dmy.__name__}! Error: {str(e)}.")
-            return None, None, None
+            DateError(f"Erro function: {self.get_dmy.__name__}! {str(e)}.")

@@ -4,8 +4,12 @@
 import re
 
 # imports internal
-from rpa_suite.functions._printer import error_print, success_print
+from rpa_suite.functions._printer import success_print
 
+class RegexError(Exception):
+    """Custom exception for Regex errors."""
+    def __init__(self, message):
+        super().__init__(f'Regex Error: {message}')
 
 class Regex:
     """
@@ -16,19 +20,11 @@ class Regex:
         - Validating strings against specific patterns
 
     The Regex class is part of the RPA Suite and can be used to enhance text processing capabilities.
-
-    pt-br
-    ----------
-    Classe que fornece utilitários para trabalhar com expressões regulares.
-
-    Esta classe oferece funcionalidades para:
-        - Buscar padrões em texto
-        - Validar strings contra padrões específicos
-
-    A classe Regex é parte do RPA Suite e pode ser usada para aprimorar as capacidades de processamento de texto.
     """
 
-    def __init__(self): ...
+    def __init__(self) -> None:
+        """Initialize the Regex class."""
+        pass
 
     def check_pattern_in_text(
         self,
@@ -38,19 +34,25 @@ class Regex:
         display_message: bool = False,
     ) -> bool:
         """
-        Function responsible for searching in a string ``origin_text`` a pattern ``pattern_to_search`` and returning True if the pattern is found, otherwise False. ``case_sensitive`` used for exact cases or cases with diferencce upper and lower cases
+        Function responsible for searching for a pattern in a text string and returning True if the pattern is found, otherwise False.
+
+        Parameters:
+        -----------
+        ``origin_text: str``
+            The text where the search should be performed.
+
+        ``pattern_to_search: str``
+            The regex pattern to search for in the text.
+
+        ``case_sensitive: bool``
+            Whether the search should be case sensitive. Default is True.
+
+        ``display_message: bool``
+            Whether to display success/failure messages. Default is False.
 
         Return:
         ----------
         A boolean indicating whether the pattern was found in the text.
-
-        Description: pt-br
-        ----------
-        Função responsável por buscar em um texto de leitura humana uma string ``origin_text`` por um padrão ``pattern_to_search`` e retornar True se o padrão for encontrado, caso contrário, False. ``case_sensitive`` usado para casos exatos ou casos com diferença entre caixa alta e baixa nos caracteres.
-
-        Retorno:
-        ----------
-        Um booleano indicando se o padrão foi encontrado no texto.
         """
 
         try:
@@ -85,8 +87,6 @@ class Regex:
                     return False
 
         except Exception as e:
-
-            error_print(
-                f"Error function: {self.check_pattern_in_text.__name__} when trying to check pattern in text. Error: {str(e)}"
-            )
-            return False
+            RegexError(
+                f"Error in function: {self.check_pattern_in_text.__name__} when trying to check pattern in text. Error: {str(e)}"
+            ) from e

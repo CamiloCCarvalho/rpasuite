@@ -9,9 +9,13 @@ from typing import Dict, List, Union
 from colorama import Fore
 
 # imports internal
-from rpa_suite.functions._printer import error_print, success_print, alert_print
+from rpa_suite.functions._printer import success_print, alert_print
 from rpa_suite.functions.__create_ss_dir import __create_ss_dir as create_ss_dir
 
+class FileError(Exception):
+    """Custom exception for File errors."""
+    def __init__(self, message):
+        super().__init__(f'FileError: {message}')
 
 class File:
     """
@@ -65,7 +69,11 @@ class File:
     """
 
     def __init__(self):
-        self.__create_ss_dir = create_ss_dir
+        """Initialize the File class."""
+        try:
+            self.__create_ss_dir = create_ss_dir
+        except Exception as e:
+            raise FileError(f"Error trying execute: {self.__init__.__name__}! {str(e)}.")
 
     def screen_shot(
         self,
@@ -75,7 +83,7 @@ class File:
         delay: int = 1,
         use_default_path_and_name: bool = True,
         name_ss_dir: str | None = None,
-        display_message: bool = False,
+        verbose: bool = False,
     ) -> str | None:
         """
         Function responsible for create a dir for screenshot, and file screenshot and save this in dir to create, if dir exists save it on original dir. By default uses date on file name. \n
@@ -88,7 +96,7 @@ class File:
         ``delay: int`` - should be a int, by default 1 (represents seconds).
         ``use_default_path_and_name: bool`` - should be a boolean, by default `True`
         ``name_ss_dir: str`` - should be a string, by default type `None`
-        ``display_message`` - should be a boolean, by default `False`
+        ``verbose`` - should be a boolean, by default `False`
 
         Return:
         ----------
@@ -97,22 +105,22 @@ class File:
 
         Description: pt-br
         ----------
-        Função responsável por criar um diretório para captura de tela, e arquivo de captura de tela e salvar isso no diretório a ser criado, se o diretório existir, salve-o no diretório original. Por padrão, usa a data no nome do arquivo.
+        Function responsible for creating a screenshot directory, and screenshot file and saving it in the directory to be created, if the directory exists, save it in the original directory. By default, uses date in the file name.
 
-        Parâmetros:
+        Parameters:
         ----------
-        ``file_name: str`` - deve ser uma string, por padrão o nome é `screenshot`.
-        ``file_path: str`` - deve ser uma string, não tem um caminho padrão.
-        ``save_with_date: bool`` - deve ser um booleano, por padrão `True` salva o nome do arquivo com a data `foo_dd_mm_yyyy-hh_mm_ss.png`.
-        ``delay: int`` - deve ser um int, por padrão 1 representado em segundo(s).
-        ``use_default_path_and_name: bool`` - deve ser um booleano, por padrão `True`
-        ``name_ss_dir: str`` - deve ser uma string, por padrão do tipo `None`
-        ``display_message`` - deve ser um booleano, por padrão `False`
+        ``file_name: str`` - should be a string, by default the name is `screenshot`.
+        ``file_path: str`` - should be a string, has no default path.
+        ``save_with_date: bool`` - should be a boolean, by default `True` saves the file name with date `foo_dd_mm_yyyy-hh_mm_ss.png`.
+        ``delay: int`` - should be an int, by default 1 represented in second(s).
+        ``use_default_path_and_name: bool`` - should be a boolean, by default `True`
+        ``name_ss_dir: str`` - should be a string, by default of type `None`
+        ``verbose`` - should be a boolean, by default `False`
 
-        Retorno:
+        Return:
         ----------
-        >>> tipo: str
-            * 'screenshot_path': str - representa o caminho absoluto do arquivo criado
+        >>> type: str
+            * 'screenshot_path': str - represents the absolute path of the created file
         """
 
         # proccess
@@ -143,9 +151,8 @@ class File:
 
                 image.save(path_file_screenshoted)
 
-                if display_message:
+                if verbose:
                     success_print(path_file_screenshoted)
-
                 return path_file_screenshoted
 
             else:  # not use date on file name
@@ -155,24 +162,21 @@ class File:
 
                 image.save(path_file_screenshoted)
 
-                if display_message:
+                if verbose:
                     success_print(path_file_screenshoted)
-
                 return path_file_screenshoted
 
         except Exception as e:
-
-            error_print(f"Error to execute function:{self.screen_shot.__name__}! Error: {str(e)}")
-            return None
+            FileError(f"Error to execute function:{self.screen_shot.__name__}! Error: {str(e)}")
 
     def flag_create(
         self,
         name_file: str = "running.flag",
         path_to_create: str | None = None,
-        display_message: bool = True,
+        verbose: bool = True,
     ) -> None:
         """
-        Cria um arquivo de sinalização indicando que o robô está em execução.
+        Creates a flag file indicating that the robot is running.
         """
 
         try:
@@ -184,20 +188,20 @@ class File:
 
             with open(full_path_with_name, "w", encoding="utf-8") as file:
                 file.write("[RPA Suite] - Running Flag File")
-            if display_message:
+            if verbose:
                 success_print("Flag file created.")
 
         except Exception as e:
-            error_print(f"Erro na função file_scheduling_create: {str(e)}")
+            FileError(f"Error in function file_scheduling_create: {str(e)}")
 
     def flag_delete(
         self,
         name_file: str = "running.flag",
         path_to_delete: str | None = None,
-        display_message: bool = True,
+        verbose: bool = True,
     ) -> None:
         """
-        Deleta o arquivo de sinalização indicando que o robô terminou a execução.
+        Deletes the flag file indicating that the robot has finished execution.
         """
 
         try:
@@ -210,20 +214,19 @@ class File:
 
             if os.path.exists(full_path_with_name):
                 os.remove(full_path_with_name)
-                if display_message:
+                if verbose:
                     success_print("Flag file deleted.")
             else:
                 alert_print("Flag file not found.")
 
         except Exception as e:
-            error_print(f"Erro na função file_scheduling_delete: {str(e)}")
-            time.sleep(1)
+            FileError(f"Error in function file_scheduling_delete: {str(e)}") from e
 
     def count_files(
         self,
         dir_to_count: List[str] = ["."],
         type_extension: str = "*",
-        display_message: bool = False,
+        verbose: bool = False,
     ) -> Dict[str, Union[bool, int]]:
         """
         Function responsible for counting files within a folder, considers subfolders to do the count, searches by file type, being all files by default. \n
@@ -241,18 +244,18 @@ class File:
 
         Description: pt-br
         ----------
-        Função responsavel por fazer a contagem de arquivos dentro de uma pasta, considera subpastas para fazer a contagem, busca por tipo de arquivo, sendo todos arquivos por default. \n
+        Function responsible for counting files within a folder, considers subfolders to do the count, searches by file type, being all files by default. \n
 
-        Parametros:
+        Parameters:
         ----------
-        ``dir_to_count: list`` - deve ser uma lista, aceita mais de um caminho para contar arquivos.
-        ``type_extension: str`` - deve ser uma string com o formato/extensão do tipo de arquivo que deseja ser buscado para contagem, se vazio por default sera usado ``*`` que contará todos arquivos.
+        ``dir_to_count: list`` - should be a list, accepts more than one path to count files.
+        ``type_extension: str`` - should be a string with the format/extension of the type of file you want to be searched for counting, if empty by default will be used ``*`` which will count all files.
 
-        Retorno:
+        Return:
         ----------
         >>> type:dict
-            * 'success': bool - representa se ação foi realizada com sucesso
-            * 'qt': int - numero que representa a quantidade de arquivos que foram contados
+            * 'success': bool - represents if the action was performed successfully
+            * 'qt': int - number that represents the quantity of files that were counted
         """
 
         # Local Variables
@@ -267,11 +270,11 @@ class File:
                             result["qt"] += 1
             result["success"] = True
 
-            if display_message:
+            if verbose:
                 success_print(f'Function: {self.count_files.__name__} counted {result["qt"]} files.')
 
         except Exception as e:
             result["success"] = False
-            error_print(f"Error when trying to count files! Error: {str(e)}")
+            FileError(f"Error when trying to count files! Error: {str(e)}")
 
         return result

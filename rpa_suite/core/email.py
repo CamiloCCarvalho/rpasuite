@@ -9,8 +9,12 @@ from email.mime.base import MIMEBase
 from email import encoders
 
 # imports internal
-from rpa_suite.functions._printer import alert_print, error_print, success_print
+from rpa_suite.functions._printer import success_print
 
+class EmailError(Exception):
+    """Custom exception for Email errors."""
+    def __init__(self, message):
+        super().__init__(f'EmailError: {message}')
 
 class Email:
     """
@@ -80,7 +84,14 @@ class Email:
     body_message: str = "<p>Testing message body</p>"
     auth_tls: bool = (False,)
 
-    def __init__(self): ...
+    def __init__(self) -> None: 
+        """
+        Constructor function for the Email class that provides utilities for email management.
+        
+        This class offers functionalities for sending emails via SMTP protocol with support
+        for attachments, HTML formatting, and various SMTP server configurations.
+        """
+        pass
 
     def send_smtp(
         self,
@@ -93,7 +104,7 @@ class Email:
         smtp_server: str = "smtp.hostinger.com",
         smtp_port: str = 465,
         auth_tls: bool = False,
-        display_message: bool = True,
+        verbose: bool = True,
     ):
         """
         Sends an email using the specified SMTP server.
@@ -158,17 +169,17 @@ class Email:
             self.attachments = attachments
             self.auth_tls = auth_tls
 
-            # Criando a mensagem
+            # Creating the message
             msg = MIMEMultipart()
             msg["From"] = self.email_user
             msg["To"] = ", ".join(self.email_to) if isinstance(self.email_to, list) else self.email_to
             msg["Subject"] = str(self.subject_title)
 
-            # Corpo do e-mail
+            # Email body
             body = str(self.body_message)
             msg.attach(MIMEText(body, "html"))
 
-            # Anexos (opcional)
+            # Attachments (optional)
             if self.attachments:
                 for attachment_path in self.attachments:
                     try:
@@ -183,29 +194,29 @@ class Email:
                             msg.attach(part)
 
                     except Exception as e:
-                        error_print(f"Erro ao anexar o arquivo {attachment_path}: {str(e)}")
+                        EmailError(f"Error attaching file {attachment_path}: {str(e)}")
 
             try:
                 if self.auth_tls:
-                    # Conectando ao servidor SMTP com TLS
+                    # Connecting to SMTP server with TLS
                     server = smtplib.SMTP(self.smtp_server, self.smtp_port)
                     server.starttls()
                     server.login(self.email_user, self.email_password)
                 else:
-                    # Conectando ao servidor SMTP com SSL
+                    # Connecting to SMTP server with SSL
                     server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port)
                     server.login(self.email_user, self.email_password)
 
-                # Enviando o e-mail
+                # Sending the email
                 server.sendmail(self.email_user, self.email_to, msg.as_string())
-                if display_message:
-                    success_print("E-mail enviado com sucesso!")
+                if verbose:
+                    success_print("Email sent successfully!")
 
-                # Encerrando a conexão
+                # Closing the connection
                 server.quit()
 
             except Exception as e:
-                alert_print(f"Falha ao enviar o e-mail: {str(e)}")
+                EmailError(f"Failed to send email: {str(e)}")
 
         except Exception as e:
-            error_print(f"Ocorreu um erro geral na função sendmail: {str(e)}")
+            EmailError(f"A general error occurred in the sendmail function: {str(e)}")

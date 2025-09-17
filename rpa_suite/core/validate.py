@@ -4,8 +4,12 @@
 import email_validator
 
 # imports internal
-from rpa_suite.functions._printer import error_print, success_print
+from rpa_suite.functions._printer import success_print
 
+class ValidateError(Exception):
+    """Custom exception for Validate errors."""
+    def __init__(self, message):
+        super().__init__(f'Validate Error: {message}')
 
 class Validate:
     """
@@ -17,24 +21,15 @@ class Validate:
         - Return a dictionary with information about the validity of the emails, including lists of valid and invalid emails, as well as counts for each category.
 
     The class uses the email_validator library to perform rigorous validation of email addresses, ensuring that the provided data is correct and ready for use in applications that require email communication. Additionally, it provides methods for searching words in text, enhancing its utility for text processing.
-
-    pt-br
-    ----
-    Classe responsável pela validação de endereços de e-mail e pela busca de palavras dentro de textos.
-
-    Esta classe oferece funcionalidades para:
-        - Validar uma lista de e-mails, verificando se cada um deles está em conformidade com os padrões de formatação de e-mail.
-        - Buscar palavras ou padrões específicos dentro de um texto fornecido, fornecendo informações sobre suas ocorrências.
-        - Retornar um dicionário com informações sobre a validade dos e-mails, incluindo listas de e-mails válidos e inválidos, bem como contagens de cada categoria.
-
-    A classe utiliza a biblioteca email_validator para realizar a validação rigorosa dos endereços de e-mail, garantindo que os dados fornecidos estejam corretos e prontos para uso em aplicações que requerem comunicação via e-mail. Além disso, fornece métodos para busca de palavras em textos, aumentando sua utilidade para o processamento de texto.
     """
 
-    def __init__(self): ...
+    def __init__(self) -> None: 
+        """Initialize the Validate class."""
+        pass
 
     def emails(self, email_list: list[str], display_message: bool = False) -> dict:
         """
-        Function responsible for rigorously validating a list of emails using the email_validator library. \n
+        Function responsible for rigorously validating a list of emails using the email_validator library.
 
         Parameters:
         ------------
@@ -50,25 +45,6 @@ class Validate:
             * 'qt_valids': int - number of valid emails
             * 'qt_invalids': int - number of invalid emails
             * 'map_validation' - map of the validation of each email
-
-        Description: pt-br
-        ----------
-        Função responsavel por validar de forma rigorosa lista de emails usando a biblioteca email_validator. \n
-
-        Paramentros:
-        ------------
-        ``email_list: list`` uma lista de strings contendo os emails a serem validados
-
-        Retorno:
-        ------------
-        >>> type: dict
-        Retorna um dicionário com os respectivos dados:
-            * 'success': bool - representa se a lista é 100% valida
-            * 'valid_emails': list - lista de emails validos
-            * 'invalid_emails': list - lista de emails invalidos
-            * 'qt_valids': int - quantidade de emails validos
-            * 'qt_invalids': int - quantidade de emails invalidos
-            * 'map_validation' - mapa da validação de cada email
         """
 
         # Local Variables
@@ -101,7 +77,7 @@ class Validate:
                 success_print(f"Function: {self.emails.__name__} executed.")
 
         except Exception as e:
-            error_print(f"Error when trying to validate email list: {str(e)}")
+            raise ValidateError(f"Error when trying to validate email list: {str(e)}") from e
 
         # Postprocessing
         result = {
@@ -124,19 +100,17 @@ class Validate:
         display_message: bool = False,
     ) -> dict:
         """
-        Function responsible for searching for a string, substring or word within a provided text. \n
+        Function responsible for searching for a string, substring or word within a provided text.
 
         Parameters:
         -----------
-        ``origin_text: str`` \n
+        ``origin_text: str`` 
+            It is the text where the search should be made, in string format.
 
-            * It is the text where the search should be made, in string format. \n
-
-        ``search_by: str`` accepts the values: \n
-
-            * 'string' - can find a requested writing excerpt. (default) \n
-            * 'word' - finds only the word written out exclusively. \n
-            * 'regex' - find regex patterns, [ UNDER DEVELOPMENT ...] \n
+        ``search_by: str`` accepts the values:
+            * 'string' - can find a requested writing excerpt. (default)
+            * 'word' - finds only the word written out exclusively.
+            * 'regex' - find regex patterns, [ UNDER DEVELOPMENT ...]
 
         Return:
         -----------
@@ -151,36 +125,6 @@ class Validate:
         -----------
         >>> type: list[set(int, int), ...]
             * at `index = 0` we find the first occurrence of the text, and the occurrence is composed of a PAIR of numbers in a set, the other indexes represent other positions where occurrences were found if any.
-
-        Description: pt-br
-        ----------
-        Função responsavel por fazer busca de uma string, sbustring ou palavra dentro de um texto fornecido. \n
-
-        Parametros:
-        -----------
-        ``origin_text: str`` \n
-
-            * É o texto onde deve ser feita a busca, no formato string. \n
-
-        ``search_by: str`` aceita os valores: \n
-
-            * 'string' - consegue encontrar um trecho de escrita solicitado. (default) \n
-            * 'word' - encontra apenas a palavra escrita por extenso exclusivamente. \n
-            * 'regex' - encontrar padrões de regex, [ EM DESENVOLVIMENTO ...] \n
-
-        Retorno:
-        -----------
-        >>> type:dict
-        um dicionário com todas informações que podem ser necessarias sobre a validação.
-        Sendo respectivamente:
-            * 'is_found': bool -  se o pattern foi encontrado em pelo menos um caso
-            * 'number_occurrences': int - representa o número de vezes que esse pattern foi econtrado
-            * 'positions': list[set(int, int), ...] - representa todas posições onde apareceu o pattern no texto original
-
-        Sobre o `Positions`:
-        -----------
-        >>> type: list[set(int, int), ...]
-            * no `index = 0` encontramos a primeira ocorrência do texto, e a ocorrência é composta por um PAR de números em um set, os demais indexes representam outras posições onde foram encontradas ocorrências caso hajam.
         """
 
         # Local Variables
@@ -204,7 +148,7 @@ class Validate:
                         result["is_found"] = result["number_occurrences"] > 0
 
                 except Exception as e:
-                    return error_print(f"Unable to complete the search: {searched_word}. Error: {str(e)}")
+                    return ValidateError(f"Unable to complete the search: {searched_word}. Error: {str(e)}")
 
             elif search_by == "string":
                 try:
@@ -218,10 +162,10 @@ class Validate:
                         result["is_found"] = result["number_occurrences"] > 0
 
                 except Exception as e:
-                    return error_print(f"Unable to complete the search: {searched_word}. Error: {str(e)}")
+                    return ValidateError(f"Unable to complete the search: {searched_word}. Error: {str(e)}")
 
         except Exception as e:
-            return error_print(f"Unable to search for: {searched_word}. Error: {str(e)}")
+            raise ValidateError(f"Unable to search for: {searched_word}. Error: {str(e)}") from e
 
         # Postprocessing
         if result["is_found"]:

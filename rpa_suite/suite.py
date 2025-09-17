@@ -22,6 +22,10 @@ import subprocess
 import sys
 import hashlib
 
+class SuiteError(Exception):
+    """Custom exception for Suite errors."""
+    def __init__(self, message):
+        super().__init__(f'SuiteError: {message}')
 
 # Windows bash colors
 class Colors:
@@ -107,6 +111,7 @@ class Suite:
         ``AsyncRunner``: Object AsyncRunner functions to run in Assyncronous
         ``Browser``: Object Browser automation functions (neeeds Selenium and Webdriver_Manager)
         ``Iris``: Object Iris automation functions to convert documents with OCR + IA based on ``docling``
+        ``Artemis``: Object Artemis automation functions to desktopbot similar Botcity with ``pyautogui``
 
     pt-br
     -----
@@ -140,6 +145,7 @@ class Suite:
         ``AsyncRunner``: Objeto AsyncRunner funções para rodar processos em assincronicidade
         ``Browser``: Objeto de Automação de Navegadores (necessario Selenium e Webdriver_Manager)
         ``Iris``: Objeto Iris Automação de funções para converter documentos com OCR + IA baseado em ``docling``
+        ``Artemis``: Objeto Artemis funções de automação para desktop similar ao Botcity com ``pyautogui``
     """
 
     # SUBMODULES
@@ -171,7 +177,13 @@ class Suite:
         from .core.iris import Iris
 
         iris: Iris = Iris
-        
+    
+    # from .iris import Iris
+    if importlib.util.find_spec("pyautogui"):
+        from .core.artemis import Artemis
+
+        artemis: Artemis = Artemis
+      
     # VARIABLES INTERNAL
     try:
         # old: __version__ = pkg_resources.get_distribution("rpa_suite").version

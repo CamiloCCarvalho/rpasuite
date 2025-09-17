@@ -6,8 +6,12 @@ from typing import Callable, Any
 from datetime import datetime as dt
 
 # imports internal
-from rpa_suite.functions._printer import error_print, success_print
+from rpa_suite.functions._printer import success_print
 
+class ClockError(Exception):
+    """Custom exception for Clock errors."""
+    def __init__(self, message):
+        super().__init__(f'ClockError: {message}')
 
 class Clock:
     """
@@ -42,7 +46,39 @@ class Clock:
         >>> rpa.clock.exec_at_hour("14:30", minha_funcao)
     """
 
-    def __init__(self): ...
+    def __init__(self) -> None:
+        """
+        Class that provides utilities for time manipulation and stopwatch.
+
+        This class offers functionalities for:
+            - Timed function execution
+            - Execution time control
+            - Task scheduling
+
+        Methods:
+            exec_at_hour: Executes a function at a specific time
+
+        The Clock class is part of RPA Suite and can be accessed through the rpa object:
+            >>> from rpa_suite import rpa
+            >>> rpa.clock.exec_at_hour("14:30", my_function)
+
+        pt-br
+        ----------
+        Classe que fornece utilitários para manipulação de tempo e cronômetro.
+
+        Esta classe oferece funcionalidades para:
+            - Execução temporizada de funções
+            - Controle de tempo de execução
+            - Agendamento de tarefas
+
+        Métodos:
+            exec_at_hour: Executa uma função em um horário específico
+
+        A classe Clock é parte do RPA Suite e pode ser acessada através do objeto rpa:
+            >>> from rpa_suite import rpa
+            >>> rpa.clock.exec_at_hour("14:30", minha_funcao)
+        """
+        pass
 
     def exec_at_hour(
         self,
@@ -127,7 +163,7 @@ class Clock:
                         run = False
                         result["tried"] = not run
                         result["success"] = False
-                        error_print(
+                        ClockError(
                             f"An error occurred that prevented the function from executing: {fn_to_exec.__name__} correctly. Error: {str(e)}"
                         )
                         break
@@ -147,10 +183,9 @@ class Clock:
                             run = False
                             result["tried"] = not run
                             result["success"] = False
-                            error_print(
+                            ClockError(
                                 f"An error occurred that prevented the function from executing: {fn_to_exec.__name__} correctly. Error: {str(e)}"
-                            )
-                            break
+                            ) from e
                     else:
                         time.sleep(30)
                         now = dt.now()
@@ -161,10 +196,8 @@ class Clock:
             return result
 
         except Exception as e:
-
             result["success"] = False
-            error_print(f"An error occurred on function from executing: {self.exec_at_hour.__name__}. Error: {str(e)}")
-            return result
+            raise ClockError(str(e)) from e
 
     def wait_for_exec(self, wait_time: int, fn_to_exec: Callable[..., Any], *args, **kwargs) -> dict[str, bool]:
         """
@@ -222,9 +255,9 @@ class Clock:
 
         except Exception as e:
             result["success"] = False
-            error_print(
+            ClockError(
                 f"Error while trying to wait to execute the function: {fn_to_exec.__name__} \nMessage: {str(e)}"
-            )
+            ) from e
 
         return result
 
@@ -284,8 +317,8 @@ class Clock:
 
         except Exception as e:
             result["success"] = False
-            error_print(
+            ClockError(
                 f"Error while trying to wait to execute the function: {fn_to_exec.__name__} \nMessage: {str(e)}"
-            )
+            ) from e
 
         return result

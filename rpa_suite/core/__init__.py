@@ -48,4 +48,8 @@ if importlib.util.find_spec("selenium") and importlib.util.find_spec("webdriver_
 if importlib.util.find_spec("docling"):
     from .iris import Iris
 
-__version__ = "1.6.1"
+# from .iris import Artemis
+if importlib.util.find_spec("pyautogui"):
+    from .artemis import Artemis
+
+__version__ = "1.6.2"

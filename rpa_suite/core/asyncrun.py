@@ -10,6 +10,10 @@ from functools import wraps
 
 T = TypeVar("T")
 
+class AsyncRunnerError(Exception):
+    """Custom exception for AsyncRunner errors."""
+    def __init__(self, message):
+        super().__init__(f'AsyncRunnerError: {message}')
 
 class AsyncRunner(Generic[T]):
     """
@@ -19,7 +23,7 @@ class AsyncRunner(Generic[T]):
     Optimized for I/O bound operations (network, files, etc).
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Start AsyncRunner."""
         self._task = None
         self._start_time = None
@@ -45,7 +49,7 @@ class AsyncRunner(Generic[T]):
 
         return wrapper
 
-    async def _execute_function(self, function, args, kwargs):
+    async def _execute_function(self, function, args, kwargs) -> None:
         """
         Executes the function and manages results/errors.
 
@@ -80,14 +84,17 @@ class AsyncRunner(Generic[T]):
         Returns:
             self: Returns the instance itself.
         """
-        self._result.clear()
-        self._start_time = time.time()
+        try:
+            self._result.clear()
+            self._start_time = time.time()
 
-        # Creates and schedules the asynchronous task
-        loop = asyncio.get_event_loop()
-        self._task = loop.create_task(self._execute_function(function, args, kwargs))
+            # Creates and schedules the asynchronous task
+            loop = asyncio.get_event_loop()
+            self._task = loop.create_task(self._execute_function(function, args, kwargs))
 
-        return self
+            return self
+        except Exception as e:
+            AsyncRunnerError(f"Erro ao iniciar a execução da função: {str(e)}.") from e
 
     def is_running(self) -> bool:
         """
