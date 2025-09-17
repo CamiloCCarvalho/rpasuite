@@ -66,7 +66,7 @@ Módulos disponíveis:
     ``Iris``: Objeto Iris Automação de funções para converter documentos com OCR + IA baseado em ``docling``
 """
 
-__version__ = "1.6.2"
+__version__ = "1.6.4"
 
 # allows importing the rpa_suite module without the package name
 from .suite import rpa

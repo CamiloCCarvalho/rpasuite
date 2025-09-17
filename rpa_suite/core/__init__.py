@@ -52,4 +52,4 @@ if importlib.util.find_spec("docling"):
 if importlib.util.find_spec("pyautogui"):
     from .artemis import Artemis
 
-__version__ = "1.6.2"
+__version__ = "1.6.4"

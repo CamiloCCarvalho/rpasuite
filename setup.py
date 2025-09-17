@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="rpa_suite",
-    version="1.6.3",
+    version="1.6.4",
     packages=find_packages(),
     description="Conjunto de ferramentas essenciais para Automação RPA com Python, que facilitam o dia a dia de desenvolvimento.",
     long_description_content_type="text/markdown",
@@ -35,7 +35,6 @@ setup(
         "typing",
         "pillow",
         "pyautogui",
-        "opencv-python"
         "requests",
         
     ],
