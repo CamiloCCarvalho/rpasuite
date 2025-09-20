@@ -245,7 +245,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
 
 ## Release Notes
 
-### Versão: **Beta 1.6.4**
+### Versão: **Beta 1.6.5**
 
 - **Data de Lançamento:** *20/02/2024*
 - **Última Atualização:** 16/09/2025
@@ -254,7 +254,7 @@ O módulo principal do rpa-suite é dividido em categorias. Cada categoria cont�
 Esta versão marca um grande avanço no desenvolvimento da RPA Suite, trazendo melhorias significativas na arquitetura, novas funcionalidades e maior simplicidade no uso. Confira as principais mudanças abaixo.
 
 ### Notas:
-- atualização 1.6.4
+- atualização 1.6.5
   - Adição Módulo: Iris (OCR-IA)
   - Feat.: leitura de documento (aceita multiplos formatos)
   - Feat.: leitura em lote (multiplos docmumentos em uma unica chamada)

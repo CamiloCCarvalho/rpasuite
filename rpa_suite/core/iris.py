@@ -108,7 +108,7 @@ class Iris:
                 raise IrisError("Specify the file path for conversion.")
             self.result_converted = self.engine.convert(path_file)
         except Exception as e:
-            raise IrisError(f"Error trying to convert document! {str(e)}.")
+            raise IrisError(f"Error trying to convert document! {str(e)} ")
 
     def read_document(self, file_path: str = None, result_format=ExportFormats.MARKDOWN, verbose: bool = False) -> Optional[Union[str, dict]]:
         """
@@ -149,7 +149,7 @@ class Iris:
             elif result_format == ExportFormats.INDENTEDTEXT:
                 self.last_result = self.result_converted.document._export_to_indented_text()
             else:
-                raise IrisError(f"Not supported format: {result_format}.")
+                raise IrisError(f"Not supported format: {result_format} ")
             if verbose:
                 success_print('Iris: Successfully converted!')
 
@@ -205,7 +205,7 @@ class Iris:
                     self.last_result = self.result_converted.document._export_to_indented_text()
                     self.list_results.append(self.last_result)
                 else:
-                    raise IrisError(f"Not supported format: {result_format}.")
+                    raise IrisError(f"Not supported format: {result_format} ")
                 if verbose:
                     success_print('Iris: Successfully converted!')
             except IrisError as ie:

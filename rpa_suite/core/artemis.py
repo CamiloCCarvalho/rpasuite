@@ -348,11 +348,11 @@ class Artemis:
                             if verbose: print(f"Image found on attempt {attempts} (without confidence): {location}")
                             return location
                     except Exception as error:
-                        ArtemisError(f"Failed attempt without confidence: {error}.") from e
+                        raise ArtemisError(f"Failed attempt without confidence: {error}.") from e
                 else:
-                    ArtemisError(f"Error during image search (attempt {attempts}): {e}") from e
+                    raise ArtemisError(f"Error during image search (attempt {attempts}): {e}") from e
             except Exception as e:
-                ArtemisError(f"Error during image search (attempt {attempts}): {e}") from e
+                raise ArtemisError(f"Error during image search (attempt {attempts}): {e}") from e
 
             # Wait before next attempt
             if time() - start_time < timeout:
@@ -394,7 +394,7 @@ class Artemis:
                 if verbose: 
                     success_print(f"Click performed at ({x}, {y}) with {click_button} button.")
         except Exception as e:
-            ArtemisError(f"Error performing click: {str(e)}.") from e
+            raise ArtemisError(f"Error performing click: {str(e)}.") from e
 
 
     # Convenience functions for specific cases
@@ -420,7 +420,7 @@ class Artemis:
                 search_interval=1.0,  # Longer interval for waiting
             )
         except Exception as e:
-            ArtemisError(f"Error waiting and clicking: {str(e)}.") from e
+            raise ArtemisError(f"Error waiting and clicking: {str(e)}.") from e
 
     def quick_click(self,
                     image_label: str,
@@ -442,4 +442,4 @@ class Artemis:
             grayscale=True,  # Faster
         )
         except Exception as e:
-            ArtemisError(f"Error performing quick click: {str(e)}.") from e
+            raise ArtemisError(f"Error performing quick click: {str(e)}.") from e

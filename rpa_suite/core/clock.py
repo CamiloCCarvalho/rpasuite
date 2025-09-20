@@ -163,9 +163,6 @@ class Clock:
                         run = False
                         result["tried"] = not run
                         result["success"] = False
-                        ClockError(
-                            f"An error occurred that prevented the function from executing: {fn_to_exec.__name__} correctly. Error: {str(e)}"
-                        )
                         break
             else:
                 # Executes the function call only at the time provided in the argument.
@@ -185,7 +182,7 @@ class Clock:
                             result["success"] = False
                             ClockError(
                                 f"An error occurred that prevented the function from executing: {fn_to_exec.__name__} correctly. Error: {str(e)}"
-                            ) from e
+                            )
                     else:
                         time.sleep(30)
                         now = dt.now()
@@ -257,7 +254,7 @@ class Clock:
             result["success"] = False
             ClockError(
                 f"Error while trying to wait to execute the function: {fn_to_exec.__name__} \nMessage: {str(e)}"
-            ) from e
+            )
 
         return result
 
@@ -317,7 +314,7 @@ class Clock:
 
         except Exception as e:
             result["success"] = False
-            ClockError(
+            raise ClockError(
                 f"Error while trying to wait to execute the function: {fn_to_exec.__name__} \nMessage: {str(e)}"
             ) from e
 

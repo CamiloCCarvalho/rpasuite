@@ -220,7 +220,7 @@ class File:
                 alert_print("Flag file not found.")
 
         except Exception as e:
-            FileError(f"Error in function file_scheduling_delete: {str(e)}") from e
+            raise FileError(f"Error in function file_scheduling_delete: {str(e)}") from e
 
     def count_files(
         self,

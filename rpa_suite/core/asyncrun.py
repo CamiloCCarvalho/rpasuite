@@ -94,7 +94,7 @@ class AsyncRunner(Generic[T]):
 
             return self
         except Exception as e:
-            AsyncRunnerError(f"Erro ao iniciar a execução da função: {str(e)}.") from e
+            raise AsyncRunnerError(f"Erro ao iniciar a execução da função: {str(e)}.") from e
 
     def is_running(self) -> bool:
         """

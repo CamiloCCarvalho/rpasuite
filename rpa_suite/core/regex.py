@@ -87,6 +87,6 @@ class Regex:
                     return False
 
         except Exception as e:
-            RegexError(
+            raise RegexError(
                 f"Error in function: {self.check_pattern_in_text.__name__} when trying to check pattern in text. Error: {str(e)}"
             ) from e

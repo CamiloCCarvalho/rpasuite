@@ -141,7 +141,7 @@ class Date:
             except Exception as e:
                 raise e from e
         except Exception as e:
-            DateError(f"Error function: {self.get_hms.__name__}! {str(e)}.") from e
+            raise DateError(f"Error function: {self.get_hms.__name__}! {str(e)}.") from e
 
     def get_dmy(self) -> Tuple[Op[str], Op[str], Op[str]]:
         """
