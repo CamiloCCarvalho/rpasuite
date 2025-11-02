@@ -8,11 +8,14 @@ from typing import Union
 # imports internal
 from rpa_suite.functions._printer import alert_print, success_print
 
+
 class DirectoryError(Exception):
     """Custom exception for Directory errors."""
+
     def __init__(self, message):
         clean_message = message.replace("DirectoryError:", "").strip()
-        super().__init__(f'DirectoryError: {clean_message}')
+        super().__init__(f"DirectoryError: {clean_message}")
+
 
 class Directory:
     """
@@ -36,7 +39,7 @@ class Directory:
         name_temp_dir (str): The name of the temporary directory to be created. Default is 'temp'.
     """
 
-    def __init__(self): 
+    def __init__(self):
         """
         Constructor function of the Class that provides utilities for directory management,
         including creation, deletion and manipulation of directories.
@@ -44,7 +47,7 @@ class Directory:
         try:
             pass
         except Exception as e:
-            raise DirectoryError(f"Error trying execute: {self.__init__.__name__}! {str(e)}.")
+            raise DirectoryError(f"Error trying execute: {self.__init__.__name__}! {str(e)}.") from e
 
     def create_temp_dir(
         self,
@@ -53,32 +56,38 @@ class Directory:
         display_message: bool = False,
     ) -> dict[str, Union[bool, str, None]]:
         """
-        Function responsible for creating a temporary directory to work with files and etc.
+        Creates a temporary directory for file operations.
 
         Parameters:
-        ----------
-        ``path_to_create: str`` - should be a string with the full path pointing to the folder where the temporary folder should be created, if it is empty the ``default`` value will be used which will create a folder in the current directory where the file containing this function was called.
+        -----------
+        path_to_create : str, optional
+            Full path pointing to the folder where the temporary folder should be created.
+            If "default" (or empty), creates the folder in the current directory.
+            Default: "default".
 
-        ``name_temp_dir: str`` - should be a string representing the name of the temporary directory to be created. If it is empty, the ``temp`` value will be used as the default directory name.
+        name_temp_dir : str, optional
+            Name of the temporary directory to be created. Default: "temp".
 
-        ``display_message: bool`` - should be a bool to display messages on terminal, by default False.
+        display_message : bool, optional
+            Whether to display success messages on terminal. Default: False.
 
-        Return:
-        ----------
-        >>> type:dict
-            * 'success': bool - represents case the action was performed successfully
-            * 'path_created': str - path of the directory that was created on the process
+        Returns:
+        --------
+        dict[str, Union[bool, str, None]]
+            Dictionary containing:
+            - 'success' (bool): Indicates if the action was performed successfully
+            - 'path_created' (str | None): Path of the directory that was created, or None if failed
         """
 
         # Local Variables
-        result: dict = {
+        result: dict = {  # pylint: disable=duplicate-code
             "success": bool,
             "path_created": str,
         }
 
         try:
             # by 'default', defines path to local script execution path
-            if path_to_create == "default":
+            if path_to_create == "default":  # pylint: disable=duplicate-code
                 path_to_create: str = os.getcwd()
 
             # Build path to new dir
@@ -95,22 +104,22 @@ class Directory:
                 if display_message:
                     success_print(f"Directory:'{full_path}' successfully created.")
 
-            except FileExistsError:
+            except FileExistsError as e:
                 result["success"] = False
                 result["path_created"] = None
                 if display_message:
-                    DirectoryError(f"Directory:'{full_path}' already exists.")
+                    raise DirectoryError(f"Directory:'{full_path}' already exists.") from e
 
-            except PermissionError:
+            except PermissionError as e:
                 result["success"] = False
                 result["path_created"] = None
                 if display_message:
-                    DirectoryError(f"Permission denied: Not possible to create Directory '{full_path}'.")
+                    raise DirectoryError(f"Permission denied: Not possible to create Directory '{full_path}'.") from e
 
         except Exception as e:
             result["success"] = False
             result["path_created"] = None
-            raise DirectoryError(f"Error trying execute: {self.create_temp_dir.__name__}! {str(e)}.")
+            raise DirectoryError(f"Error trying execute: {self.create_temp_dir.__name__}! {str(e)}.") from e
 
         return result
 
@@ -122,32 +131,42 @@ class Directory:
         display_message: bool = False,
     ) -> dict[str, Union[bool, str, None]]:
         """
-        Function responsible for deleting a temporary directory.
+        Deletes a temporary directory.
 
         Parameters:
-        ----------
-        ``path_to_delete: str`` - should be a string with the full path pointing to the folder where the temporary folder should be deleted, if it is empty the ``default`` value will be used which will delete a folder in the current directory where the file containing this function was called.
+        -----------
+        path_to_delete : str, optional
+            Full path pointing to the folder where the temporary folder should be deleted.
+            If "default" (or empty), deletes the folder in the current directory.
+            Default: "default".
 
-        ``name_temp_dir: str`` - should be a string representing the name of the temporary directory to be deleted. If it is empty, the ``temp`` value will be used as the default directory name.
+        name_temp_dir : str, optional
+            Name of the temporary directory to be deleted. Default: "temp".
 
-        ``delete_files: bool`` - should be a boolean indicating whether to delete files in the directory. If it is False, files in the directory will not be deleted.
+        delete_files : bool, optional
+            Whether to delete files in the directory. If False, only the empty directory is deleted.
+            Default: False.
 
-        Return:
-        ----------
-        >>> type:dict
-            * 'success': bool - represents case the action was performed successfully
-            * 'path_deleted': str - path of the directory that was deleted on the process
+        display_message : bool, optional
+            Whether to display success messages on terminal. Default: False.
+
+        Returns:
+        --------
+        dict[str, Union[bool, str, None]]
+            Dictionary containing:
+            - 'success' (bool): Indicates if the action was performed successfully
+            - 'path_deleted' (str | None): Path of the directory that was deleted, or None if failed
         """
 
         # Local Variables
-        result: dict = {
+        result: dict = {  # pylint: disable=duplicate-code
             "success": bool,
             "path_deleted": str,
         }
 
         try:
             # by 'default', defines path to local script execution path
-            if path_to_delete == "default":
+            if path_to_delete == "default":  # pylint: disable=duplicate-code
                 path_to_delete: str = os.getcwd()
 
             # Build path to new dir
@@ -178,21 +197,21 @@ class Directory:
                     if display_message:
                         alert_print(f"Directory:'{full_path}' doesn't exist.")
 
-            except PermissionError:
+            except PermissionError as e:
                 result["success"] = False
                 result["path_deleted"] = None
                 if display_message:
-                    DirectoryError(f"Permission denied: Not possible to delete Directory '{full_path}'.")
+                    raise DirectoryError(f"Permission denied: Not possible to delete Directory '{full_path}'.") from e
 
             except OSError as e:
                 result["success"] = False
                 result["path_deleted"] = None
                 if display_message:
-                    DirectoryError(f"OS error occurred while deleting directory '{full_path}': {str(e)}")
+                    raise DirectoryError(f"OS error occurred while deleting directory '{full_path}': {str(e)}") from e
 
         except Exception as e:
             result["success"] = False
             result["path_deleted"] = None
-            raise DirectoryError(f"Error trying execute: {self.delete_temp_dir.__name__}! {str(e)}.")
+            raise DirectoryError(f"Error trying execute: {self.delete_temp_dir.__name__}! {str(e)}.") from e
 
         return result

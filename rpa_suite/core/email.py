@@ -3,18 +3,22 @@
 # imports standard
 import os
 import smtplib
+from email import encoders
+from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
 
 # imports internal
 from rpa_suite.functions._printer import success_print
 
+
 class EmailError(Exception):
     """Custom exception for Email errors."""
+
     def __init__(self, message):
-        super().__init__(f'EmailError: {message}')
+        clean_message = message.replace("EmailError:", "").strip()
+        super().__init__(f"EmailError: {clean_message}")
+
 
 class Email:
     """
@@ -33,44 +37,10 @@ class Email:
         >>> from rpa_suite import rpa
         >>> rpa.email.send_smtp(
         ...     email_user="your@email.com",
-        ...     email_password="your_password",
+        ...     email_password="123",
         ...     email_to="destination@email.com",
         ...     subject_title="Test",
         ...     body_message="<p>Test message</p>"
-        ... )
-
-    Parameters:
-        smtp_server (str): SMTP server address
-        smtp_port (str): SMTP server port
-        email_user (str): Email for SMTP authentication
-        email_password (str): Password for SMTP authentication
-        email_to (str): Recipient email address
-        attachments (list[str]): List of file paths to attach
-        subject_title (str): Email subject
-        body_message (str): Email body in HTML format
-        auth_tls (bool): Whether to use TLS authentication
-
-    pt-br
-    ----------
-    Classe que fornece utilitários para envio de emails via protocolo SMTP.
-
-    Esta classe oferece funcionalidades para:
-        - Envio de emails com anexos
-        - Formatação de mensagens em HTML
-        - Configuração de servidor SMTP
-        - Validação de email
-
-    Métodos:
-        send_smtp: Envia um email através do servidor SMTP especificado
-
-    A classe Email é parte do RPA Suite e pode ser acessada através do objeto rpa:
-        >>> from rpa_suite import rpa
-        >>> rpa.email.send_smtp(
-        ...     email_user="seu@email.com",
-        ...     email_password="sua_senha",
-        ...     email_to="destino@email.com",
-        ...     subject_title="Teste",
-        ...     body_message="<p>Mensagem de teste</p>"
         ... )
     """
 
@@ -84,23 +54,22 @@ class Email:
     body_message: str = "<p>Testing message body</p>"
     auth_tls: bool = (False,)
 
-    def __init__(self) -> None: 
+    def __init__(self) -> None:
         """
         Constructor function for the Email class that provides utilities for email management.
-        
+
         This class offers functionalities for sending emails via SMTP protocol with support
         for attachments, HTML formatting, and various SMTP server configurations.
         """
-        pass
 
-    def send_smtp(
+    def send_smtp(  # pylint: disable=too-many-positional-arguments,too-many-locals
         self,
         email_user: str,
         email_password: str,
         email_to: str,
         subject_title: str = "Test title",
         body_message: str = "<p>Testing message body</p>",
-        attachments: list[str] = [],
+        attachments: list[str] | None = None,
         smtp_server: str = "smtp.hostinger.com",
         smtp_port: str = 465,
         auth_tls: bool = False,
@@ -109,53 +78,48 @@ class Email:
         """
         Sends an email using the specified SMTP server.
 
-        Args:
-            smtp_server (str, optional): Address of the SMTP server.
-                Default: "smtp.hostinger.com".
-            smtp_port (str, optional): Port of the SMTP server.
-                Default: 465.
-            email_user (str, optional): User (email) for authentication on the SMTP server.
-                Default: "example@email.com".
-            email_password (str, optional): Password for authentication on the SMTP server.
-                Default: "example123".
-            email_to (str, optional): Email address of the recipient.
-                Default: "person@email.com".
-            attachments (list[str], optional): List of file paths to attach to the email.
-                Default: [].
-            subject_title (str, optional): Title (subject) of the email.
-                Default: 'test title'.
-            body_message (str, optional): Body of the email message, in HTML format.
-                Default: '<p>test message</p>'.
+        Parameters:
+        -----------
+        email_user : str
+            User (email) for authentication on the SMTP server.
+
+        email_password : str
+            Password for authentication on the SMTP server.
+
+        email_to : str | list[str]
+            Email address(es) of the recipient(s). Can be a single email or a list of emails.
+
+        subject_title : str, optional
+            Title (subject) of the email. Default: "Test title".
+
+        body_message : str, optional
+            Body of the email message, in HTML format. Default: "<p>Testing message body</p>".
+
+        attachments : list[str] | None, optional
+            List of file paths to attach to the email. Default: None.
+
+        smtp_server : str, optional
+            Address of the SMTP server. Default: "smtp.hostinger.com".
+
+        smtp_port : str | int, optional
+            Port of the SMTP server. Default: 465.
+
+        auth_tls : bool, optional
+            Whether to use TLS authentication instead of SSL. Default: False.
+
+        verbose : bool, optional
+            Whether to print success messages. Default: True.
 
         Returns:
-            None: This function does not explicitly return any value,\n
-            but prints success or failure messages when sending the email.
+        --------
+        None
+            This function does not explicitly return any value, but prints success or failure
+            messages when sending the email (if verbose=True).
 
-        pt-br
-        ------
-
-        Envia um email usando o servidor SMTP especificado.
-
-        Args:
-            smtp_server (str, opcional): Endereço do servidor SMTP.
-                Padrão: "smtp.hostinger.com".
-            smtp_port (str, opcional): Porta do servidor SMTP.
-                Padrão: 465.
-            email_user (str, opcional): Usuário (email) para autenticação no servidor SMTP.
-                Padrão: "example@email.com".
-            email_password (str, opcional): Senha para autenticação no servidor SMTP.
-                Padrão: "example123".
-            email_to (str, opcional): Endereço de email do destinatário.
-                Padrão: "person@email.com".
-            attachments (list[str], opcional): Lista de caminhos de arquivos para anexar ao email.
-                Padrão: [].
-            subject_title (str, opcional): Título (assunto) do email.
-                Padrão: 'título de teste'.
-            body_message (str, opcional): Corpo da mensagem do email, em formato HTML.
-                Padrão: '<p>mensagem de teste</p>'.
-
-        Returns:
-            Nenhum: Esta função não retorna explicitamente nenhum valor, mas imprime mensagens de sucesso ou falha ao enviar o email.
+        Raises:
+        -------
+        EmailError
+            If there is an error sending the email or attaching files.
         """
 
         try:
@@ -194,7 +158,7 @@ class Email:
                             msg.attach(part)
 
                     except Exception as e:
-                        EmailError(f"Error attaching file {attachment_path}: {str(e)}")
+                        raise EmailError(f"Error attaching file {attachment_path}: {str(e)}") from e
 
             try:
                 if self.auth_tls:
@@ -216,7 +180,7 @@ class Email:
                 server.quit()
 
             except Exception as e:
-                EmailError(f"Failed to send email: {str(e)}")
+                raise EmailError(f"Failed to send email: {str(e)}") from e
 
         except Exception as e:
-            EmailError(f"A general error occurred in the sendmail function: {str(e)}")
+            raise EmailError(f"A general error occurred in the sendmail function: {str(e)}") from e

@@ -1,19 +1,22 @@
 # rpa_suite/core/asyncrun.py
 
 # imports standard
-from typing import Any, Callable, Dict, Optional, TypeVar, Generic
 import asyncio
 import time
 import traceback
 from functools import wraps
-
+from typing import Any, Callable, Dict, Generic, Optional, TypeVar
 
 T = TypeVar("T")
 
+
 class AsyncRunnerError(Exception):
     """Custom exception for AsyncRunner errors."""
+
     def __init__(self, message):
-        super().__init__(f'AsyncRunnerError: {message}')
+        clean_message = message.replace("AsyncRunnerError:", "").strip()
+        super().__init__(f"AsyncRunnerError: {clean_message}")
+
 
 class AsyncRunner(Generic[T]):
     """

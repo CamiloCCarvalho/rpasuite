@@ -6,10 +6,14 @@ import re
 # imports internal
 from rpa_suite.functions._printer import success_print
 
+
 class RegexError(Exception):
     """Custom exception for Regex errors."""
+
     def __init__(self, message):
-        super().__init__(f'Regex Error: {message}')
+        clean_message = message.replace("RegexError:", "").strip()
+        super().__init__(f"RegexError: {clean_message}")
+
 
 class Regex:
     """
@@ -23,68 +27,73 @@ class Regex:
     """
 
     def __init__(self) -> None:
-        """Initialize the Regex class."""
-        pass
+        """
+        Class that provides utilities for working with regular expressions.
+
+        This class offers functionalities for:
+            - Searching for patterns in text
+            - Validating strings against specific patterns
+
+        The Regex class is part of the RPA Suite and can be used to enhance text processing capabilities.
+        """
 
     def check_pattern_in_text(
         self,
         origin_text: str,
         pattern_to_search: str,
         case_sensitive: bool = True,
-        display_message: bool = False,
+        verbose: bool = False,
     ) -> bool:
         """
-        Function responsible for searching for a pattern in a text string and returning True if the pattern is found, otherwise False.
+        Checks if a regex pattern exists within a given text string and returns True if found, otherwise False.
 
         Parameters:
         -----------
-        ``origin_text: str``
-            The text where the search should be performed.
+        origin_text : str
+            The text where the search will be performed.
 
-        ``pattern_to_search: str``
+        pattern_to_search : str
             The regex pattern to search for in the text.
 
-        ``case_sensitive: bool``
-            Whether the search should be case sensitive. Default is True.
+        case_sensitive : bool, optional
+            If True, the search is case sensitive. Default: True.
 
-        ``display_message: bool``
-            Whether to display success/failure messages. Default is False.
+        verbose : bool, optional
+            If True, prints a message indicating if the pattern was found. Default: False.
 
-        Return:
-        ----------
-        A boolean indicating whether the pattern was found in the text.
+        Returns:
+        --------
+        bool
+            True if the pattern is found in the text, False otherwise.
+
+        Example:
+        --------
+        >>> from rpa_suite.core.regex import Regex
+        >>> r = Regex()
+        >>> r.check_pattern_in_text("Hello World", "World")
+        True
+        >>> r.check_pattern_in_text("Hello World", "world", case_sensitive=True)
+        False
+        >>> r.check_pattern_in_text("Hello World", "world", case_sensitive=False)
+        True
         """
-
         try:
-
             if case_sensitive:
-
-                # Check if the pattern is found in the text
                 if re.search(pattern_to_search, origin_text):
-                    if display_message:
-                        success_print(f"Pattern found successfully!")
+                    if verbose:
+                        success_print("Pattern found successfully!")
                     return True
-
-                else:
-                    if display_message:
-                        success_print(f"Pattern not found.")
-                    return False
-            else:
-
-                # normalize text to search without case sensitive
-                origin_text = origin_text.lower()
-                pattern_to_search = pattern_to_search.lower()
-
-                # Check if the pattern is found in the text
-                if re.search(pattern_to_search, origin_text):
-                    if display_message:
-                        success_print(f"Pattern found successfully!")
-                    return True
-
-                else:
-                    if display_message:
-                        success_print(f"Pattern not found.")
-                    return False
+                if verbose:
+                    success_print("Pattern not found.")
+                return False
+            # Busca sem diferenciar maiúsculas/minúsculas
+            if re.search(pattern_to_search, origin_text, re.IGNORECASE):
+                if verbose:
+                    success_print("Pattern found successfully!")
+                return True
+            if verbose:
+                success_print("Pattern not found.")
+            return False
 
         except Exception as e:
             raise RegexError(

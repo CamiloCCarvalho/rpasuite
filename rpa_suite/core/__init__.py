@@ -23,22 +23,22 @@ ou
 
 """
 
+# On this case, we are importing the (Browser|Iris|Artemis) class only if the (selenium and webdriver_manager| docling| pyautogui) modules are installed.
+# This is useful to avoid unnecessary imports and dependencies if the user does not need the (Browser|Iris|Artemis) functionality.
+import importlib.util
+
+from .asyncrun import AsyncRunner
 from .clock import Clock
+from .database import Database
 from .date import Date
 from .dir import Directory
 from .email import Email
 from .file import File
 from .log import Log
+from .parallel import ParallelRunner
 from .print import Print
 from .regex import Regex
 from .validate import Validate
-from .parallel import ParallelRunner
-from .asyncrun import AsyncRunner
-
-
-# On this case, we are importing the (Browser|Iris) class only if the (selenium and webdriver_manager| docling) modules are installed.
-# This is useful to avoid unnecessary imports and dependencies if the user does not need the (Browser|Iris) functionality.
-import importlib.util
 
 # from .browser import Browser
 if importlib.util.find_spec("selenium") and importlib.util.find_spec("webdriver_manager"):

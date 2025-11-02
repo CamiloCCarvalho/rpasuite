@@ -1,270 +1,315 @@
 ![RPA Suite](https://raw.githubusercontent.com/CamiloCCarvalho/rpa_suite/db6977ef087b1d8c6d1053c6e0bafab6b690ac61/logo-rpa-suite.svg)
 
-<h1 align="left">
-    RPA Suite
-</h1>
-<br>
+<div align="center">
+
+# RPA Suite
+
+**A comprehensive Python toolkit for Robotic Process Automation (RPA) development**
 
 [![PyPI Downloads](https://static.pepy.tech/badge/rpa-suite/month)](https://pepy.tech/projects/rpa_suite)
-![PyPI Downloads](https://img.shields.io/pypi/dm/rpa-suite.svg?label=PyPI%20downloads)
 [![PyPI version](https://img.shields.io/pypi/v/rpa-suite)](https://pypi.org/project/rpa-suite/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/rpa-suite)](https://pypi.org/project/rpa-suite/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Imports: pyautogui](https://img.shields.io/badge/%20imports-pyautogui-%231674b1?style=flat&labelColor=ef8336)](https://github.com/asweigart/pyautogui)
-[![Imports: loguru](https://img.shields.io/badge/%20imports-loguru-%231674b1?style=flat&labelColor=ef8336)](https://github.com/Delgan/loguru)
 [![License MIT](https://img.shields.io/github/license/docling-project/docling)](https://opensource.org/licenses/MIT)
 
-## O que é?
+[Documentation](#documentation) • [Installation](#installation) • [Quick Start](#quick-start) • [Features](#features) • [Contributing](#contributing)
 
-**RPA Suite:** um conjunto abrangente de ferramentas projetadas para simplificar e otimizar o desenvolvimento de projetos de automação RPA com Python. Embora nossa suíte seja um conjunto de Ferramentas de RPA especializado, sua versatilidade a torna igualmente útil para uma ampla gama de projetos de desenvolvimento. Esta desenvolvendo com Selenium ou Botcity? Experimente a RPA Suite e descubra como podemos facilitar seu projeto e qualquer projeto de Robôs de Software.
+</div>
 
-<br>
+---
 
-## Documentação
+## Overview
 
-- **[Documentação no GitHub](https://github.com/CamiloCCarvalho/rpasuite/wiki)**
-  Conta com guia de uso , instação e todas funcionalidades.
+**RPA Suite** is a powerful and versatile Python library designed to streamline and optimize the development of Robotic Process Automation (RPA) projects. Built with simplicity and efficiency in mind, it provides a comprehensive set of tools that make automation development faster, more reliable, and more maintainable.
 
-<br>
+Whether you're working with Selenium, Botcity, or building custom automation solutions, RPA Suite offers the essential utilities you need to accelerate your development process.
 
-## Sumário
+## Key Features
 
-- [O que é?](#o-que-é)
-- [Documentação](#documentação)
-- [Sumário do conteudo](#sumário-do-conteudo)
-- [Destaque](#destaque)
-- [Objetivo](#objetivo)
-- [Instalação](#instalação)
-- [Exemplo](#exemplo)
-- [Dependências](#dependências)
-- [Estrutura do módulo](#estrutura-do-módulo)
-- [Release](#release)
-- [Mais Sobre](#mais-sobre)
+- **🕐 Time Management** - Schedule executions, wait for specific times, and manage time-based automation flows
+- **📧 Email Automation** - Send emails via SMTP with HTML support and attachments
+- **📝 Logging System** - Comprehensive logging with file and stream support using Loguru
+- **📁 File Operations** - Screenshot capture, file counting, and flag file management
+- **🗂️ Directory Management** - Create and manage temporary directories with ease
+- **🔍 Text Processing** - Pattern matching, regex operations, and text validation
+- **🌐 Browser Automation** - Selenium-based browser control with Chrome support (optional)
+- **⚡ Parallel & Async Execution** - Run processes in parallel or asynchronously
+- **🤖 Desktop Automation** - PyAutoGUI-based desktop automation (Artemis module)
+- **📄 OCR with AI** - Document conversion with OCR capabilities (Iris module - optional)
+- **💾 Database Tracking** - Complete execution tracking and management system with multi-database support (SQLite, PostgreSQL, MySQL)
+- **🎨 Colored Console Output** - Beautiful terminal output with color-coded messages
+- **✅ Data Validation** - Email validation and pattern checking utilities
 
-## Destaque
+## Installation
 
-**Versátil**: Além da Automação de Processos e criação de BOT em RPA, mas também para uso geral podendo  ser aplicadas em outros modelos de projeto, *além do RPA*.
+### Basic Installation
 
-**Simples**: Construímos as ferramentas de maneira mais direta e assertiva possível, utilizando apenas bibliotecas conhecidas no mercado para garantir o melhor desempenho possível.
+Install RPA Suite using pip:
 
-<br>
-
-## Objetivo
-
-Nosso objetivo é se tornar a Biblioteca Python para RPA referência. Tornando o desenvolvimento de RPAs mais produtivo, oferecendo uma gama de funções para tal:
-
-- Envio e validação de Emails com apenas uma linha
-- Criação e Manipulação de registros de Logs
-- Busca por palavras, strings e padrões em textos
-- Criar e Deletar Pastas e arquivos temporarios
-- Console com mensagens de melhor visualização com cores definidas para alerta, erro, informativo e sucesso.
-- Módulo dedicado para execução com Paralelismo
-- Funções que facilitam execuções Assincronas
-- Registro de Screenshot com apenas um comando
-- E muito mais
-
-<br>
-
-## Instalação
-
-Para **instalar** o projeto, utilize o comando:
-
-```python
->>> python -m pip install rpa-suite
+```bash
+pip install rpa-suite
 ```
 
-ou no conda:
+Or using conda:
 
-```python
+```bash
 conda install -c conda-forge rpa-suite
 ```
 
-Após instalação basta fazer a importação do modulo rpa que ja tera um objeto instanciado de ``suite``:
+### Optional Dependencies
 
-```python
-from rpa_suite import rpa
+For advanced features, install additional dependencies:
+
+```bash
+# Browser automation (Selenium)
+pip install selenium webdriver-manager
+
+# OCR with AI (Iris module)
+pip install docling
+
+# Desktop automation (Artemis - included by default)
+# pyautogui is already included
 ```
 
-Feito isso já estará pronto para o uso:
+## Quick Start
 
-```python
-# function send mail by SMTP 
-rpa.email.send_mail(...)
-```
-
-> **⚠️ IMPORTANTE:**
-> Para **desinstalar** o projeto, utilize o comando abaixo:
->
-> ```python
-> python -m pip uninstall rpa-suite
-> ```
->
-> **Observação:** Caso necessário, desinstale também as bibliotecas utilizadas no projeto, como `loguru`, `mail_validator`, `colorama`, `pillow`, e `pyautogui`.
-
-> **⚠️ IMPORTANTE:**
-> Opcionalmente, você pode querer desinstalar as bibliotecas que foram incluídas no projeto. Para isso, utilize o seguinte comando:
->
-> ```python
-> python -m pip uninstall loguru mail_validator colorama pillow pyautogui
-> ```
-
-<br>
-
-## Exemplo
-
-Do módulo principal, importe a suite. Ela retorna uma instância do Objeto de classe Rpa_suite, onde possui variáveis apontando para todas funções dos submódulos:
+After installation, import and use RPA Suite immediately:
 
 ```python
 from rpa_suite import rpa
 
-# Exemplo com função de execução em horário específico
-rpa.clock.exec_at_hour('13:53', my_function, param_a, param_b)
+# Send an email
+rpa.email.send_smtp(
+    email_user="your@email.com",
+    email_password="your_password",
+    email_to="recipient@email.com",
+    subject_title="Hello from RPA Suite",
+    body_message="<p>This is a test email</p>"
+)
 
-# Usando submódulo clock para aguardar 30(seg) para executar minha função
-time = 30
-rpa.clock.wait_for_exec(time, my_function, param1, param2)
+# Schedule a function to run at a specific time
+rpa.clock.exec_at_hour('14:30', my_function, arg1, arg2)
 
-# Usando submódulo email para envio de email por SMTP comum
-rpa.email.send_smtp(...)
+# Wait before executing a function
+rpa.clock.wait_for_exec(30, my_function)
+
+# Take a screenshot
+rpa.file.screen_shot(filename="screenshot.png")
+
+# Print colored messages
+rpa.success_print("Operation completed successfully!")
+rpa.error_print("An error occurred!")
 ```
 
-<br>
+### Database Module Example
 
-## Dependências
+Track your automation executions with the Database module:
 
-No setup do nosso projeto já estão inclusas as dependências, só será necessário instalar nossa **Lib**, mas segue a lista das libs usadas:
+```python
+from rpa_suite import rpa
 
+# Initialize database (SQLite by default)
+db = rpa.database()
+
+# Start tracking an execution
+exec_id = db.start_execution(automation_name="My Automation Bot")
+
+# Add items to process
+item_id = db.add_item(execution_id=exec_id, item_identifier="item_001")
+
+# Finish the execution
+db.finish_execution(exec_id, status="completed")
+```
+
+## Requirements
+
+### Core Dependencies
+
+- Python 3.11+
 - colorama
-- loguru
-- email-validator
 - colorlog
+- email-validator
+- loguru
 - pillow
 - pyautogui
-- typing
+- requests
+- opencv-python
 
-  opcionalmente para usar todas funcionalidades:
+### Optional Dependencies
 
-  - selenium
-  - webdriver_manager
-  - docling
+- selenium (for browser automation)
+- webdriver-manager (for browser automation)
+- docling (for OCR/AI features)
+- psycopg2-binary (for PostgreSQL support)
+- mysql-connector-python (for MySQL support)
 
-<br>
-<hr>
-<br>
+## Features in Detail
 
-> **⚠️ IMPORTANTE:**
-> No caso da função de screenshot, é necessário ter as bibliotecas `pyautogui`, `pillow` e `pyscreeze` instaladas. Geralmente, a instalação de `pyautogui` já inclui as demais dependências necessárias.
+### Time Management (Clock Module)
 
-<br>
+Control execution timing and scheduling:
 
-## Estrutura do módulo
+- `exec_at_hour()` - Execute functions at specific times
+- `wait_for_exec()` - Wait before executing functions
+- `exec_and_wait()` - Execute and wait pattern
 
-O módulo principal do rpa-suite é dividido em categorias. Cada categoria contém módulos com funções destinadas a categoria:
+### Email (Email Module)
 
-- **rpa_suite**
+Send emails with full SMTP support:
 
-  **clock**
+- HTML email support
+- File attachments
+- Custom SMTP configuration
+- Email validation
 
-  - **exec_at_hour** - Função que executa uma função no horário especificado "xx:yy", permitindo agendamento de tarefas com precisão.
-  - **wait_for_exec** - Função que aguarda um tempo em segundos antes de executar a função passada como argumento.
-  - **exec_and_wait** - Função que executa uma função e, em seguida, aguarda um tempo em segundos antes de continuar.
+### Logging (Log Module)
 
-  **date**
+Comprehensive logging system based on Loguru:
 
-  - **get_hms** - Função que retorna hora, minuto e segundo formatados como strings.
-  - **get_dmy** - Função que retorna dia, mês e ano formatados como strings.
+- File and console logging
+- Multiple log levels (debug, info, warning, error, critical)
+- Configurable log formats
+- Automatic log rotation
 
-  **email**
+### File Operations (File Module)
 
-  - **send_smtp** - Função para envio de emails via SMTP com suporte a anexos e mensagens HTML, configurável e personalizável.
+File and screenshot management:
 
-  **file**
+- Screenshot capture with custom naming
+- Flag file creation/deletion for process tracking
+- File counting with extension filtering
 
-  - **screen_shot** - Função para capturar screenshots, criando diretórios e arquivos com nomes e caminhos personalizáveis.
-  - **flag_create** - Função para criar arquivos de flag indicando execução de processos.
-  - **flag_delete** - Função para deletar arquivos de flag após a execução de processos.
-  - **count_files** - Função para contar arquivos em diretórios, com suporte a extensões específicas.
+### Database Tracking (Database Module)
 
-  **directory**
+Complete execution lifecycle management:
 
-  - **create_temp_dir** - Função para criar diretórios temporários com nomes e caminhos personalizáveis.
-  - **delete_temp_dir** - Função para deletar diretórios temporários, com opção de remover arquivos contidos.
+- Multi-database support (SQLite, PostgreSQL, MySQL)
+- Execution tracking with status management
+- Item queue processing
+- Automatic interruption detection
+- Reprocessing capabilities
+- Comprehensive statistics and reporting
+- Structured logging integration
 
-  **log**
+## Module Structure
 
-  - **config_logger** - Função para configurar logs com suporte a arquivos e streams, utilizando a biblioteca Loguru.
-  - **log_start_run_debug** - Função para registrar logs de início de execução em nível de depuração.
-  - **log_debug** - Função para registrar logs em nível de depuração.
-  - **log_info** - Função para registrar logs em nível informativo.
-  - **log_warning** - Função para registrar logs em nível de aviso.
-  - **log_error** - Função para registrar logs em nível de erro.
-  - **log_critical** - Função para registrar logs em nível crítico.
+### Core Modules
 
-  **printer**
+- **clock** - Time management and scheduling
+- **date** - Date and time formatting utilities
+- **email** - SMTP email sending
+- **file** - File operations and screenshots
+- **directory** - Directory management
+- **log** - Logging system
+- **printer** - Colored console output
+- **regex** - Pattern matching and regex operations
+- **validate** - Data validation utilities
 
-  - **success_print** - Função para imprimir mensagens de sucesso com destaque em verde.
-  - **alert_print** - Função para imprimir mensagens de alerta com destaque em amarelo.
-  - **info_print** - Função para imprimir mensagens informativas com destaque em ciano.
-  - **error_print** - Função para imprimir mensagens de erro com destaque em vermelho.
+### Advanced Modules
 
-  **regex**
+- **database** - Execution tracking and database management
+- **browser** - Selenium-based browser automation (optional)
+- **parallel** - Parallel process execution
+- **async** - Asynchronous execution
+- **artemis** - Desktop automation with PyAutoGUI
+- **iris** - OCR and document conversion (optional)
 
-  - **check_pattern_in_text** - Função para verificar a presença de padrões em textos, com suporte a case-sensitive.
+### Database Module Methods
 
-  **validate**
+**Execution Management:**
+- `start_execution()` - Start tracking a new execution
+- `finish_execution()` - Complete an execution
+- `get_execution()` - Retrieve execution details
+- `get_executions()` - List executions with filtering
+- `detect_and_mark_interrupted_executions()` - Auto-detect interruptions
 
-  - **emails** - Função para validar listas de emails, retornando listas de emails válidos e inválidos.
-  - **word** - Função para buscar palavras ou padrões específicos em textos, com suporte a contagem de ocorrências.
+**Item Processing:**
+- `add_item()` - Add item to processing queue
+- `add_items()` - Batch add items
+- `get_next_item_from_queue()` - Get next item to process
+- `start_processing_item()` - Mark item as processing
+- `update_checkpoint()` - Update processing checkpoint
+- `finish_item()` - Complete item processing
+- `get_item()` - Get item details
+- `get_items()` - List items with filtering
 
-  **Browser**
+**Reprocessing:**
+- `can_reprocess_execution()` - Check if execution can be reprocessed
+- `reprocess_interrupted_execution()` - Restart interrupted execution
+- `can_reprocess_item()` - Check if item can be reprocessed
+- `reprocess_interrupted_item()` - Restart interrupted item
 
-  - **start_browser** - Função para iniciar o navegador Chrome com suporte a depuração remota.
-  - **find_ele** - Função para localizar elementos na página utilizando estratégias de localização do Selenium.
-  - **get** - Função para navegar para URLs específicas.
-  - **close_browser** - Função para fechar o navegador e encerrar processos relacionados.
+**Maintenance:**
+- `clear_pending_items()` - Remove pending items
+- `clear_interrupted_items()` - Remove interrupted items
+- `clear_successful_executions()` - Remove successful executions
+- `clear_failed_executions()` - Remove failed executions
+- `clear_executions_table()` - Clear all executions
+- `clear_items_table()` - Clear all items
+- `clear_logs_table()` - Clear all logs
+- `clear_database()` - Clear entire database
 
-  **Parallel (ParallelRunner)**
+**Statistics & Logging:**
+- `add_log()` - Add log entry
+- `get_logs()` - Retrieve execution logs
+- `clear_logs()` - Clear execution logs
+- `get_statistics()` - Get comprehensive statistics
 
-  - **run** - Função para iniciar um processo em paralelo.
-  - **is_running** - Função para capturar o status atual do processo que esta rodando em paralelo.
-  - **get_result** - Função para coletar o retorno da execução em paralelo junto com resultado da função ou funções que foram enviadas a este processo com retorno em forma de dict.
-  - **terminate** - Função para finalizar o processo paralelo mantendo apenas o processo principal do seu código, também é chamada de forma automatica esta função ao final de um procesos paralelo ou no final da função "get_result".
+## Documentation
 
-  **Asyn (AsyncRunner)**
+For detailed documentation, usage examples, and API reference, visit:
 
-  - **run** - Função para iniciar a execução assíncrona de uma função mantendo o fluxo principal da aplicação.
-  - **is_running** - Função para verificar se a tarefa assíncrona ainda está em execução.
-  - **get_result** - Função para obter o resultado da execução assíncrona, incluindo tempo de execução e status, com suporte a timeout.
-  - **cancel** - Função para cancelar a tarefa assíncrona em execução.
+- **[GitHub Wiki](https://github.com/CamiloCCarvalho/rpasuite/wiki)** - Complete documentation and guides
+- **[PyPI Project Page](https://pypi.org/project/rpa-suite/)** - Package information and releases
 
-  **Iris (OCR-IA)**
+## Contributing
 
-  - **read_document** - Reads and converts a document to the specified format.
+Contributions are welcome! If you'd like to contribute to RPA Suite:
 
-<br>
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Author
+
+**Camilo Costa de Carvalho**
+
+- GitHub: [@CamiloCCarvalho](https://github.com/CamiloCCarvalho)
+- LinkedIn: [camilocostac](https://www.linkedin.com/in/camilocostac/)
+- Email: camilo.costa1993@gmail.com
 
 ## Release Notes
 
-### Versão: **Beta 1.6.5**
+### Version 1.6.6
 
-- **Data de Lançamento:** *20/02/2024*
-- **Última Atualização:** 16/09/2025
-- **Status:** Em desenvolvimento
+**New Features:**
+- ✨ Added Database module for complete execution tracking and lifecycle management
+- ✨ Multi-database support (SQLite, PostgreSQL, MySQL)
+- ✨ Automatic interruption detection and recovery
+- ✨ Item queue processing system
+- ✨ Comprehensive statistics and reporting
 
-Esta versão marca um grande avanço no desenvolvimento da RPA Suite, trazendo melhorias significativas na arquitetura, novas funcionalidades e maior simplicidade no uso. Confira as principais mudanças abaixo.
+**Improvements:**
+- 🔧 Enhanced Suite instance initialization with proper type hints
+- 🔧 Improved autocomplete and IDE support
+- 🔧 Better docstrings and module descriptions
+- 🔧 Refactored module structure for better maintainability
 
-### Notas:
-- atualização 1.6.5
-  - Adição Módulo: Iris (OCR-IA)
-  - Feat.: leitura de documento (aceita multiplos formatos)
-  - Feat.: leitura em lote (multiplos docmumentos em uma unica chamada)
-  - Melhoria de docstrings
+### Version 1.6.5
 
-## Mais Sobre
+- Initial release with core functionality
 
-Para mais informações, visite os links abaixo:
+---
 
-- **[Repositório no GitHub](https://github.com/CamiloCCarvalho/rpa_suite)**
-  Explore o código-fonte, contribua com melhorias e acompanhe o desenvolvimento do projeto.
-- **[Página no PyPI](https://pypi.org/project/rpa-suite/)**
-  Confira a documentação oficial, instale a biblioteca e veja as versões disponíveis.
+<div align="center">
+
+**[⬆ Back to Top](#rpa-suite)**
+
+Made with ❤️ for the RPA community
+
+</div>

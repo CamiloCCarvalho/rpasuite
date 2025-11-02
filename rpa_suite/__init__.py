@@ -10,7 +10,7 @@ Example of usage:
     >>> from rpa_suite import rpa
     >>> rpa.email.send_smtp(
     ...     email_user="your@email.com",
-    ...     email_password="your_password",
+    ...     email_password="123",
     ...     email_to="destination@email.com",
     ...     subject_title="Test",
     ...     body_message="<p>Test message</p>"
@@ -43,7 +43,7 @@ Exemplo de uso:
     >>> from rpa_suite import rpa
     >>> rpa.email.send_smtp(
     ...     email_user="seu@email.com",
-    ...     email_password="sua_senha",
+    ...     email_password="123",
     ...     email_to="destino@email.com",
     ...     subject_title="Teste",
     ...     body_message="<p>Mensagem de teste</p>"
@@ -70,5 +70,3 @@ __version__ = "1.6.5"
 
 # allows importing the rpa_suite module without the package name
 from .suite import rpa
-
-rpa

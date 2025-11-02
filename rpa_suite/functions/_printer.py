@@ -5,7 +5,7 @@ from colorama import Fore
 
 
 # Windows bash colors
-class Colors:
+class Colors:  # pylint: disable=duplicate-code
     black = f"{Fore.BLACK}"
     blue = f"{Fore.BLUE}"
     green = f"{Fore.GREEN}"
@@ -19,6 +19,7 @@ class Colors:
     retur_fn = f"{Fore.LIGHTYELLOW_EX}"
 
 
+# pylint: disable=duplicate-code
 def success_print(string_text: str, color=Colors.green, ending="\n") -> None:
     """
     Print that indicates ``SUCCESS``. Customized with the color Green \n
@@ -38,6 +39,7 @@ def success_print(string_text: str, color=Colors.green, ending="\n") -> None:
     print(f"{color}{string_text}{Colors.default}", end=ending)
 
 
+# pylint: disable=duplicate-code
 def alert_print(string_text: str, color=Colors.yellow, ending="\n") -> None:
     """
     Print that indicates ``ALERT``. Customized with the color Yellow \n
@@ -56,6 +58,7 @@ def alert_print(string_text: str, color=Colors.yellow, ending="\n") -> None:
     print(f"{color}{string_text}{Colors.default}", end=ending)
 
 
+# pylint: disable=duplicate-code
 def info_print(string_text: str, color=Colors.cyan, ending="\n") -> None:
     """
     Print that indicates ``INFORMATION``. Customized with the color Cyan \n
@@ -74,6 +77,7 @@ def info_print(string_text: str, color=Colors.cyan, ending="\n") -> None:
     print(f"{color}{string_text}{Colors.default}", end=ending)
 
 
+# pylint: disable=duplicate-code
 def error_print(string_text: str, color=Colors.red, ending="\n") -> None:
     """
     Print that indicates ``ERROR``. Customized with the color Red \n
@@ -92,6 +96,7 @@ def error_print(string_text: str, color=Colors.red, ending="\n") -> None:
     print(f"{color}{string_text}{Colors.default}", end=ending)
 
 
+# pylint: disable=duplicate-code
 def magenta_print(string_text: str, color=Colors.magenta, ending="\n") -> None:
     """
     Print customized with the color Magenta \n
@@ -110,6 +115,7 @@ def magenta_print(string_text: str, color=Colors.magenta, ending="\n") -> None:
     print(f"{color}{string_text}{Colors.default}", end=ending)
 
 
+# pylint: disable=duplicate-code
 def blue_print(string_text: str, color=Colors.blue, ending="\n") -> None:
     """
     Print customized with the color Blue \n
@@ -128,6 +134,7 @@ def blue_print(string_text: str, color=Colors.blue, ending="\n") -> None:
     print(f"{color}{string_text}{Colors.default}", end=ending)
 
 
+# pylint: disable=duplicate-code
 def print_call_fn(string_text: str, color=Colors.call_fn, ending="\n") -> None:
     """
     Print customized for function called (log) \n
@@ -147,6 +154,7 @@ def print_call_fn(string_text: str, color=Colors.call_fn, ending="\n") -> None:
     print(f"{color}{string_text}{Colors.default}", end=ending)
 
 
+# pylint: disable=duplicate-code
 def print_retur_fn(string_text: str, color=Colors.retur_fn, ending="\n") -> None:
     """
     Print customized for function return (log) \n

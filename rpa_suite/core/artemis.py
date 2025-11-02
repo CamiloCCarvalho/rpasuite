@@ -1,16 +1,13 @@
 # rpa_suite/core/artemis.py
 
 # imports standard
-from enum import Enum
 from pathlib import Path
-from typing import Tuple, Union, Optional
-from time import time
-from time import sleep
+from time import sleep, time
+from typing import Optional, Tuple, Union
 
 # imports external
 import pyautogui as artemis_engine
 
-# imports internos
 # imports internal
 from rpa_suite.functions._printer import alert_print, success_print
 
@@ -20,8 +17,10 @@ OPENCV_AVAILABLE_FROM_ARTEMIS = False
 
 class ArtemisError(Exception):
     """Custom exception for Artemis errors."""
+
     def __init__(self, message):
-        super().__init__(f'ArtemisError: {message}')
+        clean_message = message.replace("ArtemisError:", "").strip()
+        super().__init__(f"ArtemisError: {clean_message}")
 
 
 class Artemis:
@@ -29,27 +28,27 @@ class Artemis:
     Artemis:
     ----------
     Intelligent desktop automation based on computer vision.
-    
+
     Specialized in locating and interacting with visual elements
     in the graphical interface, optimized for robust RPA automation.
     """
-    
+
     def __init__(self):
         """
         Artemis:
         ----------
         Intelligent desktop automation based on computer vision.
-        
+
         Specialized in locating and interacting with visual elements
         in the graphical interface, optimized for robust RPA automation.
         """
         artemis_engine.FAILSAFE = True  # Move mouse to top-left corner to stop
         artemis_engine.PAUSE = 0.1  # Default pause between commands
-        global OPENCV_AVAILABLE_FROM_ARTEMIS
+        global OPENCV_AVAILABLE_FROM_ARTEMIS  # pylint: disable=global-statement
         OPENCV_AVAILABLE_FROM_ARTEMIS = self.__check_opencv_availability()
-        
+
     # pylint: disable=import-outside-toplevel
-    def __check_opencv_availability() -> bool:
+    def __check_opencv_availability(self) -> bool:
         """Checks if OpenCV is available in the system."""
         try:
             # pylint: disable=import-outside-toplevel
@@ -59,7 +58,7 @@ class Artemis:
         except ImportError:
             return False
 
-    def click_image(
+    def click_image(  # pylint: disable=too-many-positional-arguments,too-many-locals
         self,
         image_label: str,
         images_folder: Union[str, Path] = "resource",
@@ -72,7 +71,7 @@ class Artemis:
         region: Optional[Tuple[int, int, int, int]] = None,
         grayscale: bool = True,
         display_details: bool = False,
-        verbose: bool = False
+        verbose: bool = False,
     ) -> Union[Tuple[int, int], bool]:
         """
         Locates an image on the screen and clicks on it.
@@ -148,14 +147,19 @@ class Artemis:
 
         # Warning if confidence will be ignored
         if confidence != 0.8 and not OPENCV_AVAILABLE_FROM_ARTEMIS:
-            if verbose: alert_print(f"Parameter confidence={confidence} will be ignored. " + "Install OpenCV: pip install opencv-python")
+            if verbose:
+                alert_print(
+                    f"Parameter confidence={confidence} will be ignored. " + "Install OpenCV: pip install opencv-python"
+                )
 
-        if verbose: print(f"Starting image search: {image_path}")
+        if verbose:
+            print(f"Starting image search: {image_path}")
         if display_details:
-            if verbose: print(
-                f"Settings: confidence={'N/A' if not OPENCV_AVAILABLE_FROM_ARTEMIS else confidence}, "
-                + f"timeout={timeout}s, region={region}"
-            )
+            if verbose:
+                print(
+                    f"Settings: confidence={'N/A' if not OPENCV_AVAILABLE_FROM_ARTEMIS else confidence}, "
+                    + f"timeout={timeout}s, region={region}"
+                )
 
         # Temporary PyAutoGUI settings
         original_pause = artemis_engine.PAUSE
@@ -170,17 +174,19 @@ class Artemis:
                 search_interval=search_interval,
                 region=region,
                 grayscale=grayscale,
+                verbose=verbose,
             )
 
             if not position:
-                if verbose: alert_print(f"Image not found after {timeout}s: {image_path.name}")
+                if verbose:
+                    alert_print(f"Image not found after {timeout}s: {image_path.name}")
                 return False
 
             # Calculate click position
             click_position = self._calculate_click_position(position, click_center)
 
             # Perform click
-            self._perform_click(click_position, click_button, double_click)
+            self._perform_click(click_position, click_button, double_click, verbose)
 
             # print(f"Click performed!")
             return click_position
@@ -193,8 +199,7 @@ class Artemis:
             # Restore original settings
             artemis_engine.PAUSE = original_pause
 
-
-    def find_image_position(
+    def find_image_position(  # pylint: disable=too-many-positional-arguments
         self,
         image_label: str,
         images_folder: Union[str, Path] = "resource",
@@ -233,9 +238,12 @@ class Artemis:
                 search_interval=0.5,
                 region=region,
                 grayscale=grayscale,
+                verbose=verbose,
             )
 
             if position:
+                if verbose:
+                    success_print(f"Image found on position: {position}.")
                 return self._calculate_click_position(position, click_center=True)
             return False
 
@@ -243,7 +251,7 @@ class Artemis:
             error_msg = f"Error searching for image {image_path.name}: {str(e)}"
             raise ArtemisError(error_msg) from e
 
-    def _validate_parameters(
+    def _validate_parameters(  # pylint: disable=too-many-positional-arguments
         self,
         confidence: float,
         timeout: float,
@@ -272,8 +280,7 @@ class Artemis:
             if any(not isinstance(val, int) or val < 0 for val in region):
                 raise ValueError("All region values must be non-negative integers")
 
-
-    def _resolve_image_path(image_label: str, images_folder: Union[str, Path]) -> Path:
+    def _resolve_image_path(self, image_label: str, images_folder: Union[str, Path]) -> Path:
         """Resolves the full path to the image file."""
 
         folder_path = Path(images_folder)
@@ -301,8 +308,7 @@ class Artemis:
 
         return image_path
 
-
-    def _search_image_with_timeout(
+    def _search_image_with_timeout(  # pylint: disable=too-many-branches,too-many-positional-arguments
         self,
         image_path: Path,
         confidence: float,
@@ -332,7 +338,8 @@ class Artemis:
                 location = artemis_engine.locateOnScreen(**locate_args)
 
                 if location:
-                    if verbose: print(f"Image found on attempt {attempts}.")
+                    if verbose:
+                        print(f"Image found on attempt {attempts}.")
                     return location
 
             except artemis_engine.ImageNotFoundException:
@@ -345,7 +352,8 @@ class Artemis:
                     try:
                         location = artemis_engine.locateOnScreen(str(image_path), region=region, grayscale=grayscale)
                         if location:
-                            if verbose: print(f"Image found on attempt {attempts} (without confidence): {location}")
+                            if verbose:
+                                print(f"Image found on attempt {attempts} (without confidence): {location}")
                             return location
                     except Exception as error:
                         raise ArtemisError(f"Failed attempt without confidence: {error}.") from e
@@ -362,8 +370,7 @@ class Artemis:
             success_print(f"Search completed after {attempts} attempts in {timeout}s")
         return None
 
-
-    def _calculate_click_position(image_box: any, click_center: bool) -> Tuple[int, int]:
+    def _calculate_click_position(self, image_box: any, click_center: bool) -> Tuple[int, int]:
         """Calculates the exact click position based on image location."""
 
         if click_center:
@@ -374,8 +381,9 @@ class Artemis:
         # Click at top-left corner
         return (image_box.left, image_box.top)
 
-
-    def _perform_click(position: Tuple[int, int], click_button: str, double_click: bool, verbose: bool = False) -> None:
+    def _perform_click(
+        self, position: Tuple[int, int], click_button: str, double_click: bool, verbose: bool = False
+    ) -> None:
         """Performs click at specified position."""
 
         try:
@@ -387,25 +395,24 @@ class Artemis:
             # Perform click
             if double_click:
                 artemis_engine.doubleClick(x, y, button=click_button)
-                if verbose: 
+                if verbose:
                     success_print(f"Double click performed at ({x}, {y}) with {click_button} button.")
             else:
                 artemis_engine.click(x, y, button=click_button)
-                if verbose: 
+                if verbose:
                     success_print(f"Click performed at ({x}, {y}) with {click_button} button.")
         except Exception as e:
             raise ArtemisError(f"Error performing click: {str(e)}.") from e
 
-
     # Convenience functions for specific cases
-    def wait_and_click(
+    def wait_and_click(  # pylint: disable=too-many-positional-arguments
         self,
         image_label: str,
         images_folder: Union[str, Path] = "resource",
         confidence: float = 0.8,
-        timeout: float = 30.0
-        ) -> Union[Tuple[int, int], bool]:
-        
+        timeout: float = 30.0,
+        verbose: bool = False,
+    ) -> Union[Tuple[int, int], bool]:
         """
         Waits for an image to appear on screen and clicks on it.
 
@@ -418,28 +425,29 @@ class Artemis:
                 confidence=confidence,
                 timeout=timeout,
                 search_interval=1.0,  # Longer interval for waiting
+                verbose=verbose,
             )
         except Exception as e:
             raise ArtemisError(f"Error waiting and clicking: {str(e)}.") from e
 
-    def quick_click(self,
-                    image_label: str,
-                    images_folder: Union[str, Path] = "resource"
-        ) -> Union[Tuple[int, int], bool]:
+    def quick_click(
+        self, image_label: str, images_folder: Union[str, Path] = "resource", verbose: bool = False
+    ) -> Union[Tuple[int, int], bool]:
         """
         Quick click with optimized default settings.
 
         Convenience function for fast clicks with balanced settings.
         """
-        
+
         try:
             return self.click_image(
-            image_label=image_label,
-            images_folder=images_folder,
-            confidence=0.8,
-            timeout=3.0,
-            search_interval=0.2,
-            grayscale=True,  # Faster
-        )
+                image_label=image_label,
+                images_folder=images_folder,
+                confidence=0.8,
+                timeout=3.0,
+                search_interval=0.2,
+                grayscale=True,  # Faster
+                verbose=verbose,
+            )
         except Exception as e:
             raise ArtemisError(f"Error performing quick click: {str(e)}.") from e

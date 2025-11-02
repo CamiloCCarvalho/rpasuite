@@ -1,17 +1,21 @@
 # rpa_suite/utils/system.py
 
 # imports third-party
-import sys
-import os
 import ctypes
+import os
+import sys
 
 # imports internal
-from rpa_suite.functions._printer import error_print, success_print
+from rpa_suite.functions._printer import success_print
+
 
 class UtilsError(Exception):
     """Custom exception for Utils errors."""
+
     def __init__(self, message):
-        super().__init__(f'UtilsError: {message}')
+        clean_message = message.replace("UtilsError:", "").strip()
+        super().__init__(f"UtilsError: {clean_message}")
+
 
 class Utils:
     """
@@ -29,7 +33,7 @@ class Utils:
         try:
             pass
         except Exception as e:
-            UtilsError(f"Error during Utils class initialization: {str(e)}.")
+            raise UtilsError(f"Error during Utils class initialization: {str(e)}.") from e
 
     def set_importable_dir(self, display_message: bool = False) -> None:
         """
@@ -60,7 +64,7 @@ class Utils:
                 success_print("Directory successfully configured for import!")
 
         except Exception as e:
-            UtilsError(f"Error configuring importable directory: {str(e)}.")
+            raise UtilsError(f"Error configuring importable directory: {str(e)}.") from e
 
 
 class KeepSessionActive:
@@ -98,7 +102,7 @@ class KeepSessionActive:
             self.ES_SYSTEM_REQUIRED = 0x00000001
             self.ES_DISPLAY_REQUIRED = 0x00000002
         except Exception as e:
-            UtilsError(f"Error initializing KeepSessionActive: {str(e)}.")
+            raise UtilsError(f"Error initializing KeepSessionActive: {str(e)}.") from e
 
     def __enter__(self) -> None:
         """
@@ -122,7 +126,7 @@ class KeepSessionActive:
             )
             return self
         except Exception as e:
-            UtilsError(f"Error configuring execution state: {str(e)}.")
+            raise UtilsError(f"Error configuring execution state: {str(e)}.") from e
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """
@@ -147,7 +151,7 @@ class KeepSessionActive:
         try:
             ctypes.windll.kernel32.SetThreadExecutionState(self.ES_CONTINUOUS)
         except Exception as e:
-            UtilsError(f"Error restoring execution state: {str(e)}.")
+            raise UtilsError(f"Error restoring execution state: {str(e)}.") from e
 
 
 class Tools(Utils):

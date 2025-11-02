@@ -1,81 +1,46 @@
 # rpa_suite/core/file.py
 
 # imports standard
-import os, time
+import os
+import time
 from datetime import datetime
 from typing import Dict, List, Union
 
 # imports third party
 from colorama import Fore
 
-# imports internal
-from rpa_suite.functions._printer import success_print, alert_print
 from rpa_suite.functions.__create_ss_dir import __create_ss_dir as create_ss_dir
+
+# imports internal
+from rpa_suite.functions._printer import alert_print, success_print
+
 
 class FileError(Exception):
     """Custom exception for File errors."""
+
     def __init__(self, message):
-        super().__init__(f'FileError: {message}')
+        clean_message = message.replace("FileError:", "").strip()
+        super().__init__(f"FileError: {clean_message}")
+
 
 class File:
     """
-    Class that provides utilities for file management, including creation, deletion, and manipulation of files.
+    Class for file management utilities: create/delete flag files, count files in directories, and take screenshots.
 
-    This class offers functionalities for:
-        - Creating and deleting flag files
-        - Counting files in a directory
-        - Capturing screenshots and managing their paths
-
-    Methods:
-        screen_shot: Creates a screenshot and saves it in a specified directory
-        count_files: Counts the number of files in a specified directory
-        flag_create: Creates a flag file
-        flag_delete: Deletes a flag file
-
-    The File class is part of the RPA Suite and can be accessed through the rpa object:
-        >>> from rpa_suite import rpa
-        >>> rpa.file.screen_shot('example')
-
-    Parameters:
-        file_name (str): The name of the screenshot file
-        path_dir (str): The path of the directory where the screenshot should be saved
-        save_with_date (bool): Indicates if the file name should include the date
-        delay (int): The wait time before capturing the screen
-
-    pt-br
-    ----------
-    Classe que fornece utilitários para gerenciamento de arquivos, incluindo criação, exclusão e manipulação de arquivos.
-
-    Esta classe oferece funcionalidades para:
-        - Criar e excluir arquivos de flag
-        - Contar arquivos em um diretório
-        - Capturar screenshots e gerenciar seus caminhos
-
-    Métodos:
-        screen_shot: Cria uma captura de tela e a salva em um diretório especificado
-        count_files: Conta o número de arquivos em um diretório especificado
-        flag_create: Cria um arquivo de flag
-        flag_delete: Exclui um arquivo de flag
-
-    A classe File é parte do RPA Suite e pode ser acessada através do objeto rpa:
-        >>> from rpa_suite import rpa
-        >>> rpa.file.screen_shot('exemplo')
-
-    Parâmetros:
-        file_name (str): O nome do arquivo de captura de tela
-        path_dir (str): O caminho do diretório onde a captura de tela deve ser salva
-        save_with_date (bool): Indica se o nome do arquivo deve incluir a data
-        delay (int): O tempo de espera antes de capturar a tela
+    Example:
+        >>> from rpa_suite.core.file import File
+        >>> file_util = File()
+        >>> file_util.screen_shot('example')
     """
 
     def __init__(self):
-        """Initialize the File class."""
+        """Initialize the File class for file management utilities."""
         try:
             self.__create_ss_dir = create_ss_dir
         except Exception as e:
-            raise FileError(f"Error trying execute: {self.__init__.__name__}! {str(e)}.")
+            raise FileError(f"Error trying execute: {self.__init__.__name__}! {str(e)}.") from e
 
-    def screen_shot(
+    def screen_shot(  # pylint: disable=too-many-positional-arguments
         self,
         file_name: str = "screenshot",
         path_dir: str = None,
@@ -86,54 +51,61 @@ class File:
         verbose: bool = False,
     ) -> str | None:
         """
-        Function responsible for create a dir for screenshot, and file screenshot and save this in dir to create, if dir exists save it on original dir. By default uses date on file name. \n
+        Takes a screenshot and saves it to a directory. By default, uses the current date in the filename.
 
         Parameters:
-        ----------
-        ``file_name: str`` - should be a string, by default name is `screenshot`.
-        ``path_dir: str`` - should be a string, not have a default path.
-        ``save_with_date: bool`` - should be a boolean, by default `True` save namefile with date `foo_dd_mm_yyyy-hh_mm_ss.png`.
-        ``delay: int`` - should be a int, by default 1 (represents seconds).
-        ``use_default_path_and_name: bool`` - should be a boolean, by default `True`
-        ``name_ss_dir: str`` - should be a string, by default type `None`
-        ``verbose`` - should be a boolean, by default `False`
+        -----------
+        file_name : str, optional
+            Base name for the screenshot file. Default: "screenshot".
 
-        Return:
-        ----------
-        >>> type:str
-            * 'screenshot_path': str - represents the absulute path created for this file
+        path_dir : str | None, optional
+            Path where the screenshot should be saved. If None, uses default screenshot directory.
+            Default: None.
 
-        Description: pt-br
-        ----------
-        Function responsible for creating a screenshot directory, and screenshot file and saving it in the directory to be created, if the directory exists, save it in the original directory. By default, uses date in the file name.
+        save_with_date : bool, optional
+            Whether to append current date and time to the filename. Default: True.
 
-        Parameters:
-        ----------
-        ``file_name: str`` - should be a string, by default the name is `screenshot`.
-        ``file_path: str`` - should be a string, has no default path.
-        ``save_with_date: bool`` - should be a boolean, by default `True` saves the file name with date `foo_dd_mm_yyyy-hh_mm_ss.png`.
-        ``delay: int`` - should be an int, by default 1 represented in second(s).
-        ``use_default_path_and_name: bool`` - should be a boolean, by default `True`
-        ``name_ss_dir: str`` - should be a string, by default of type `None`
-        ``verbose`` - should be a boolean, by default `False`
+        delay : int, optional
+            Delay in seconds before taking the screenshot. Default: 1.
 
-        Return:
-        ----------
-        >>> type: str
-            * 'screenshot_path': str - represents the absolute path of the created file
+        use_default_path_and_name : bool, optional
+            Whether to use default path and directory name. Default: True.
+
+        name_ss_dir : str | None, optional
+            Name of the screenshot directory if not using default. Default: None.
+
+        verbose : bool, optional
+            Whether to print the file path after saving. Default: False.
+
+        Returns:
+        --------
+        str | None
+            Path to the saved screenshot file, or None if an error occurred.
+
+        Raises:
+        -------
+        FileError
+            If there is an error taking or saving the screenshot.
+        ImportError
+            If pyautogui or Pillow libraries are not installed.
+
+        Example:
+        --------
+        >>> file_util = File()
+        >>> file_util.screen_shot('my_screenshot', save_with_date=True)
         """
 
         # proccess
         try:
 
-            try:
-                import pyautogui
-                import pyscreeze
+            try:  # only to check if opencv, pillow allowed and installed
+                import pyautogui  # pylint: disable=import-outside-toplevel
+                import pyscreeze  # pylint: disable=unused-import,import-outside-toplevel
 
-            except ImportError:
+            except ImportError as e:
                 raise ImportError(
                     f"\nThe 'pyautogui' e 'Pillow' libraries are necessary to use this module. {Fore.YELLOW}Please install them with: 'pip install pyautogui pillow'{Fore.WHITE}"
-                )
+                ) from e
 
             time.sleep(delay)
 
@@ -155,19 +127,19 @@ class File:
                     success_print(path_file_screenshoted)
                 return path_file_screenshoted
 
-            else:  # not use date on file name
-                image = pyautogui.screenshot()
-                file_name = f"{file_name}.png"
-                path_file_screenshoted = os.path.join(path_dir, file_name)
+            # not use date on file name
+            image = pyautogui.screenshot()
+            file_name = f"{file_name}.png"
+            path_file_screenshoted = os.path.join(path_dir, file_name)
 
-                image.save(path_file_screenshoted)
+            image.save(path_file_screenshoted)
 
-                if verbose:
-                    success_print(path_file_screenshoted)
-                return path_file_screenshoted
+            if verbose:
+                success_print(path_file_screenshoted)
+            return path_file_screenshoted
 
         except Exception as e:
-            FileError(f"Error to execute function:{self.screen_shot.__name__}! Error: {str(e)}")
+            raise FileError(f"Error to execute function:{self.screen_shot.__name__}! Error: {str(e)}") from e
 
     def flag_create(
         self,
@@ -176,7 +148,28 @@ class File:
         verbose: bool = True,
     ) -> None:
         """
-        Creates a flag file indicating that the robot is running.
+        Creates a flag file to indicate the robot is running.
+
+        Parameters:
+        -----------
+        name_file : str, optional
+            Name of the flag file to create. Default: "running.flag".
+
+        path_to_create : str | None, optional
+            Path where the flag file should be created. If None, uses current directory.
+            Default: None.
+
+        verbose : bool, optional
+            Whether to print success messages. Default: True.
+
+        Returns:
+        --------
+        None
+
+        Raises:
+        -------
+        FileError
+            If there is an error creating the flag file.
         """
 
         try:
@@ -192,7 +185,7 @@ class File:
                 success_print("Flag file created.")
 
         except Exception as e:
-            FileError(f"Error in function file_scheduling_create: {str(e)}")
+            raise FileError(f"Error in function file_scheduling_create: {str(e)}") from e
 
     def flag_delete(
         self,
@@ -201,7 +194,28 @@ class File:
         verbose: bool = True,
     ) -> None:
         """
-        Deletes the flag file indicating that the robot has finished execution.
+        Deletes the flag file to indicate the robot has finished.
+
+        Parameters:
+        -----------
+        name_file : str, optional
+            Name of the flag file to delete. Default: "running.flag".
+
+        path_to_delete : str | None, optional
+            Path where the flag file is located. If None, uses current directory.
+            Default: None.
+
+        verbose : bool, optional
+            Whether to print success messages. Default: True.
+
+        Returns:
+        --------
+        None
+
+        Raises:
+        -------
+        FileError
+            If there is an error deleting the flag file.
         """
 
         try:
@@ -224,38 +238,43 @@ class File:
 
     def count_files(
         self,
-        dir_to_count: List[str] = ["."],
+        dir_to_count: List[str] | None = None,
         type_extension: str = "*",
         verbose: bool = False,
     ) -> Dict[str, Union[bool, int]]:
         """
-        Function responsible for counting files within a folder, considers subfolders to do the count, searches by file type, being all files by default. \n
+        Counts files in one or more directories, optionally filtering by extension.
 
         Parameters:
-        ----------
-        ``dir_to_count: list`` - should be a list, accepts more than one path to count files.
-        ``type_extension: str`` - should be a string with the format/extension of the type of file you want to be searched for counting, if empty by default will be used ``*`` which will count all files.
+        -----------
+        dir_to_count : list[str] | None, optional
+            List of directory paths to count files in. If None or empty, counts in current directory.
+            Default: None.
 
-        Return:
-        ----------
-        >>> type:dict
-            * 'success': bool - represents if the action was performed successfully
-            * 'qt': int - number that represents the quantity of files that were counted
+        type_extension : str, optional
+            File extension to filter by (e.g., 'txt', 'pdf'). Use "*" to count all files.
+            Default: "*".
 
-        Description: pt-br
-        ----------
-        Function responsible for counting files within a folder, considers subfolders to do the count, searches by file type, being all files by default. \n
+        verbose : bool, optional
+            Whether to print the count result. Default: False.
 
-        Parameters:
-        ----------
-        ``dir_to_count: list`` - should be a list, accepts more than one path to count files.
-        ``type_extension: str`` - should be a string with the format/extension of the type of file you want to be searched for counting, if empty by default will be used ``*`` which will count all files.
+        Returns:
+        --------
+        dict[str, Union[bool, int]]
+            Dictionary containing:
+            - 'success' (bool): Indicates if the count was performed successfully
+            - 'qt' (int): Total number of files counted
 
-        Return:
-        ----------
-        >>> type:dict
-            * 'success': bool - represents if the action was performed successfully
-            * 'qt': int - number that represents the quantity of files that were counted
+        Raises:
+        -------
+        FileError
+            If there is an error counting files.
+
+        Example:
+        --------
+        >>> file_util = File()
+        >>> result = file_util.count_files(['./myfolder'], type_extension='txt')
+        >>> print(result['qt'])  # Number of .txt files found
         """
 
         # Local Variables
@@ -263,6 +282,10 @@ class File:
 
         # Process
         try:
+            # by default, search in the current directory
+            if not dir_to_count:
+                dir_to_count = ["."]
+
             for directory in dir_to_count:
                 for _, _, files in os.walk(directory):
                     for file in files:
@@ -275,6 +298,6 @@ class File:
 
         except Exception as e:
             result["success"] = False
-            FileError(f"Error when trying to count files! Error: {str(e)}")
+            raise FileError(f"Error when trying to count files! Error: {str(e)}") from e
 
         return result

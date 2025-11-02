@@ -6,10 +6,14 @@ import email_validator
 # imports internal
 from rpa_suite.functions._printer import success_print
 
+
 class ValidateError(Exception):
     """Custom exception for Validate errors."""
+
     def __init__(self, message):
-        super().__init__(f'Validate Error: {message}')
+        clean_message = message.replace("ValidateError:", "").strip()
+        super().__init__(f"ValidateError: {clean_message}")
+
 
 class Validate:
     """
@@ -23,28 +27,54 @@ class Validate:
     The class uses the email_validator library to perform rigorous validation of email addresses, ensuring that the provided data is correct and ready for use in applications that require email communication. Additionally, it provides methods for searching words in text, enhancing its utility for text processing.
     """
 
-    def __init__(self) -> None: 
-        """Initialize the Validate class."""
-        pass
-
-    def emails(self, email_list: list[str], display_message: bool = False) -> dict:
+    def __init__(self) -> None:
         """
-        Function responsible for rigorously validating a list of emails using the email_validator library.
+        Class responsible for validating email addresses and searching for words within text.
+
+        This class offers functionalities to:
+            - Validate a list of emails, checking if each one complies with email formatting standards.
+            - Search for specific words or patterns within a given text, providing information about their occurrences.
+            - Return a dictionary with information about the validity of the emails, including lists of valid and invalid emails, as well as counts for each category.
+
+        The class uses the email_validator library to perform rigorous validation of email addresses, ensuring that the provided data is correct and ready for use in applications that require email communication. Additionally, it provides methods for searching words in text, enhancing its utility for text processing.
+        """
+
+    def emails(self, email_list: list[str], verbose: bool = False) -> dict:
+        """
+        Validates a list of emails using the email_validator library.
 
         Parameters:
-        ------------
-        ``email_list: list`` a list of strings containing the emails to be validated
+        -----------
+        email_list : list[str]
+            A list of strings containing the emails to be validated.
 
-        Return:
-        ------------
-        >>> type: dict
-        Returns a dictionary with the respective data:
-            * 'success': bool - represents if the list is 100% valid
-            * 'valid_emails': list - list of valid emails
-            * 'invalid_emails': list - list of invalid emails
-            * 'qt_valids': int - number of valid emails
-            * 'qt_invalids': int - number of invalid emails
-            * 'map_validation' - map of the validation of each email
+        verbose : bool, optional
+            If True, prints a success message after execution. Default: False.
+
+        Returns:
+        --------
+        dict
+            Dictionary with the following keys:
+            - 'success' (bool): True if all emails are valid, False otherwise
+            - 'valid_emails' (list): List of valid emails
+            - 'invalid_emails' (list): List of invalid emails
+            - 'qt_valids' (int): Number of valid emails
+            - 'qt_invalids' (int): Number of invalid emails
+            - 'map_validation' (list): Validation result for each email
+
+        Example:
+        --------
+        >>> from rpa_suite.core.validate import Validate
+        >>> v = Validate()
+        >>> v.emails(['test@example.com', 'invalid-email'])
+        {
+            'success': False,
+            'valid_emails': ['test@example.com'],
+            'invalid_emails': ['invalid-email'],
+            'qt_valids': 1,
+            'qt_invalids': 1,
+            'map_validation': [<ValidationResult object>, ...]
+        }
         """
 
         # Local Variables
@@ -73,7 +103,7 @@ class Validate:
                 except email_validator.EmailNotValidError:
                     invalid_emails.append(email)
 
-            if display_message:
+            if verbose:
                 success_print(f"Function: {self.emails.__name__} executed.")
 
         except Exception as e:
@@ -91,40 +121,52 @@ class Validate:
 
         return result
 
-    def word(
+    def word(  # pylint: disable=too-many-positional-arguments
         self,
         origin_text: str,
         searched_word: str,
         case_sensitivy: bool = True,
         search_by: str = "string",
-        display_message: bool = False,
+        verbose: bool = False,
     ) -> dict:
         """
-        Function responsible for searching for a string, substring or word within a provided text.
+        Searches for a string, substring, or word within a provided text.
 
         Parameters:
         -----------
-        ``origin_text: str`` 
-            It is the text where the search should be made, in string format.
+        origin_text : str
+            The text where the search should be performed.
 
-        ``search_by: str`` accepts the values:
-            * 'string' - can find a requested writing excerpt. (default)
-            * 'word' - finds only the word written out exclusively.
-            * 'regex' - find regex patterns, [ UNDER DEVELOPMENT ...]
+        searched_word : str
+            The word, substring, or pattern to search for.
 
-        Return:
-        -----------
-        >>> type:dict
-        a dictionary with all information that may be necessary about the validation.
-        Respectively being:
-            * 'is_found': bool -  if the pattern was found in at least one case
-            * 'number_occurrences': int - represents the number of times this pattern was found
-            * 'positions': list[set(int, int), ...] - represents all positions where the pattern appeared in the original text
+        case_sensitivy : bool, optional
+            If True, the search is case sensitive. Default: True.
 
-        About `Positions`:
-        -----------
-        >>> type: list[set(int, int), ...]
-            * at `index = 0` we find the first occurrence of the text, and the occurrence is composed of a PAIR of numbers in a set, the other indexes represent other positions where occurrences were found if any.
+        search_by : str, optional
+            Search mode. Accepts:
+            - 'string' - finds the requested substring (default)
+            - 'word' - finds only the exact word
+            - 'regex' - finds regex patterns [UNDER DEVELOPMENT]
+            Default: "string".
+
+        verbose : bool, optional
+            If True, prints a message with the result. Default: False.
+
+        Returns:
+        --------
+        dict
+            Dictionary with the following keys:
+            - 'is_found' (bool): True if the pattern was found at least once
+            - 'number_occurrences' (int): Number of times the pattern was found
+            - 'positions' (list): All positions where the pattern appeared (currently empty)
+
+        Example:
+        --------
+        >>> from rpa_suite.core.validate import Validate
+        >>> v = Validate()
+        >>> v.word("Hello world, hello!", "hello", case_sensitivy=False, search_by="word")
+        {'is_found': True, 'number_occurrences': 2, 'positions': []}
         """
 
         # Local Variables
@@ -148,7 +190,7 @@ class Validate:
                         result["is_found"] = result["number_occurrences"] > 0
 
                 except Exception as e:
-                    return ValidateError(f"Unable to complete the search: {searched_word}. Error: {str(e)}")
+                    raise ValidateError(f"Unable to complete the search: {searched_word}. Error: {str(e)}") from e
 
             elif search_by == "string":
                 try:
@@ -162,19 +204,19 @@ class Validate:
                         result["is_found"] = result["number_occurrences"] > 0
 
                 except Exception as e:
-                    return ValidateError(f"Unable to complete the search: {searched_word}. Error: {str(e)}")
+                    raise ValidateError(f"Unable to complete the search: {searched_word}. Error: {str(e)}") from e
 
         except Exception as e:
             raise ValidateError(f"Unable to search for: {searched_word}. Error: {str(e)}") from e
 
         # Postprocessing
         if result["is_found"]:
-            if display_message:
+            if verbose:
                 success_print(
                     f'Function: {self.word.__name__} found: {result["number_occurrences"]} occurrences for "{searched_word}".'
                 )
         else:
-            if display_message:
+            if verbose:
                 success_print(
                     f'Function: {self.word.__name__} found no occurrences of "{searched_word}" during the search.'
                 )

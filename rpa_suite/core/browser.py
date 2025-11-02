@@ -1,25 +1,30 @@
 # rpa_suite/core/browser.py
 
 # imports standard
-from time import sleep
 import os
+from time import sleep
+
 import requests
 
 # imports third party
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
 # imports internal
 from rpa_suite.functions._printer import alert_print, success_print
 
+
 class BrowserError(Exception):
     """Custom exception for Browser errors."""
+
     def __init__(self, message):
-        super().__init__(f'BrowserError: {message}')
+        clean_message = message.replace("BrowserError:", "").strip()
+        super().__init__(f"BrowserError: {clean_message}")
+
 
 class Browser:
     """
@@ -129,9 +134,9 @@ class Browser:
             )
 
         except Exception as e:
-            BrowserError(f"Error configure_brower: {str(e)}.")
+            raise BrowserError(f"Error configure_brower: {str(e)}.") from e
 
-    def start_browser(self, close_chrome_on_this_port: bool = True, verbose: bool = False):
+    def start_browser(self, close_chrome_on_this_port: bool = True, timeout: int = 10, verbose: bool = False) -> None:
         """
         Starts a Chrome browser instance with remote debugging enabled.
         Args:
@@ -160,7 +165,7 @@ class Browser:
             while True:
                 try:
                     # Tenta conectar ao Chrome na porta de depuração
-                    response = requests.get(f"http://127.0.0.1:{self.port}/json")
+                    response = requests.get(f"http://127.0.0.1:{self.port}/json", timeout=timeout)
                     if response.status_code == 200:
                         break  # O Chrome está aberto
                 except requests.ConnectionError:
@@ -170,10 +175,10 @@ class Browser:
             self.configure_browser()
 
             if verbose:
-                success_print(f"Browser: Started successfully!")
+                success_print("Browser: Started successfully!")
 
         except Exception as e:
-            BrowserError(f"Error starting browser: {str(e)}.")
+            raise BrowserError(f"Error starting browser: {str(e)}.") from e
 
     def find_ele(self, value: str, by: By = By.XPATH, timeout=12, verbose=True):
         """
@@ -202,13 +207,10 @@ class Browser:
         except Exception as e:
 
             if verbose:
-                BrowserError(f"Error find_ele (FindElement): {str(e)}.")
-                return None
-            else:
-                return None
+                raise BrowserError(f"Error find_ele (FindElement): {str(e)}.") from e
+            return None
 
     # find elements (needs implementation)
-    ...
 
     # navigate
     def get(self, url: str, verbose: bool = False):
@@ -227,7 +229,7 @@ class Browser:
                 success_print(f"Browser: Navigating to: {url}")
 
         except Exception as e:
-            BrowserError(f"Error navigating to URL: {url}. Error: {str(e)}.")
+            raise BrowserError(f"Error navigating to URL: {url}. Error: {str(e)}.") from e
 
     def _close_all_browsers(self):
         """
@@ -240,7 +242,7 @@ class Browser:
 
         try:
             os.system("taskkill /F /IM chrome.exe >nul 2>&1")
-        except:
+        except:  # pylint: disable=bare-except
             pass
 
     def close_browser(self, verbose: bool = False):
@@ -267,13 +269,13 @@ class Browser:
             # Primeiro tenta fechar todas as janelas via Selenium
             try:
                 self.driver.close()
-            except:
+            except:  # pylint: disable=bare-except
                 pass
 
             # Depois tenta encerrar a sessão
             try:
                 self.driver.quit()
-            except:
+            except:  # pylint: disable=bare-except
                 pass
 
             # Aguarda um momento para o processo ser liberado
@@ -316,4 +318,6 @@ class Browser:
 
             except Exception as error_ultimate:
                 if verbose:
-                    BrowserError(f"Critical failure trying to close browser! Error: {str(error_ultimate)}!")
+                    raise BrowserError(
+                        f"Critical failure trying to close browser! Error: {str(error_ultimate)}!"
+                    ) from error_ultimate

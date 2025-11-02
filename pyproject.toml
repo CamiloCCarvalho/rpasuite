@@ -21,7 +21,6 @@ disable = [
     "R0903", # too-many-instance-attributes
     "R0902", # too-many-instance-attributes
     "W0718", # broad-exception-caught
-    "W0719", # broad-exception-raised
     "C0301", # line-too-long
     "C0103", # invalid-name
     "R0915", # too-many-statements
