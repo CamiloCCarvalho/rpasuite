@@ -113,11 +113,27 @@ db = rpa.database()
 # Start tracking an execution
 exec_id = db.start_execution(automation_name="My Automation Bot")
 
-# Add items to process
-item_id = db.add_item(execution_id=exec_id, item_identifier="item_001")
+# Add items to the processing queue
+db.add_items(execution_id=exec_id, items=[
+    {"item_identifier": "invoice_001", "item_data": {"value": 150.00}},
+    {"item_identifier": "invoice_002", "item_data": {"value": 320.50}},
+])
 
-# Finish the execution
+# Process the queue
+while item := db.get_next_item_from_queue(execution_id=exec_id):
+    db.start_processing_item(item["id"])
+    try:
+        # ... your processing logic here ...
+        db.finish_item(item["id"], status="success")
+    except Exception as e:
+        db.finish_item(item["id"], status="failed", error_message=str(e))
+
+# Log and finish the execution
+db.add_log_info("All items processed", execution_id=exec_id)
 db.finish_execution(exec_id, status="completed")
+
+# Check the results
+stats = db.get_statistics(execution_id=exec_id)
 ```
 
 ## Requirements
@@ -220,7 +236,7 @@ Complete execution lifecycle management:
 - `finish_execution()` - Complete an execution
 - `get_execution()` - Retrieve execution details
 - `get_executions()` - List executions with filtering
-- `detect_and_mark_interrupted_executions()` - Auto-detect interruptions
+- `detect_and_mark_interrupted_executions()` - Auto-detect and mark interrupted executions
 
 **Item Processing:**
 - `add_item()` - Add item to processing queue
@@ -231,27 +247,45 @@ Complete execution lifecycle management:
 - `finish_item()` - Complete item processing
 - `get_item()` - Get item details
 - `get_items()` - List items with filtering
+- `detect_and_mark_interrupted_items()` - Auto-detect and mark interrupted items
 
 **Reprocessing:**
+- `is_reprocessable()` - Check if an item is eligible for reprocessing
 - `can_reprocess_execution()` - Check if execution can be reprocessed
 - `reprocess_interrupted_execution()` - Restart interrupted execution
 - `can_reprocess_item()` - Check if item can be reprocessed
 - `reprocess_interrupted_item()` - Restart interrupted item
+- `reprocess_items_from_execution()` - Batch reprocess eligible items from an execution
 
-**Maintenance:**
+**Maintenance (Safe):**
 - `clear_pending_items()` - Remove pending items
 - `clear_interrupted_items()` - Remove interrupted items
+- `clear_interrupted_executions()` - Remove interrupted executions
+
+**Maintenance (Protected - requires confirmation code):**
+- `clear_successful_items()` - Remove successful items
+- `clear_failed_items()` - Remove failed items
 - `clear_successful_executions()` - Remove successful executions
 - `clear_failed_executions()` - Remove failed executions
+
+**Maintenance (Full - requires confirmation):**
 - `clear_executions_table()` - Clear all executions
 - `clear_items_table()` - Clear all items
 - `clear_logs_table()` - Clear all logs
 - `clear_database()` - Clear entire database
 
-**Statistics & Logging:**
-- `add_log()` - Add log entry
+**Logging:**
+- `add_log()` - Add log entry with custom level
+- `add_log_debug()` - Add DEBUG level log
+- `add_log_info()` - Add INFO level log
+- `add_log_warn()` / `add_log_warning()` - Add WARNING level log
+- `add_log_error()` - Add ERROR level log
+- `add_log_critical()` - Add CRITICAL level log
+- `add_log_success()` - Add SUCCESS level log
 - `get_logs()` - Retrieve execution logs
 - `clear_logs()` - Clear execution logs
+
+**Statistics:**
 - `get_statistics()` - Get comprehensive statistics
 
 ## Documentation
@@ -285,7 +319,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Release Notes
 
-### Version 1.6.6
+### Version 1.7.0
 
 **New Features:**
 - ✨ Added Database module for complete execution tracking and lifecycle management
@@ -300,7 +334,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 🔧 Better docstrings and module descriptions
 - 🔧 Refactored module structure for better maintainability
 
-### Version 1.6.5
+### Version 1.7.0
 
 - Initial release with core functionality
 
