@@ -56,27 +56,21 @@ class Directory:
         display_message: bool = False,
     ) -> dict[str, Union[bool, str, None]]:
         """
-        Creates a temporary directory for file operations.
+        Function responsible for creating a temporary directory to work with files and etc.
 
         Parameters:
-        -----------
-        path_to_create : str, optional
-            Full path pointing to the folder where the temporary folder should be created.
-            If "default" (or empty), creates the folder in the current directory.
-            Default: "default".
+        ----------
+        ``path_to_create: str`` - should be a string with the full path pointing to the folder where the temporary folder should be created, if it is empty the ``default`` value will be used which will create a folder in the current directory where the file containing this function was called.
 
-        name_temp_dir : str, optional
-            Name of the temporary directory to be created. Default: "temp".
+        ``name_temp_dir: str`` - should be a string representing the name of the temporary directory to be created. If it is empty, the ``temp`` value will be used as the default directory name.
 
-        display_message : bool, optional
-            Whether to display success messages on terminal. Default: False.
+        ``display_message: bool`` - should be a bool to display messages on terminal, by default False.
 
-        Returns:
-        --------
-        dict[str, Union[bool, str, None]]
-            Dictionary containing:
-            - 'success' (bool): Indicates if the action was performed successfully
-            - 'path_created' (str | None): Path of the directory that was created, or None if failed
+        Return:
+        ----------
+        >>> type:dict
+            * 'success': bool - represents case the action was performed successfully
+            * 'path_created': str - path of the directory that was created on the process
         """
 
         # Local Variables
@@ -131,31 +125,21 @@ class Directory:
         display_message: bool = False,
     ) -> dict[str, Union[bool, str, None]]:
         """
-        Deletes a temporary directory.
+        Function responsible for deleting a temporary directory.
 
         Parameters:
-        -----------
-        path_to_delete : str, optional
-            Full path pointing to the folder where the temporary folder should be deleted.
-            If "default" (or empty), deletes the folder in the current directory.
-            Default: "default".
+        ----------
+        ``path_to_delete: str`` - should be a string with the full path pointing to the folder where the temporary folder should be deleted, if it is empty the ``default`` value will be used which will delete a folder in the current directory where the file containing this function was called.
 
-        name_temp_dir : str, optional
-            Name of the temporary directory to be deleted. Default: "temp".
+        ``name_temp_dir: str`` - should be a string representing the name of the temporary directory to be deleted. If it is empty, the ``temp`` value will be used as the default directory name.
 
-        delete_files : bool, optional
-            Whether to delete files in the directory. If False, only the empty directory is deleted.
-            Default: False.
+        ``delete_files: bool`` - should be a boolean indicating whether to delete files in the directory. If it is False, files in the directory will not be deleted.
 
-        display_message : bool, optional
-            Whether to display success messages on terminal. Default: False.
-
-        Returns:
-        --------
-        dict[str, Union[bool, str, None]]
-            Dictionary containing:
-            - 'success' (bool): Indicates if the action was performed successfully
-            - 'path_deleted' (str | None): Path of the directory that was deleted, or None if failed
+        Return:
+        ----------
+        >>> type:dict
+            * 'success': bool - represents case the action was performed successfully
+            * 'path_deleted': str - path of the directory that was deleted on the process
         """
 
         # Local Variables

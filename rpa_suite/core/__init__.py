@@ -23,8 +23,8 @@ ou
 
 """
 
-# On this case, we are importing the (Browser|Iris|Artemis) class only if the (selenium and webdriver_manager| docling| pyautogui) modules are installed.
-# This is useful to avoid unnecessary imports and dependencies if the user does not need the (Browser|Iris|Artemis) functionality.
+# On this case, we are importing the (Browser|Iris) class only if the (selenium and webdriver_manager| docling) modules are installed.
+# This is useful to avoid unnecessary imports and dependencies if the user does not need the (Browser|Iris) functionality.
 import importlib.util
 
 from .asyncrun import AsyncRunner

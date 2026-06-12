@@ -25,33 +25,96 @@ class Date:
 
     Methods:
         get_hms: Returns current time as tuple of hour, minute, second
-        get_dmy: Returns current date as tuple of day, month, year
 
     The Date class is part of RPA Suite and can be accessed through the rpa object:
         >>> from rpa_suite import rpa
         >>> hour, minute, second = rpa.date.get_hms()
-        >>> day, month, year = rpa.date.get_dmy()
+
+    pt-br
+    ----------
+    Classe que fornece utilitários para manipulação e formatação de datas.
+
+    Esta classe oferece funcionalidades para:
+        - Obtenção de componentes do tempo atual (horas, minutos, segundos)
+        - Formatação e manipulação de datas
+        - Validação e conversão de datas
+
+    Métodos:
+        get_hms: Retorna o horário atual como tupla de hora, minuto, segundo
+
+    A classe Date é parte do RPA Suite e pode ser acessada através do objeto rpa:
+        >>> from rpa_suite import rpa
+        >>> hora, minuto, segundo = rpa.date.get_hms()
     """
 
     def __init__(self) -> None:
-        """Initialize the Date class."""
+        """
+        Class that provides utilities for date manipulation and formatting.
+
+        This class offers functionalities for:
+            - Getting current time components (hours, minutes, seconds)
+            - Date formatting and manipulation
+            - Date validation and conversion
+
+        Methods:
+            get_hms: Returns current time as tuple of hour, minute, second
+
+        The Date class is part of RPA Suite and can be accessed through the rpa object:
+            >>> from rpa_suite import rpa
+            >>> hour, minute, second = rpa.date.get_hms()
+
+        pt-br
+        ----------
+        Classe que fornece utilitários para manipulação e formatação de datas.
+
+        Esta classe oferece funcionalidades para:
+            - Obtenção de componentes do tempo atual (horas, minutos, segundos)
+            - Formatação e manipulação de datas
+            - Validação e conversão de datas
+
+        Métodos:
+            get_hms: Retorna o horário atual como tupla de hora, minuto, segundo
+
+        A classe Date é parte do RPA Suite e pode ser acessada através do objeto rpa:
+            >>> from rpa_suite import rpa
+            >>> hora, minuto, segundo = rpa.date.get_hms()
+        """
 
     def get_hms(self) -> Tuple[Op[str], Op[str], Op[str]]:
         """
-        Returns the current hour, minute, and second as a tuple of strings.
+        Function to return hour, minute and second. The return is in the form of a tuple with strings being able to store and use the values individually.
 
-        The function formats values below 10 with leading zeros (e.g., "09" instead of "9").
-        All individual values are returned as strings in two-digit format.
+        Treatment:
+        ----------
+        The function already does the treatment for values below 10 always keeping 2 decimal places in all results, the individual values are always in string format
 
-        Returns:
-        --------
-        Tuple[str, str, str]
-            Tuple containing (hour, minute, second) as strings in format ('HH', 'MM', 'SS').
+        Return:
+        ----------
+        >>> type:tuple
+            * tuple('hh', 'mm', 'ss') - tuple with the values of hour, minute and second being able to be stored individually, the values are in string
 
         Example:
-        --------
-        >>> hour, minute, second = get_hms()
-        >>> print(f"{hour}:{minute}:{second}")  # Output: "14:30:45"
+        ---------
+        >>> hour, minute, second = get_hms() \n
+            * NOTE:  Note that it is possible to destructure the return to store simultaneously.
+
+        Description: pt-br
+        ----------
+        Função para retornar hora, minuto e segundo. O retorno é em forma de tupla com strings podendo armazenar e usar os valores de forma individual.
+
+        Tratamento:
+        ----------
+        A função já faz o tratamento para valores abaixo de 10 mantendo sempre 2 casas decimais em todos resultados, os valores individuais são sempre em formato string
+
+        Retorno:
+        ----------
+        >>> type:tuple
+            * tuple('hh', 'mm', 'ss') - tupla com os valores de hora, minuto e segundo podendo ser armazenados individualmente, os valores são em string
+
+        Exemplo:
+        ---------
+        >>> hora, minuto, segundo = get_hms() \n
+            * OBS.:  Note que é possivel desestruturar o retorno para armazenar de forma simultânea.
         """
 
         # Local Variables
@@ -87,20 +150,31 @@ class Date:
 
     def get_dmy(self) -> Tuple[Op[str], Op[str], Op[str]]:
         """
-        Returns the current day, month, and year as a tuple of strings.
+        Function to return day, month and year. The return is in the form of a tuple with strings being able to store and use the values individually.
 
-        The function formats values below 10 with leading zeros (e.g., "09" instead of "9").
-        All individual values are returned as strings.
-
-        Returns:
-        --------
-        Tuple[str, str, str]
-            Tuple containing (day, month, year) as strings in format ('DD', 'MM', 'YYYY').
+        Return:
+        ----------
+        >>> type:tuple
+            * tuple('dd', 'mm', 'yy') - tuple with the values of day, month and year being able to be stored individually
 
         Example:
-        --------
-        >>> day, month, year = get_dmy()
-        >>> print(f"{day}/{month}/{year}")  # Output: "02/11/2024"
+        ---------
+        >>> day, month, year = get_dmy() \n
+            * NOTE:  Note that it is possible to destructure the return to store simultaneously.
+
+        Description: pt-br
+        ----------
+        Função para retornar dia, mes e ano. O retorno é em forma de tupla com strings podendo armazenar e usar os valores de forma individual.
+
+        Retorno:
+        ----------
+        >>> type:tuple
+            * tuple('dd', 'mm', 'yy') - tupla com os valores de dia, mes e ano podendo ser armazenados individualmente
+
+        Exemplo:
+        ---------
+        >>> dia, mes, ano = get_dmy() \n
+            * OBS.:  Note que é possivel desestruturar o retorno para armazenar de forma simultânea.
         """
         try:
             # Local Variables
@@ -124,4 +198,4 @@ class Date:
                     f"Error trying process day, month or year convert strings: [{day_got}, {month_got}, {year_got}]! {str(e)}."
                 ) from e
         except Exception as e:
-            raise DateError(f"Error in function: {self.get_dmy.__name__}! {str(e)}.") from e
+            raise DateError(f"Erro function: {self.get_dmy.__name__}! {str(e)}.") from e

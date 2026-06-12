@@ -14,35 +14,40 @@ from typing import Any, Dict, List, Optional, Tuple
 
 # imports third party
 try:
-    import mysql.connector
-    from mysql.connector import pooling
+    import mysql.connector  # type: ignore
+    from mysql.connector import pooling  # type: ignore
+
     MYSQL_AVAILABLE = True
 except ImportError:
     MYSQL_AVAILABLE = False
 
 try:
-    import psycopg2
-    from psycopg2 import pool
+    import psycopg2  # type: ignore
+    from psycopg2 import pool  # type: ignore
+
     POSTGRESQL_AVAILABLE = True
 except ImportError:
     POSTGRESQL_AVAILABLE = False
 
 # imports internal
-from rpa_suite.functions._printer import alert_print, error_print, success_print
+from rpa_suite.functions._printer import alert_print, success_print
 
 # Import condicional para evitar dependência circular
 try:
     from .log import Log
+
     LOG_AVAILABLE = True
 except ImportError:
     LOG_AVAILABLE = False
-    Log = None
+    Log = None  # type: ignore
 
 
 # ========== ENUMS E CONSTANTES ==========
 
+
 class DatabaseType(Enum):
     """Tipos de banco de dados suportados."""
+
     SQLITE = "sqlite"
     POSTGRESQL = "postgresql"
     MYSQL = "mysql"
@@ -50,12 +55,12 @@ class DatabaseType(Enum):
 
 # Constantes de confirmação para limpeza protegida
 CONFIRMATION_CODES = {
-    'DELETE_SUCCESS': 'DELETE_SUCCESS',
-    'DELETE_FAILED': 'DELETE_FAILED',
-    'DELETE_SUCCESS_EXECUTIONS': 'DELETE_SUCCESS_EXECUTIONS',
-    'DELETE_FAILED_EXECUTIONS': 'DELETE_FAILED_EXECUTIONS',
-    'CLEAR_TABLE': 'CLEAR_TABLE',
-    'CLEAR_DATABASE': 'CLEAR_DATABASE'
+    "DELETE_SUCCESS": "DELETE_SUCCESS",
+    "DELETE_FAILED": "DELETE_FAILED",
+    "DELETE_SUCCESS_EXECUTIONS": "DELETE_SUCCESS_EXECUTIONS",
+    "DELETE_FAILED_EXECUTIONS": "DELETE_FAILED_EXECUTIONS",
+    "CLEAR_TABLE": "CLEAR_TABLE",
+    "CLEAR_DATABASE": "CLEAR_DATABASE",
 }
 
 # Nomes padrão baseados em Athena
@@ -64,8 +69,47 @@ DEFAULT_EXECUTIONS_TABLE = "athena_executions"
 DEFAULT_ITEMS_TABLE = "athena_items"
 DEFAULT_LOGS_TABLE = "athena_logs"
 
+# Constantes de nível de log para evitar texto livre
+LOG_LEVEL_DEBUG = "debug"
+LOG_LEVEL_INFO = "info"
+LOG_LEVEL_WARNING = "warning"
+LOG_LEVEL_ERROR = "error"
+LOG_LEVEL_CRITICAL = "critical"
+LOG_LEVEL_SUCCESS = "success"
+VALID_LOG_LEVELS = (
+    LOG_LEVEL_DEBUG,
+    LOG_LEVEL_INFO,
+    LOG_LEVEL_WARNING,
+    LOG_LEVEL_ERROR,
+    LOG_LEVEL_CRITICAL,
+    LOG_LEVEL_SUCCESS,
+)
+VALID_LOG_LEVELS_SQL = "', '".join(VALID_LOG_LEVELS)
+
+# Palavras-chave para classificar falhas transitórias (reprocessáveis)
+TRANSIENT_ERROR_KEYWORDS = (
+    "timeout",
+    "timed out",
+    "temporar",
+    "temporarily",
+    "connection reset",
+    "connection aborted",
+    "connection refused",
+    "network",
+    "rate limit",
+    "too many requests",
+    "429",
+    "500",
+    "502",
+    "503",
+    "504",
+    "lock",
+    "deadlock",
+)
+
 
 # ========== EXCEÇÕES CUSTOMIZADAS ==========
+
 
 class DatabaseError(Exception):
     """Custom exception for Database errors."""
@@ -79,53 +123,45 @@ class DatabaseError(Exception):
 
 # ========== ABSTRAÇÃO DE BANCO (ADAPTERS) ==========
 
+
 class DatabaseAdapter(ABC):
-    """Abstract class for database adapters."""
+    """Classe abstrata para adaptadores de banco de dados."""
 
     @abstractmethod
     def connect(self) -> Any:
-        """Create a connection to the database."""
-        pass
+        """Cria conexão com o banco."""
 
     @abstractmethod
     def execute_query(self, query: str, params: Optional[Tuple] = None) -> Any:
-        """Execute query and return cursor."""
-        pass
+        """Executa query e retorna cursor."""
 
     @abstractmethod
     def execute_many(self, query: str, params_list: List[Tuple]) -> None:
-        """Execute query multiple times."""
-        pass
+        """Executa query múltiplas vezes."""
 
     @abstractmethod
     def commit(self) -> None:
-        """Commit transaction."""
-        pass
+        """Confirma transação."""
 
     @abstractmethod
     def rollback(self) -> None:
-        """Rollback transaction."""
-        pass
+        """Reverte transação."""
 
     @abstractmethod
     def close(self) -> None:
-        """Close connection."""
-        pass
+        """Fecha conexão."""
 
     @abstractmethod
     def get_last_insert_id(self, cursor: Any, table_name: str) -> int:
-        """Return the last inserted ID."""
-        pass
+        """Retorna o último ID inserido."""
 
     @abstractmethod
     def get_table_exists_query(self, table_name: str) -> str:
-        """Query to check if table exists."""
-        pass
+        """Query para verificar se tabela existe."""
 
     @abstractmethod
     def escape_table_name(self, table_name: str) -> str:
-        """Escape table name for use in queries."""
-        pass
+        """Escapa nome de tabela para uso em queries."""
 
 
 class SQLiteAdapter(DatabaseAdapter):
@@ -138,43 +174,39 @@ class SQLiteAdapter(DatabaseAdapter):
     def connect(self) -> sqlite3.Connection:
         """Cria conexão SQLite."""
         try:
-            self.connection = sqlite3.connect(
-                self.db_path,
-                check_same_thread=False,
-                isolation_level=None
+            self.connection = sqlite3.connect(  # type: ignore
+                self.db_path, check_same_thread=False, isolation_level=None
             )
-            self.connection.row_factory = sqlite3.Row
-            return self.connection
+            self.connection.row_factory = sqlite3.Row  # type: ignore
+            return self.connection  # type: ignore
         except Exception as e:
-            raise DatabaseError(f"Error connecting to SQLite: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao conectar ao SQLite: {str(e)}.") from e
 
     def execute_query(self, query: str, params: Optional[Tuple] = None) -> sqlite3.Cursor:
         """Executa query SQLite."""
         try:
-            cursor = self.connection.cursor()
+            cursor = self.connection.cursor()  # type: ignore
             if params:
                 cursor.execute(query, params)
             else:
                 cursor.execute(query)
             return cursor
         except Exception as e:
-            raise DatabaseError(f"Error executing SQLite query: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao executar query SQLite: {str(e)}.") from e
 
     def execute_many(self, query: str, params_list: List[Tuple]) -> None:
         """Executa query múltiplas vezes."""
         try:
-            cursor = self.connection.cursor()
+            cursor = self.connection.cursor()  # type: ignore
             cursor.executemany(query, params_list)
         except Exception as e:
-            raise DatabaseError(f"Error executing SQLite executemany: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao executar executemany SQLite: {str(e)}.") from e
 
     def commit(self) -> None:
         """SQLite auto-commit está habilitado."""
-        pass
 
     def rollback(self) -> None:
         """SQLite auto-commit está habilitado."""
-        pass
 
     def close(self) -> None:
         """Fecha conexão SQLite."""
@@ -183,35 +215,28 @@ class SQLiteAdapter(DatabaseAdapter):
 
     def get_last_insert_id(self, cursor: sqlite3.Cursor, table_name: str) -> int:
         """SQLite usa lastrowid."""
-        return cursor.lastrowid
+        return cursor.lastrowid  # type: ignore
 
     def get_table_exists_query(self, table_name: str) -> str:
         """Query para verificar se tabela existe no SQLite."""
+        # nosec B608
         return f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'"
 
     def escape_table_name(self, table_name: str) -> str:
         """SQLite não precisa escapar com backticks."""
+        # nosec B608
         return table_name
 
 
 class PostgreSQLAdapter(DatabaseAdapter):
-    """Adapter for PostgreSQL."""
+    """Adaptador para PostgreSQL."""
 
     def __init__(
-        self,
-        host: str,
-        port: int,
-        database: str,
-        user: str,
-        password: str,
-        use_pool: bool = True,
-        pool_size: int = 5
+        self, host: str, port: int, database: str, user: str, password: str, use_pool: bool = True, pool_size: int = 5
     ):
         if not POSTGRESQL_AVAILABLE:
-            raise DatabaseError(
-                "PostgreSQL is not available. Install it with: pip install psycopg2-binary"
-            )
-        
+            raise DatabaseError("PostgreSQL não está disponível. Instale: pip install psycopg2-binary")
+
         self.host = host
         self.port = port
         self.database = database
@@ -223,65 +248,62 @@ class PostgreSQLAdapter(DatabaseAdapter):
         self.connection = None
 
     def connect(self) -> Any:
-        """Create PostgreSQL connection."""
+        """Cria conexão PostgreSQL."""
         try:
             if self.use_pool and self.pool is None:
                 self.pool = pool.SimpleConnectionPool(
-                    1, self.pool_size,
+                    1,
+                    self.pool_size,
                     host=self.host,
                     port=self.port,
                     database=self.database,
                     user=self.user,
-                    password=self.password
+                    password=self.password,
                 )
 
             if self.use_pool:
-                self.connection = self.pool.getconn()
+                self.connection = self.pool.getconn()  # type: ignore
             else:
                 self.connection = psycopg2.connect(
-                    host=self.host,
-                    port=self.port,
-                    database=self.database,
-                    user=self.user,
-                    password=self.password
+                    host=self.host, port=self.port, database=self.database, user=self.user, password=self.password
                 )
 
             return self.connection
         except Exception as e:
-            raise DatabaseError(f"Error connecting to PostgreSQL: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao conectar ao PostgreSQL: {str(e)}.") from e
 
     def execute_query(self, query: str, params: Optional[Tuple] = None) -> Any:
-        """Execute PostgreSQL query."""
+        """Executa query PostgreSQL."""
         try:
-            cursor = self.connection.cursor()
+            cursor = self.connection.cursor()  # type: ignore
             if params:
                 cursor.execute(query, params)
             else:
                 cursor.execute(query)
             return cursor
         except Exception as e:
-            raise DatabaseError(f"Error executing PostgreSQL query: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao executar query PostgreSQL: {str(e)}.") from e
 
     def execute_many(self, query: str, params_list: List[Tuple]) -> None:
-        """Execute query multiple times (PostgreSQL)."""
+        """Executa query múltiplas vezes."""
         try:
-            cursor = self.connection.cursor()
+            cursor = self.connection.cursor()  # type: ignore
             cursor.executemany(query, params_list)
         except Exception as e:
-            raise DatabaseError(f"Error executing PostgreSQL executemany: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao executar executemany PostgreSQL: {str(e)}.") from e
 
     def commit(self) -> None:
-        """Commit PostgreSQL transaction."""
+        """Confirma transação PostgreSQL."""
         if self.connection:
             self.connection.commit()
 
     def rollback(self) -> None:
-        """Rollback PostgreSQL transaction."""
+        """Reverte transação PostgreSQL."""
         if self.connection:
             self.connection.rollback()
 
     def close(self) -> None:
-        """Close PostgreSQL connection."""
+        """Fecha conexão PostgreSQL."""
         if self.connection:
             if self.use_pool and self.pool:
                 self.pool.putconn(self.connection)
@@ -289,18 +311,19 @@ class PostgreSQLAdapter(DatabaseAdapter):
                 self.connection.close()
 
     def get_last_insert_id(self, cursor: Any, table_name: str) -> int:
-        """Get last insert id in PostgreSQL (uses RETURNING or cursor.fetchone()[0])."""
-        # If the query does not use RETURNING, use a separate query
+        """PostgreSQL usa RETURNING ou cursor.fetchone()[0]."""
+        # Se a query não tem RETURNING, usar uma query separada
         try:
             cursor.execute(f"SELECT CURRVAL(pg_get_serial_sequence('{table_name}', 'id'))")
             result = cursor.fetchone()
-            return result[0] if result else None
+            return result[0] if result else None  # type: ignore
         except Exception:
-            # Fallback: try 'lastrowid' if available
-            return getattr(cursor, 'lastrowid', None)
+            # Fallback: tentar lastrowid se disponível
+            return getattr(cursor, "lastrowid", None)  # type: ignore
 
     def get_table_exists_query(self, table_name: str) -> str:
-        """Query to check if table exists in PostgreSQL."""
+        """Query para verificar se tabela existe no PostgreSQL."""
+        # nosec B608
         return f"""
             SELECT EXISTS (
                 SELECT FROM information_schema.tables 
@@ -310,28 +333,19 @@ class PostgreSQLAdapter(DatabaseAdapter):
         """
 
     def escape_table_name(self, table_name: str) -> str:
-        """PostgreSQL uses double quotes."""
+        """PostgreSQL usa aspas duplas."""
         return f'"{table_name}"'
 
 
 class MySQLAdapter(DatabaseAdapter):
-    """Adapter for MySQL."""
+    """Adaptador para MySQL."""
 
     def __init__(
-        self,
-        host: str,
-        port: int,
-        database: str,
-        user: str,
-        password: str,
-        use_pool: bool = True,
-        pool_size: int = 5
+        self, host: str, port: int, database: str, user: str, password: str, use_pool: bool = True, pool_size: int = 5
     ):
         if not MYSQL_AVAILABLE:
-            raise DatabaseError(
-                "MySQL is not available. Install: pip install mysql-connector-python"
-            )
-        
+            raise DatabaseError("MySQL não está disponível. Instale: pip install mysql-connector-python")
+
         self.host = host
         self.port = port
         self.database = database
@@ -343,7 +357,7 @@ class MySQLAdapter(DatabaseAdapter):
         self.connection = None
 
     def connect(self) -> Any:
-        """Create MySQL connection."""
+        """Cria conexão MySQL."""
         try:
             if self.use_pool and self.pool is None:
                 self.pool = pooling.MySQLConnectionPool(
@@ -353,65 +367,62 @@ class MySQLAdapter(DatabaseAdapter):
                     port=self.port,
                     database=self.database,
                     user=self.user,
-                    password=self.password
+                    password=self.password,
                 )
 
             if self.use_pool:
-                self.connection = self.pool.get_connection()
+                self.connection = self.pool.get_connection()  # type: ignore
             else:
                 self.connection = mysql.connector.connect(
-                    host=self.host,
-                    port=self.port,
-                    database=self.database,
-                    user=self.user,
-                    password=self.password
+                    host=self.host, port=self.port, database=self.database, user=self.user, password=self.password
                 )
 
             return self.connection
         except Exception as e:
-            raise DatabaseError(f"Error connecting to MySQL: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao conectar ao MySQL: {str(e)}.") from e
 
     def execute_query(self, query: str, params: Optional[Tuple] = None) -> Any:
-        """Execute MySQL query."""
+        """Executa query MySQL."""
         try:
-            cursor = self.connection.cursor(dictionary=True)
+            cursor = self.connection.cursor(dictionary=True)  # type: ignore
             if params:
                 cursor.execute(query, params)
             else:
                 cursor.execute(query)
             return cursor
         except Exception as e:
-            raise DatabaseError(f"Error executing MySQL query: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao executar query MySQL: {str(e)}.") from e
 
     def execute_many(self, query: str, params_list: List[Tuple]) -> None:
-        """Execute a query multiple times."""
+        """Executa query múltiplas vezes."""
         try:
-            cursor = self.connection.cursor()
+            cursor = self.connection.cursor()  # type: ignore
             cursor.executemany(query, params_list)
         except Exception as e:
-            raise DatabaseError(f"Error executing MySQL executemany: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao executar executemany MySQL: {str(e)}.") from e
 
     def commit(self) -> None:
-        """Commit MySQL transaction."""
+        """Confirma transação MySQL."""
         if self.connection:
             self.connection.commit()
 
     def rollback(self) -> None:
-        """Rollback MySQL transaction."""
+        """Reverte transação MySQL."""
         if self.connection:
             self.connection.rollback()
 
     def close(self) -> None:
-        """Close MySQL connection."""
+        """Fecha conexão MySQL."""
         if self.connection:
             self.connection.close()
 
     def get_last_insert_id(self, cursor: Any, table_name: str) -> int:
-        """MySQL uses lastrowid."""
+        """MySQL usa lastrowid."""
         return cursor.lastrowid
 
     def get_table_exists_query(self, table_name: str) -> str:
-        """Query to verify if table exists in MySQL."""
+        """Query para verificar se tabela existe no MySQL."""
+        # nosec B608
         return f"""
             SELECT EXISTS (
                 SELECT 1 FROM information_schema.tables 
@@ -421,14 +432,15 @@ class MySQLAdapter(DatabaseAdapter):
         """
 
     def escape_table_name(self, table_name: str) -> str:
-        """MySQL uses backticks."""
+        """MySQL usa backticks."""
         return f"`{table_name}`"
 
 
-# ========== SQL GENERATOR ==========
+# ========== GERADOR DE SQL ==========
+
 
 class SQLGenerator:
-    """Generates SQL compatible with different databases."""
+    """Gera SQL compatível com diferentes bancos de dados."""
 
     def __init__(self, db_type: DatabaseType, executions_table: str, items_table: str, logs_table: str):
         self.db_type = db_type
@@ -437,7 +449,7 @@ class SQLGenerator:
         self.logs_table = logs_table
 
     def _get_pk_type(self) -> str:
-        """Returns PRIMARY KEY type based on the database."""
+        """Retorna tipo de PRIMARY KEY baseado no banco."""
         if self.db_type == DatabaseType.SQLITE:
             return "INTEGER PRIMARY KEY AUTOINCREMENT"
         elif self.db_type == DatabaseType.POSTGRESQL:
@@ -447,7 +459,7 @@ class SQLGenerator:
         return "INTEGER PRIMARY KEY AUTOINCREMENT"
 
     def _get_text_type(self) -> str:
-        """Returns text type based on the database."""
+        """Retorna tipo de texto baseado no banco."""
         if self.db_type == DatabaseType.SQLITE:
             return "TEXT"
         elif self.db_type == DatabaseType.POSTGRESQL:
@@ -457,7 +469,7 @@ class SQLGenerator:
         return "TEXT"
 
     def _get_long_text_type(self) -> str:
-        """Returns long text type based on the database."""
+        """Retorna tipo de texto longo baseado no banco."""
         if self.db_type == DatabaseType.SQLITE:
             return "TEXT"
         elif self.db_type == DatabaseType.POSTGRESQL:
@@ -467,7 +479,7 @@ class SQLGenerator:
         return "TEXT"
 
     def _get_boolean_type(self) -> str:
-        """Returns boolean type based on the database."""
+        """Retorna tipo booleano baseado no banco."""
         if self.db_type == DatabaseType.SQLITE:
             return "INTEGER"
         elif self.db_type == DatabaseType.POSTGRESQL:
@@ -477,7 +489,7 @@ class SQLGenerator:
         return "INTEGER"
 
     def _get_datetime_type(self) -> str:
-        """Returns datetime type based on the database."""
+        """Retorna tipo datetime baseado no banco."""
         if self.db_type == DatabaseType.SQLITE:
             return "DATETIME"
         elif self.db_type == DatabaseType.POSTGRESQL:
@@ -487,7 +499,7 @@ class SQLGenerator:
         return "DATETIME"
 
     def _get_real_type(self) -> str:
-        """Returns real type based on the database."""
+        """Retorna tipo real baseado no banco."""
         if self.db_type == DatabaseType.SQLITE:
             return "REAL"
         elif self.db_type == DatabaseType.POSTGRESQL:
@@ -497,11 +509,11 @@ class SQLGenerator:
         return "REAL"
 
     def _get_integer_type(self) -> str:
-        """Returns integer type based on the database."""
+        """Retorna tipo inteiro baseado no banco."""
         return "INTEGER"
 
     def create_executions_table(self) -> str:
-        """Generates CREATE TABLE statement for executions."""
+        """Gera CREATE TABLE para executions."""
         pk_type = self._get_pk_type()
         text_type = self._get_text_type()
         long_text_type = self._get_long_text_type()
@@ -545,14 +557,14 @@ class SQLGenerator:
                 CHECK (status IN ('running', 'completed', 'failed', 'cancelled', 'interrupted'))
             )
         """
-        
+
         if self.db_type == DatabaseType.MYSQL:
             sql += " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
 
         return sql
 
     def create_items_table(self) -> str:
-        """Generates CREATE TABLE statement for execution_items."""
+        """Gera CREATE TABLE para execution_items."""
         pk_type = self._get_pk_type()
         text_type = self._get_text_type()
         long_text_type = self._get_long_text_type()
@@ -598,14 +610,14 @@ class SQLGenerator:
                 CHECK (status IN ('pending', 'queued', 'processing', 'success', 'failed', 'skipped', 'interrupted', 'retrying'))
             )
         """
-        
+
         if self.db_type == DatabaseType.MYSQL:
             sql += " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
 
         return sql
 
     def create_logs_table(self) -> str:
-        """Generates CREATE TABLE statement for execution_logs."""
+        """Gera CREATE TABLE para execution_logs."""
         pk_type = self._get_pk_type()
         text_type = self._get_text_type()
         long_text_type = self._get_long_text_type()
@@ -629,23 +641,23 @@ class SQLGenerator:
             CREATE TABLE IF NOT EXISTS {self.logs_table} (
                 id {pk_type},
                 execution_id {int_type} NOT NULL,
-                log_level {text_type} DEFAULT 'info',
+                log_level {text_type} DEFAULT '{LOG_LEVEL_INFO}',
                 step_name {text_type},
                 message {long_text_type} NOT NULL,
                 timestamp {datetime_type} NOT NULL {default_timestamp},
                 created_at {datetime_type} NOT NULL {default_timestamp},
                 FOREIGN KEY (execution_id) REFERENCES {self.executions_table}(id) {cascade_delete},
-                CHECK (log_level IN ('debug', 'info', 'warning', 'error', 'critical', 'success'))
+                CHECK (log_level IN ('{VALID_LOG_LEVELS_SQL}'))
             )
         """
-        
+
         if self.db_type == DatabaseType.MYSQL:
             sql += " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
 
         return sql
 
     def create_indexes(self) -> List[str]:
-        """Generates CREATE INDEX statements for better performance."""
+        """Gera CREATE INDEX para melhor performance."""
         indexes = [
             f"CREATE INDEX IF NOT EXISTS idx_{self.executions_table}_execution_id ON {self.executions_table}(execution_id)",
             f"CREATE INDEX IF NOT EXISTS idx_{self.executions_table}_status ON {self.executions_table}(status)",
@@ -658,12 +670,12 @@ class SQLGenerator:
             f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_execution_id ON {self.logs_table}(execution_id)",
             f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_timestamp ON {self.logs_table}(timestamp)",
             f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_log_level ON {self.logs_table}(log_level)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_execution_timestamp ON {self.logs_table}(execution_id, timestamp)"
+            f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_execution_timestamp ON {self.logs_table}(execution_id, timestamp)",
         ]
         return indexes
 
     def get_last_id_query(self) -> str:
-        """Returns query to get last inserted ID."""
+        """Retorna query para pegar último ID inserido."""
         if self.db_type == DatabaseType.SQLITE:
             return "SELECT last_insert_rowid()"
         elif self.db_type == DatabaseType.POSTGRESQL:
@@ -673,18 +685,68 @@ class SQLGenerator:
         return "SELECT last_insert_rowid()"
 
 
-# ========== MAIN DATABASE CLASS ==========
+# ========== CLASSE PRINCIPAL DATABASE ==========
+
 
 class Database:
     """
-    Main class for RPA execution management with multi-database support.
-    Supports: SQLite (default), PostgreSQL, MySQL
-    
+    Classe principal para gerenciamento de execuções RPA com suporte multi-banco.
+
+    Suporta: SQLite (padrão), PostgreSQL, MySQL
+
     Example:
     --------
+    >>> # SQLite (padrão)
     >>> from rpa_suite.core import Database, DatabaseType
     >>> register = Database()
+    >>>
+    >>> # PostgreSQL
+    >>> register = Database(
+    ...     db_type=DatabaseType.POSTGRESQL,
+    ...     host="localhost",
+    ...     database="rpa_db",
+    ...     user="user",
+    ...     password="pass"
+    ... )
+    >>>
+    >>> exec_id = register.start_execution(automation_name="Meu Bot")
+    >>> register.add_item(execution_id=exec_id, item_identifier="001")
+    >>> register.finish_execution(exec_id)
+
+    pt-br
+    -----
+    Classe principal para gerenciamento de execuções RPA com suporte multi-banco.
+
+    Suporta: SQLite (padrão), PostgreSQL, MySQL
+
+    Exemplo:
+    --------
+    >>> # SQLite (padrão)
+    >>> from rpa_suite.core import Database, DatabaseType
+    >>> register = Database()
+    >>>
+    >>> # PostgreSQL
+    >>> register = Database(
+    ...     db_type=DatabaseType.POSTGRESQL,
+    ...     host="localhost",
+    ...     database="rpa_db",
+    ...     user="user",
+    ...     password="pass"
+    ... )
+    >>>
+    >>> exec_id = register.start_execution(automation_name="Meu Bot")
+    >>> register.add_item(execution_id=exec_id, item_identifier="001")
+    >>> register.finish_execution(exec_id)
     """
+
+    # Constantes expostas na classe para facilitar descoberta via IDE/autocomplete
+    LOG_LEVEL_DEBUG = LOG_LEVEL_DEBUG
+    LOG_LEVEL_INFO = LOG_LEVEL_INFO
+    LOG_LEVEL_WARNING = LOG_LEVEL_WARNING
+    LOG_LEVEL_ERROR = LOG_LEVEL_ERROR
+    LOG_LEVEL_CRITICAL = LOG_LEVEL_CRITICAL
+    LOG_LEVEL_SUCCESS = LOG_LEVEL_SUCCESS
+    VALID_LOG_LEVELS = VALID_LOG_LEVELS
 
     def __init__(
         self,
@@ -705,84 +767,156 @@ class Database:
         allow_reprocess_interrupted_executions: bool = False,
         auto_detect_interruptions: bool = True,
         log_instance: Log | None = None,
-        verbose: bool = False
+        verbose: bool = False,
     ):
         """
-        Initialize the database manager.
-        
+        Inicializa o gerenciador de banco de dados.
+
         Parameters:
         -----------
-        db_type : DatabaseType, optional
-            Database type: SQLITE, POSTGRESQL, or MYSQL.
+        db_type: DatabaseType
+            Tipo de banco: SQLITE, POSTGRESQL ou MYSQL
             Default: DatabaseType.SQLITE
-            
-        db_path : str, optional
-            SQLite database file name (SQLite only).
-            If db_dir is specified, it will be used together with db_dir.
+
+        db_path: str
+            Nome do arquivo SQLite (apenas para SQLite)
+            Se db_dir for especificado, será usado junto com db_dir
             Default: "athena_executions.db"
-            
-        db_dir : str, optional
-            Directory where the SQLite database will be created (SQLite only).
-            If "default", uses the current directory (os.getcwd()).
-            The directory will be created automatically if it doesn't exist.
+
+        db_dir: str
+            Diretório onde o banco SQLite será criado (apenas para SQLite)
+            Se "default", usa o diretório atual (os.getcwd())
+            O diretório será criado automaticamente se não existir
             Default: "default"
-            
-        host : Optional[str], optional
-            Server host (PostgreSQL/MySQL)
-            
-        port : Optional[int], optional
-            Server port (PostgreSQL: 5432, MySQL: 3306)
-            
-        database : Optional[str], optional
-            Database name (PostgreSQL/MySQL)
-            
-        user : Optional[str], optional
-            Database user (PostgreSQL/MySQL)
-            
-        password : Optional[str], optional
-            Database password (PostgreSQL/MySQL)
-            
-        use_pool : bool, optional
-            Use connection pooling (PostgreSQL/MySQL).
+
+        host: Optional[str]
+            Host do servidor (PostgreSQL/MySQL)
+
+        port: Optional[int]
+            Porta do servidor (PostgreSQL: 5432, MySQL: 3306)
+
+        database: Optional[str]
+            Nome do banco de dados (PostgreSQL/MySQL)
+
+        user: Optional[str]
+            Usuário do banco (PostgreSQL/MySQL)
+
+        password: Optional[str]
+            Senha do banco (PostgreSQL/MySQL)
+
+        use_pool: bool
+            Usar pool de conexões (PostgreSQL/MySQL)
             Default: True
-            
-        pool_size : int, optional
-            Connection pool size.
+
+        pool_size: int
+            Tamanho do pool de conexões
             Default: 5
-            
-        executions_table : str, optional
-            Executions table name.
+
+        executions_table: str
+            Nome da tabela de execuções
             Default: "athena_executions"
-            
-        items_table : str, optional
-            Items table name.
+
+        items_table: str
+            Nome da tabela de itens
             Default: "athena_items"
-            
-        logs_table : str, optional
-            Logs table name.
+
+        logs_table: str
+            Nome da tabela de logs
             Default: "athena_logs"
-            
-        allow_reprocess_interrupted_items : bool, optional
-            Allow reprocessing interrupted items.
-            Default: False
-            
-        allow_reprocess_interrupted_executions : bool, optional
-            Allow reprocessing interrupted executions.
-            Default: False
-            
-        auto_detect_interruptions : bool, optional
-            Automatically detect interruptions.
-            Default: True
-            
-        log_instance : Optional[Log], optional
-            Optional instance of RPA Suite Log object.
-            If provided, logs added to the database will also be
-            triggered in the Log object with the same levels.
+
+        log_instance: Optional[Log]
+            Instância opcional do objeto Log do RPA Suite.
+            Se fornecido, os logs adicionados no banco também serão
+            disparados no objeto Log com os mesmos níveis.
             Default: None
-            
-        verbose : bool, optional
-            Display informative messages about directory creation.
+
+        allow_reprocess_interrupted_items: bool
+            Permite reprocessar itens interrompidos
+
+        allow_reprocess_interrupted_executions: bool
+            Permite reprocessar execuções interrompidas
+
+        auto_detect_interruptions: bool
+            Detecta interrupções automaticamente
+
+        verbose: bool
+            Displays informative messages about directory creation
             Default: False
+
+        pt-br
+        -----------
+        Inicializa o gerenciador de banco de dados.
+
+        Parâmetros:
+        -----------
+        db_type: DatabaseType
+            Tipo de banco: SQLITE, POSTGRESQL ou MYSQL
+            Padrão: DatabaseType.SQLITE
+
+        db_path: str
+            Nome do arquivo SQLite (apenas para SQLite)
+            Se db_dir for especificado, será usado junto com db_dir
+            Padrão: "athena_executions.db"
+
+        db_dir: str
+            Diretório onde o banco SQLite será criado (apenas para SQLite)
+            Se "default", usa o diretório atual (os.getcwd())
+            O diretório será criado automaticamente se não existir
+            Padrão: "default"
+
+        host: Optional[str]
+            Host do servidor (PostgreSQL/MySQL)
+
+        port: Optional[int]
+            Porta do servidor (PostgreSQL: 5432, MySQL: 3306)
+
+        database: Optional[str]
+            Nome do banco de dados (PostgreSQL/MySQL)
+
+        user: Optional[str]
+            Usuário do banco (PostgreSQL/MySQL)
+
+        password: Optional[str]
+            Senha do banco (PostgreSQL/MySQL)
+
+        use_pool: bool
+            Usar pool de conexões (PostgreSQL/MySQL)
+            Padrão: True
+
+        pool_size: int
+            Tamanho do pool de conexões
+            Padrão: 5
+
+        executions_table: str
+            Nome da tabela de execuções
+            Padrão: "athena_executions"
+
+        items_table: str
+            Nome da tabela de itens
+            Padrão: "athena_items"
+
+        logs_table: str
+            Nome da tabela de logs
+            Padrão: "athena_logs"
+
+        log_instance: Optional[Log]
+            Instância opcional do objeto Log do RPA Suite.
+            Se fornecido, os logs adicionados no banco também serão
+            disparados no objeto Log com os mesmos níveis.
+            Padrão: None
+
+        allow_reprocess_interrupted_items: bool
+            Permite reprocessar itens interrompidos
+
+        allow_reprocess_interrupted_executions: bool
+            Permite reprocessar execuções interrompidas
+
+        auto_detect_interruptions: bool
+            Detecta interrupções automaticamente
+
+        verbose: bool
+            Exibe mensagens informativas sobre criação de diretórios
+            Padrão: False
         """
         try:
             self.db_type = db_type
@@ -793,21 +927,20 @@ class Database:
             self.allow_reprocess_executions = allow_reprocess_interrupted_executions
             self.auto_detect = auto_detect_interruptions
             self._current_execution_id = None
-            
+
             # Armazena instância do Log se fornecida
             if log_instance is not None:
                 if not LOG_AVAILABLE:
                     raise DatabaseError(
-                        "Objeto Log não está disponível. "
-                        "Certifique-se de que rpa_suite.core.log está disponível."
+                        "Objeto Log não está disponível. " "Certifique-se de que rpa_suite.core.log está disponível."
                     )
-                if not hasattr(log_instance, 'log_debug'):
+                if not hasattr(log_instance, "log_debug"):
                     raise DatabaseError(
                         "Objeto fornecido não é uma instância válida de Log. "
                         "O objeto deve ter os métodos log_debug, log_info, etc."
                     )
             self.log_instance = log_instance
-            
+
             # Processa o caminho do banco de dados (apenas para SQLite)
             final_db_path = db_path
             if db_type == DatabaseType.SQLITE:
@@ -816,26 +949,26 @@ class Database:
                     base_dir = os.getcwd()
                 else:
                     base_dir = db_dir
-                
+
                 # Extrai apenas o nome do arquivo de db_path (remove diretórios se houver)
                 db_filename = os.path.basename(db_path)
-                
+
                 # Constrói o caminho completo
                 final_db_path = os.path.join(base_dir, db_filename)
-                
+
                 # Cria o diretório se não existir
                 try:
                     os.makedirs(base_dir, exist_ok=True)
                     if verbose:
-                        success_print(f"Directory '{base_dir}' was created or already exists.")
+                        success_print(f"Diretório '{base_dir}' foi criado ou já existe.")
                 except FileExistsError:
                     if verbose:
-                        alert_print(f"Directory '{base_dir}' already exists.")
+                        alert_print(f"Diretório '{base_dir}' já existe.")
                 except PermissionError as e:
                     raise DatabaseError(
-                        f"Permission denied: cannot create directory '{base_dir}'! {str(e)}."
+                        f"Permissão negada: não é possível criar o diretório '{base_dir}'! {str(e)}."
                     ) from e
-            
+
             # Cria o adaptador baseado no tipo
             self._adapter = self._create_adapter(
                 db_type=db_type,
@@ -846,106 +979,107 @@ class Database:
                 user=user,
                 password=password,
                 use_pool=use_pool,
-                pool_size=pool_size
+                pool_size=pool_size,
             )
-            
+
             # Conecta e cria tabelas
             self._adapter.connect()
             self._create_tables()
-            
+
             # Registra handlers para detectar interrupção
             if auto_detect_interruptions:
                 atexit.register(self._handle_exit)
                 signal.signal(signal.SIGTERM, self._handle_signal)
                 signal.signal(signal.SIGINT, self._handle_signal)
                 self.detect_and_mark_interrupted_executions()
-                
+
         except Exception as e:
-            raise DatabaseError(f"Error initializing Database: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao inicializar Database: {str(e)}.") from e
 
     def _create_adapter(self, **kwargs) -> DatabaseAdapter:
-        """Factory to create the correct adapter."""
-        db_type = kwargs['db_type']
-        
+        """Factory para criar o adaptador correto."""
+        db_type = kwargs["db_type"]
+
         if db_type == DatabaseType.SQLITE:
-            return SQLiteAdapter(db_path=kwargs['db_path'])
-        
+            return SQLiteAdapter(db_path=kwargs["db_path"])
+
         elif db_type == DatabaseType.POSTGRESQL:
             return PostgreSQLAdapter(
-                host=kwargs['host'],
-                port=kwargs.get('port', 5432),
-                database=kwargs['database'],
-                user=kwargs['user'],
-                password=kwargs['password'],
-                use_pool=kwargs['use_pool'],
-                pool_size=kwargs['pool_size']
+                host=kwargs["host"],
+                port=kwargs.get("port", 5432),
+                database=kwargs["database"],
+                user=kwargs["user"],
+                password=kwargs["password"],
+                use_pool=kwargs["use_pool"],
+                pool_size=kwargs["pool_size"],
             )
-        
+
         elif db_type == DatabaseType.MYSQL:
             return MySQLAdapter(
-                host=kwargs['host'],
-                port=kwargs.get('port', 3306),
-                database=kwargs['database'],
-                user=kwargs['user'],
-                password=kwargs['password'],
-                use_pool=kwargs['use_pool'],
-                pool_size=kwargs['pool_size']
+                host=kwargs["host"],
+                port=kwargs.get("port", 3306),
+                database=kwargs["database"],
+                user=kwargs["user"],
+                password=kwargs["password"],
+                use_pool=kwargs["use_pool"],
+                pool_size=kwargs["pool_size"],
             )
-        
+
         else:
-            raise DatabaseError(f"Unsupported database type: {db_type}")
+            raise DatabaseError(f"Tipo de banco não suportado: {db_type}")
 
     def _create_tables(self) -> None:
-        """Creates tables using the adapter."""
+        """Cria as tabelas usando o adaptador."""
         try:
             sql_generator = SQLGenerator(
                 db_type=self.db_type,
                 executions_table=self.executions_table,
                 items_table=self.items_table,
-                logs_table=self.logs_table
+                logs_table=self.logs_table,
             )
-            
+
             create_executions = sql_generator.create_executions_table()
             create_items = sql_generator.create_items_table()
             create_logs = sql_generator.create_logs_table()
             create_indexes = sql_generator.create_indexes()
-            
-            # Execute using the adapter
+
+            # Executa usando o adaptador
             self._adapter.execute_query(create_executions)
             self._adapter.execute_query(create_items)
             self._adapter.execute_query(create_logs)
-            
+
             for index_sql in create_indexes:
                 try:
                     self._adapter.execute_query(index_sql)
-                except Exception:
-                    # Index may already exist, ignore
+                except Exception: # nosec B110
+                    # Índice pode já existir, ignorar
                     pass
-            
+
             self._adapter.commit()
-            
+
         except Exception as e:
-            raise DatabaseError(f"Error creating tables: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao criar tabelas: {str(e)}.") from e
 
     def _handle_exit(self) -> None:
-        """Handler to detect unexpected program exit."""
+        """Handler para detectar saída inesperada do programa."""
         if self._current_execution_id:
             try:
                 self._mark_execution_interrupted(self._current_execution_id)
-            except Exception:
+            except Exception: # nosec B110
                 pass
 
     def _handle_signal(self, signum, frame) -> None:
-        """Handler to detect interruption signals."""
+        """Handler para sinais de interrupção."""
         if self._current_execution_id:
             try:
                 self._mark_execution_interrupted(self._current_execution_id)
-            except Exception:
+            except Exception: # nosec B110
                 pass
 
     def _mark_execution_interrupted(self, execution_id: int) -> None:
-        """Marks execution as interrupted."""
+        """Marca execução como interrompida."""
         try:
+            # nosec B608
             query = f"""
                 UPDATE {self.executions_table}
                 SET status = 'interrupted', finished_properly = 0
@@ -953,126 +1087,135 @@ class Database:
             """
             self._adapter.execute_query(query, (execution_id,))
             self._adapter.commit()
-        except Exception:
+        except Exception: # nosec B110
             pass
 
-    # ========== EXECUTION METHODS ==========
+    # ========== MÉTODOS DE EXECUÇÃO ==========
 
     def start_execution(
-        self,
-        automation_name: str,
-        execution_id: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        self, automation_name: str, execution_id: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None
     ) -> int:
         """
-        Starts a new execution.
-        
+        Inicia uma nova execução.
+
         Parameters:
         -----------
         automation_name: str
-            Automation/bot name
-            
+            Nome da automação/bot
+
         execution_id: Optional[str]
-            Optional external ID for the execution
-            
+            ID opcional externo para a execução
+
         metadata: Optional[Dict[str, Any]]
-            Additional metadata in JSON format
-            
+            Metadados adicionais em formato JSON
+
         Returns:
         --------
-        int: Created execution ID
-        Inicia uma nova execução.        -----------
+        int: ID da execução criada
+
+        pt-br
+        -----------
+        Inicia uma nova execução.
+
+        Parâmetros:
+        -----------
         automation_name: str
-            Automation/bot name
-            
+            Nome da automação/bot
+
         execution_id: Optional[str]
-            Optional external ID for the execution
-            
+            ID opcional externo para a execução
+
         metadata: Optional[Dict[str, Any]]
-            Additional metadata in JSON format
-            
+            Metadados adicionais em formato JSON
+
         Retorna:
         --------
-        int: Created execution ID
+        int: ID da execução criada
         """
         try:
             metadata_str = json.dumps(metadata) if metadata else None
             now = datetime.now()
-            
+
+            # nosec B608
             query = f"""
                 INSERT INTO {self.executions_table}
                 (execution_id, automation_name, status, started_at, metadata)
                 VALUES (?, ?, 'running', ?, ?)
             """
-            
-            cursor = self._adapter.execute_query(
-                query,
-                (execution_id, automation_name, now, metadata_str)
-            )
-            
+
+            cursor = self._adapter.execute_query(query, (execution_id, automation_name, now, metadata_str))
+
             exec_id = self._adapter.get_last_insert_id(cursor, self.executions_table)
             self._adapter.commit()
-            
-            self._current_execution_id = exec_id
+
+            self._current_execution_id = exec_id  # type: ignore
             return exec_id
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error starting execution: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao iniciar execução: {str(e)}.") from e
 
     def finish_execution(
-        self,
-        execution_id: int,
-        status: str = 'completed',
-        error_message: Optional[str] = None
+        self, execution_id: int, status: str = "completed", error_message: Optional[str] = None
     ) -> bool:
         """
-        Finishes an execution.
-        
+        Finaliza uma execução.
+
         Parameters:
         -----------
         execution_id: int
-            Execution ID to finish the execution
-            
+            ID da execução
+
         status: str
-            Final status: 'completed', 'failed', 'cancelled'
+            Status final: 'completed', 'failed', 'cancelled'
             Default: 'completed'
-            
+
         error_message: Optional[str]
-            Error message if any
-            
+            Mensagem de erro se houver
+
         Returns:
         --------
-        bool: True if successful
-        Finaliza uma execução.        -----------
+        bool: True se sucesso
+
+        pt-br
+        -----------
+        Finaliza uma execução.
+
+        Parâmetros:
+        -----------
         execution_id: int
-            Execution ID to finish the execution
-            
+            ID da execução
+
         status: str
-            Final status: 'completed', 'failed', 'cancelled'
+            Status final: 'completed', 'failed', 'cancelled'
             Padrão: 'completed'
-            
+
         error_message: Optional[str]
-            Error message if any error occurs
-            
+            Mensagem de erro se houver
+
         Retorna:
         --------
-        bool: True if successful
+        bool: True se sucesso
         """
         try:
-            if status not in ['completed', 'failed', 'cancelled']:
-                raise DatabaseError(f"Invalid status: {status}")
-            
-            # Search execution data
+            if status not in ["completed", "failed", "cancelled"]:
+                raise DatabaseError(f"Status inválido: {status}")
+
+            # Busca dados da execução
             exec_data = self.get_execution(execution_id)
             if not exec_data:
-                raise DatabaseError(f"Execution {execution_id} not found")
-            
-            started_at = datetime.fromisoformat(exec_data['started_at']) if isinstance(exec_data['started_at'], str) else exec_data['started_at']
+                raise DatabaseError(f"Execução {execution_id} não encontrada")
+
+            started_at = (
+                datetime.fromisoformat(exec_data["started_at"])
+                if isinstance(exec_data["started_at"], str)
+                else exec_data["started_at"]
+            )
             finished_at = datetime.now()
             execution_time = (finished_at - started_at).total_seconds()
-            
-            # Search item counters
+
+            # Busca contadores de itens
+            # nosec B608
             items_query = f"""
                 SELECT 
                     COUNT(*) as total,
@@ -1084,12 +1227,13 @@ class Database:
             """
             items_cursor = self._adapter.execute_query(items_query, (execution_id,))
             items_result = items_cursor.fetchone()
-            
+
             total_items = items_result[0] if items_result else 0
             successful_items = items_result[1] if items_result else 0
             failed_items = items_result[2] if items_result else 0
             interrupted_items = items_result[3] if items_result else 0
-            
+
+            # nosec B608
             query = f"""
                 UPDATE {self.executions_table}
                 SET status = ?,
@@ -1103,160 +1247,189 @@ class Database:
                     error_message = ?
                 WHERE id = ?
             """
-            
+
             self._adapter.execute_query(
                 query,
-                (status, finished_at, execution_time, total_items, successful_items,
-                 failed_items, interrupted_items, error_message, execution_id)
+                (
+                    status,
+                    finished_at,
+                    execution_time,
+                    total_items,
+                    successful_items,
+                    failed_items,
+                    interrupted_items,
+                    error_message,
+                    execution_id,
+                ),
             )
-            
+
             self._adapter.commit()
-            
+
             if self._current_execution_id == execution_id:
                 self._current_execution_id = None
-            
+
             return True
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error finishing execution: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao finalizar execução: {str(e)}.") from e
 
     def get_execution(self, execution_id: int) -> Optional[Dict[str, Any]]:
         """
-        Search execution by ID.
-        
+        Busca execução por ID.
+
         Parameters:
         -----------
         execution_id: int
-            Execution ID to search
-            
+            ID da execução
+
         Returns:
         --------
-        Optional[Dict[str, Any]]: Execution data or None
-        Busca execução por ID.        -----------
+        Optional[Dict[str, Any]]: Dados da execução ou None
+
+        pt-br
+        -----------
+        Busca execução por ID.
+
+        Parâmetros:
+        -----------
         execution_id: int
-            Execution ID to search
-            
+            ID da execução
+
         Retorna:
         --------
         Optional[Dict[str, Any]]: Dados da execução ou None
         """
         try:
+            # nosec B608
             query = f"SELECT * FROM {self.executions_table} WHERE id = ?"
             cursor = self._adapter.execute_query(query, (execution_id,))
             row = cursor.fetchone()
-            
+
             if row:
                 if self.db_type == DatabaseType.SQLITE:
                     return dict(row)
                 else:
-                    return dict(row) if hasattr(row, 'keys') else row
+                    return dict(row) if hasattr(row, "keys") else row
             return None
-            
+
         except Exception as e:
-            raise DatabaseError(f"Error fetching execution: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao buscar execução: {str(e)}.") from e
 
     def get_executions(
-        self,
-        status: Optional[str] = None,
-        automation_name: Optional[str] = None,
-        limit: Optional[int] = None
+        self, status: Optional[str] = None, automation_name: Optional[str] = None, limit: Optional[int] = None
     ) -> List[Dict[str, Any]]:
         """
-        List executions with filters.
-        
+        Lista execuções com filtros.
+
         Parameters:
         -----------
         status: Optional[str]
-            Filter by status
-            
+            Filtrar por status
+
         automation_name: Optional[str]
-            Filter by automation name
-            
+            Filtrar por nome da automação
+
         limit: Optional[int]
-            Limit number of results
-            
+            Limitar número de resultados
+
         Returns:
         --------
-        List[Dict[str, Any]]: List of executions
-        Lista execuções com filtros.        -----------
+        List[Dict[str, Any]]: Lista de execuções
+
+        pt-br
+        -----------
+        Lista execuções com filtros.
+
+        Parâmetros:
+        -----------
         status: Optional[str]
-            Filter by status
-            
+            Filtrar por status
+
         automation_name: Optional[str]
-            Filter by automation name
-            
+            Filtrar por nome da automação
+
         limit: Optional[int]
-            Limit number of results
-            
+            Limitar número de resultados
+
         Retorna:
         --------
-        List[Dict[str, Any]]: List of executions
+        List[Dict[str, Any]]: Lista de execuções
         """
         try:
+            # nosec B608
             query = f"SELECT * FROM {self.executions_table} WHERE 1=1"
             params = []
-            
+
             if status:
                 query += " AND status = ?"
                 params.append(status)
-            
+
             if automation_name:
                 query += " AND automation_name = ?"
                 params.append(automation_name)
-            
+
             query += " ORDER BY started_at DESC"
-            
+
             if limit:
                 query += f" LIMIT {limit}"
-            
+
             cursor = self._adapter.execute_query(query, tuple(params) if params else None)
             rows = cursor.fetchall()
-            
+
             if self.db_type == DatabaseType.SQLITE:
                 return [dict(row) for row in rows]
             else:
-                return [dict(row) if hasattr(row, 'keys') else row for row in rows]
-            
+                return [dict(row) if hasattr(row, "keys") else row for row in rows]
+
         except Exception as e:
-            raise DatabaseError(f"Error listing executions: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao listar execuções: {str(e)}.") from e
 
     def detect_and_mark_interrupted_executions(self) -> List[int]:
         """
-        Detects and marks executions that were not finished correctly.
-        
+        Detecta e marca execuções que não foram finalizadas corretamente.
+
         Returns:
         --------
-        List[int]: List of execution IDs marked as interrupted
-        Detects and marks executions that were not finished properly.
+        List[int]: Lista de IDs de execuções marcadas como interrompidas
+
+        pt-br
+        -----------
+        Detecta e marca execuções que não foram finalizadas corretamente.
+
+        Retorna:
+        --------
+        List[int]: Lista de IDs de execuções marcadas como interrompidas
         """
         try:
+            # nosec B608
             query = f"""
                 UPDATE {self.executions_table}
                 SET status = 'interrupted', finished_properly = 0
                 WHERE status = 'running' AND finished_properly = 0
             """
-            
+
             self._adapter.execute_query(query)
-            
+
             # Busca IDs atualizados
+            # nosec B608
             query_ids = f"""
                 SELECT id FROM {self.executions_table}
                 WHERE status = 'interrupted' AND finished_properly = 0
             """
             cursor = self._adapter.execute_query(query_ids)
             rows = cursor.fetchall()
-            
-            interrupted_ids = [row[0] if isinstance(row, tuple) else row['id'] for row in rows]
-            
+
+            interrupted_ids = [row[0] if isinstance(row, tuple) else row["id"] for row in rows]
+
             self._adapter.commit()
             return interrupted_ids
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error detecting interruptions: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao detectar interrupções: {str(e)}.") from e
 
-    # ========== ITEMS METHODS ==========
+    # ========== MÉTODOS DE ITENS ==========
 
     def add_item(
         self,
@@ -1264,35 +1437,73 @@ class Database:
         item_identifier: Optional[str] = None,
         item_data: Optional[Dict[str, Any]] = None,
         processing_schema: Optional[Dict[str, Any]] = None,
-        priority: int = 0
+        priority: int = 0,
+        max_retries: int = 0,
     ) -> int:
         """
-        Adds an item to the processing queue.
+        Adiciona item à fila de processamento.
 
         Parameters:
         -----------
         execution_id: int
-            Execution ID to add the item to
+            ID da execução
 
         item_identifier: Optional[str]
-            Unique identifier for the item
+            Identificador único do item
 
         item_data: Optional[Dict[str, Any]]
-            Item data in JSON format
+            Dados do item em formato JSON
 
         processing_schema: Optional[Dict[str, Any]]
-            Processing schema/instructions in JSON format
+            Schema/instruções de processamento em formato JSON
 
         priority: int
-            Item priority (higher = more prioritized)
+            Prioridade do item (maior = mais prioritário)
+            Default: 0
+
+        max_retries: int
+            Número máximo de tentativas de reprocessamento.
+            0 = sem limite (comportamento atual)
             Default: 0
 
         Returns:
         --------
-        int: Created item ID
+        int: ID do item criado
+
+        pt-br
+        -----------
+        Adiciona item à fila de processamento.
+
+        Parâmetros:
+        -----------
+        execution_id: int
+            ID da execução
+
+        item_identifier: Optional[str]
+            Identificador único do item
+
+        item_data: Optional[Dict[str, Any]]
+            Dados do item em formato JSON
+
+        processing_schema: Optional[Dict[str, Any]]
+            Schema/instruções de processamento em formato JSON
+
+        priority: int
+            Prioridade do item (maior = mais prioritário)
+            Padrão: 0
+
+        max_retries: int
+            Número máximo de tentativas de reprocessamento.
+            0 = sem limite (comportamento atual)
+            Padrão: 0
+
+        Retorna:
+        --------
+        int: ID do item criado
         """
         try:
-            # Calculate next position in the queue
+            # Calcula próxima posição na fila
+            # nosec B608
             queue_query = f"""
                 SELECT COALESCE(MAX(queue_position), 0) + 1 as next_pos
                 FROM {self.items_table}
@@ -1301,78 +1512,128 @@ class Database:
             queue_cursor = self._adapter.execute_query(queue_query, (execution_id,))
             queue_result = queue_cursor.fetchone()
             queue_position = queue_result[0] if queue_result else 1
-            
+
             item_data_str = json.dumps(item_data) if item_data else None
             schema_str = json.dumps(processing_schema) if processing_schema else None
-            
+
+            # nosec B608
             query = f"""
                 INSERT INTO {self.items_table}
                 (execution_id, item_identifier, status, priority, queue_position, 
-                 processing_schema, item_data)
-                VALUES (?, ?, 'pending', ?, ?, ?, ?)
+                 processing_schema, item_data, max_retries)
+                VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
             """
-            
+
             cursor = self._adapter.execute_query(
-                query,
-                (execution_id, item_identifier, priority, queue_position, schema_str, item_data_str)
+                query, (execution_id, item_identifier, priority, queue_position, schema_str, item_data_str, max_retries)
             )
-            
+
             item_id = self._adapter.get_last_insert_id(cursor, self.items_table)
-            
-            # Update total items counter in the execution
+
+            # Atualiza contador total de itens na execução
+            # nosec B608
             update_query = f"""
                 UPDATE {self.executions_table}
                 SET total_items = total_items + 1
                 WHERE id = ?
             """
             self._adapter.execute_query(update_query, (execution_id,))
-            
+
             self._adapter.commit()
             return item_id
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error adding item: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao adicionar item: {str(e)}.") from e
 
     def add_items(
-        self,
-        execution_id: int,
-        items: List[Dict[str, Any]],
-        default_priority: int = 0
+        self, execution_id: int, items: List[Dict[str, Any]], default_priority: int = 0, default_max_retries: int = 0
     ) -> List[int]:
         """
-        Adds multiple items to the processing queue in batch (more efficient).
+        Adiciona múltiplos itens à fila de processamento em lote (mais eficiente).
 
         Parameters:
         -----------
         execution_id: int
-            The execution ID to which these items belong.
+            ID da execução
 
         items: List[Dict[str, Any]]
-            List of dictionaries containing item data. Each dictionary may contain:
-            - item_identifier (Optional[str]): Unique identifier of the item
-            - item_data (Optional[Dict[str, Any]]): Item data as a JSON-serializable dict
-            - processing_schema (Optional[Dict[str, Any]]): Processing instructions/schema for the item
-            - priority (Optional[int]): Item priority (uses default_priority if not provided)
+            Lista de dicionários com dados dos itens. Cada dicionário deve conter:
+            - item_identifier (Optional[str]): Identificador único do item
+            - item_data (Optional[Dict[str, Any]]): Dados do item em formato JSON
+            - processing_schema (Optional[Dict[str, Any]]): Schema/instruções de processamento
+            - priority (Optional[int]): Prioridade do item (usa default_priority se não fornecido)
+            - max_retries (Optional[int]): Máximo de tentativas (usa default_max_retries se não fornecido)
 
-        default_priority: int, default 0
-            Default priority for items that do not specify a priority.
-        
+        default_priority: int
+            Prioridade padrão para itens que não especificarem priority
+            Default: 0
+
+        default_max_retries: int
+            Máximo de tentativas padrão para itens que não especificarem max_retries
+            0 = sem limite
+            Default: 0
+
         Returns:
         --------
-        List[int]: List of IDs of the created items (in the same order as the provided items)
+        List[int]: Lista de IDs dos itens criados (na mesma ordem dos items fornecidos)
 
         Example:
         --------
         >>> items = [
         ...     {
         ...         "item_identifier": "001",
-        ...         "item_data": {"name": "Item 1"},
+        ...         "item_data": {"nome": "Item 1"},
         ...         "priority": 1
         ...     },
         ...     {
         ...         "item_identifier": "002",
-        ...         "item_data": {"name": "Item 2"}
+        ...         "item_data": {"nome": "Item 2"}
+        ...     }
+        ... ]
+        >>> item_ids = register.add_items(execution_id=exec_id, items=items)
+
+        pt-br
+        -----------
+        Adiciona múltiplos itens à fila de processamento em lote (mais eficiente).
+
+        Parâmetros:
+        -----------
+        execution_id: int
+            ID da execução
+
+        items: List[Dict[str, Any]]
+            Lista de dicionários com dados dos itens. Cada dicionário deve conter:
+            - item_identifier (Optional[str]): Identificador único do item
+            - item_data (Optional[Dict[str, Any]]): Dados do item em formato JSON
+            - processing_schema (Optional[Dict[str, Any]]): Schema/instruções de processamento
+            - priority (Optional[int]): Prioridade do item (usa default_priority se não fornecido)
+            - max_retries (Optional[int]): Máximo de tentativas (usa default_max_retries se não fornecido)
+
+        default_priority: int
+            Prioridade padrão para itens que não especificarem priority
+            Padrão: 0
+
+        default_max_retries: int
+            Máximo de tentativas padrão para itens que não especificarem max_retries
+            0 = sem limite
+            Padrão: 0
+
+        Retorna:
+        --------
+        List[int]: Lista de IDs dos itens criados (na mesma ordem dos items fornecidos)
+
+        Exemplo:
+        --------
+        >>> items = [
+        ...     {
+        ...         "item_identifier": "001",
+        ...         "item_data": {"nome": "Item 1"},
+        ...         "priority": 1
+        ...     },
+        ...     {
+        ...         "item_identifier": "002",
+        ...         "item_data": {"nome": "Item 2"}
         ...     }
         ... ]
         >>> item_ids = register.add_items(execution_id=exec_id, items=items)
@@ -1380,8 +1641,9 @@ class Database:
         try:
             if not items or len(items) == 0:
                 return []
-            
+
             # Calcula posição inicial na fila
+            # nosec B608
             queue_query = f"""
                 SELECT COALESCE(MAX(queue_position), 0) as max_pos
                 FROM {self.items_table}
@@ -1390,106 +1652,103 @@ class Database:
             queue_cursor = self._adapter.execute_query(queue_query, (execution_id,))
             queue_result = queue_cursor.fetchone()
             start_position = (queue_result[0] if queue_result else 0) + 1
-            
+
             # Prepara dados para batch insert
             params_list = []
             for idx, item in enumerate(items):
-                item_identifier = item.get('item_identifier')
-                item_data = item.get('item_data')
-                processing_schema = item.get('processing_schema')
-                priority = item.get('priority', default_priority)
+                item_identifier = item.get("item_identifier")
+                item_data = item.get("item_data")
+                processing_schema = item.get("processing_schema")
+                priority = item.get("priority", default_priority)
+                max_retries = item.get("max_retries", default_max_retries)
                 queue_position = start_position + idx
-                
+
                 item_data_str = json.dumps(item_data) if item_data else None
                 schema_str = json.dumps(processing_schema) if processing_schema else None
-                
-                params_list.append((
-                    execution_id,
-                    item_identifier,
-                    priority,
-                    queue_position,
-                    schema_str,
-                    item_data_str
-                ))
-            
+
+                params_list.append(
+                    (execution_id, item_identifier, priority, queue_position, schema_str, item_data_str, max_retries)
+                )
+
             # Insere todos os itens em batch
+            # nosec B608
             query = f"""
                 INSERT INTO {self.items_table}
                 (execution_id, item_identifier, status, priority, queue_position, 
-                 processing_schema, item_data)
-                VALUES (?, ?, 'pending', ?, ?, ?, ?)
+                 processing_schema, item_data, max_retries)
+                VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
             """
-            
+
             self._adapter.execute_many(query, params_list)
-            
+
             # Busca os IDs dos itens recém-inseridos usando queue_position
             # Busca todos os itens inseridos nesta execução com queue_position >= start_position
+            # nosec B608
             id_query = f"""
                 SELECT id FROM {self.items_table}
                 WHERE execution_id = ? AND queue_position >= ?
                 ORDER BY queue_position ASC
                 LIMIT ?
             """
-            id_cursor = self._adapter.execute_query(
-                id_query,
-                (execution_id, start_position, len(items))
-            )
+            id_cursor = self._adapter.execute_query(id_query, (execution_id, start_position, len(items)))
             id_results = id_cursor.fetchall()
-            
+
             # Extrai IDs dos resultados
             if self.db_type == DatabaseType.SQLITE:
-                item_ids = [row['id'] for row in id_results]
+                item_ids = [row["id"] for row in id_results]
             else:
-                item_ids = [
-                    (row[0] if isinstance(row, tuple) else row['id'])
-                    for row in id_results
-                ]
-            
+                item_ids = [(row[0] if isinstance(row, tuple) else row["id"]) for row in id_results]
+
             # Atualiza contador total de itens na execução (uma única vez)
+            # nosec B608
             update_query = f"""
                 UPDATE {self.executions_table}
                 SET total_items = total_items + ?
                 WHERE id = ?
             """
             self._adapter.execute_query(update_query, (len(items), execution_id))
-            
+
             self._adapter.commit()
             return item_ids
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error adding items in batch: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao adicionar itens em lote: {str(e)}.") from e
 
     def get_next_item_from_queue(
-        self,
-        execution_id: int,
-        include_interrupted: Optional[bool] = None
+        self, execution_id: int, include_interrupted: Optional[bool] = None
     ) -> Optional[Dict[str, Any]]:
         """
         Retorna próximo item da fila ordenado por priority e queue_position.
-        
+
         Parameters:
         -----------
         execution_id: int
-            Execution ID
-            
+            ID da execução
+
         include_interrupted: Optional[bool]
             Se None, usa configuração da classe (allow_reprocess_items)
-            If True, includes interrupted items
-            If False, does not include interrupted items
-            
+            Se True, inclui itens interrompidos
+            Se False, não inclui itens interrompidos
+
         Returns:
         --------
         Optional[Dict[str, Any]]: Próximo item ou None
-        Retorna próximo item da fila ordenado por priority e queue_position.        -----------
+
+        pt-br
+        -----------
+        Retorna próximo item da fila ordenado por priority e queue_position.
+
+        Parâmetros:
+        -----------
         execution_id: int
-            Execution ID
-            
+            ID da execução
+
         include_interrupted: Optional[bool]
             Se None, usa configuração da classe (allow_reprocess_items)
-            If True, includes interrupted items
-            If False, does not include interrupted items
-            
+            Se True, inclui itens interrompidos
+            Se False, não inclui itens interrompidos
+
         Retorna:
         --------
         Optional[Dict[str, Any]]: Próximo item ou None
@@ -1497,171 +1756,193 @@ class Database:
         try:
             if include_interrupted is None:
                 include_interrupted = self.allow_reprocess_items
-            
+
             status_filter = "('pending', 'queued')"
             if include_interrupted:
                 status_filter = "('pending', 'queued', 'interrupted')"
-            
+
+            # nosec B608
             query = f"""
                 SELECT * FROM {self.items_table}
                 WHERE execution_id = ? AND status IN {status_filter}
                 ORDER BY priority DESC, queue_position ASC
                 LIMIT 1
             """
-            
+
             cursor = self._adapter.execute_query(query, (execution_id,))
             row = cursor.fetchone()
-            
+
             if row:
                 if self.db_type == DatabaseType.SQLITE:
                     return dict(row)
                 else:
-                    return dict(row) if hasattr(row, 'keys') else row
+                    return dict(row) if hasattr(row, "keys") else row
             return None
-            
+
         except Exception as e:
-            raise DatabaseError(f"Error fetching next item: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao buscar próximo item: {str(e)}.") from e
 
     def start_processing_item(self, item_id: int) -> bool:
         """
         Marca item como 'processing' e registra started_at.
-        
+
         Parameters:
         -----------
         item_id: int
             ID do item
-            
+
         Returns:
         --------
         bool: True se sucesso
-        Marca item como 'processing' e registra started_at.        -----------
+
+        pt-br
+        -----------
+        Marca item como 'processing' e registra started_at.
+
+        Parâmetros:
+        -----------
         item_id: int
             ID do item
-            
+
         Retorna:
         --------
         bool: True se sucesso
         """
         try:
+            # nosec B608
             query = f"""
                 UPDATE {self.items_table}
                 SET status = 'processing', started_at = ?
                 WHERE id = ? AND status IN ('pending', 'queued', 'interrupted')
             """
-            
+
             self._adapter.execute_query(query, (datetime.now(), item_id))
             self._adapter.commit()
             return True
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error starting item processing: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao iniciar processamento do item: {str(e)}.") from e
 
     def update_checkpoint(self, item_id: int, checkpoint: str) -> bool:
         """
         Atualiza last_checkpoint do item.
-        
+
         Parameters:
         -----------
         item_id: int
             ID do item
-            
+
         checkpoint: str
             Descrição do checkpoint atual
-            
+
         Returns:
         --------
         bool: True se sucesso
-        Atualiza last_checkpoint do item.        -----------
+
+        pt-br
+        -----------
+        Atualiza last_checkpoint do item.
+
+        Parâmetros:
+        -----------
         item_id: int
             ID do item
-            
+
         checkpoint: str
             Descrição do checkpoint atual
-            
+
         Retorna:
         --------
         bool: True se sucesso
         """
         try:
+            # nosec B608
             query = f"""
                 UPDATE {self.items_table}
                 SET last_checkpoint = ?
                 WHERE id = ?
             """
-            
+
             self._adapter.execute_query(query, (checkpoint, item_id))
             self._adapter.commit()
             return True
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error updating checkpoint: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao atualizar checkpoint: {str(e)}.") from e
 
     def finish_item(
-        self,
-        item_id: int,
-        status: str = 'success',
-        error_message: Optional[str] = None,
-        notes: Optional[str] = None
+        self, item_id: int, status: str = "success", error_message: Optional[str] = None, notes: Optional[str] = None
     ) -> bool:
         """
         Finaliza processamento do item.
-        
+
         Parameters:
         -----------
         item_id: int
             ID do item
-            
+
         status: str
             Status final: 'success', 'failed', 'skipped'
             Default: 'success'
-            
+
         error_message: Optional[str]
-            Error message if any
-            
+            Mensagem de erro se houver
+
         notes: Optional[str]
             Observações adicionais
-            
+
         Returns:
         --------
         bool: True se sucesso
-        Finaliza processamento do item.        -----------
+
+        pt-br
+        -----------
+        Finaliza processamento do item.
+
+        Parâmetros:
+        -----------
         item_id: int
             ID do item
-            
+
         status: str
             Status final: 'success', 'failed', 'skipped'
             Padrão: 'success'
-            
+
         error_message: Optional[str]
-            Error message if any
-            
+            Mensagem de erro se houver
+
         notes: Optional[str]
             Observações adicionais
-            
+
         Retorna:
         --------
         bool: True se sucesso
         """
         try:
-            if status not in ['success', 'failed', 'skipped']:
-                raise DatabaseError(f"Invalid status: {status}")
-            
+            if status not in ["success", "failed", "skipped"]:
+                raise DatabaseError(f"Status inválido: {status}")
+
             # Busca dados do item
             item_data = self.get_item(item_id)
             if not item_data:
-                raise DatabaseError(f"Item {item_id} not found")
-            
+                raise DatabaseError(f"Item {item_id} não encontrado")
+
             started_at = None
-            if item_data.get('started_at'):
-                started_at = datetime.fromisoformat(item_data['started_at']) if isinstance(item_data['started_at'], str) else item_data['started_at']
-            
+            if item_data.get("started_at"):
+                started_at = (
+                    datetime.fromisoformat(item_data["started_at"])
+                    if isinstance(item_data["started_at"], str)
+                    else item_data["started_at"]
+                )
+
             finished_at = datetime.now()
             execution_time = None
             if started_at:
                 execution_time = (finished_at - started_at).total_seconds()
-            
+
+            # nosec B608
             query = f"""
                 UPDATE {self.items_table}
                 SET status = ?,
@@ -1671,13 +1952,11 @@ class Database:
                     notes = ?
                 WHERE id = ?
             """
-            
-            self._adapter.execute_query(
-                query,
-                (status, finished_at, execution_time, error_message, notes, item_id)
-            )
-            
+
+            self._adapter.execute_query(query, (status, finished_at, execution_time, error_message, notes, item_id))
+
             # Atualiza contadores na execução
+            # nosec B608
             count_query = f"""
                 UPDATE {self.executions_table}
                 SET successful_items = (
@@ -1691,154 +1970,221 @@ class Database:
                 WHERE id = (SELECT execution_id FROM {self.items_table} WHERE id = ?)
             """
             self._adapter.execute_query(count_query, (item_id,))
-            
+
             self._adapter.commit()
             return True
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error finishing item: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao finalizar item: {str(e)}.") from e
 
     def get_item(self, item_id: int) -> Optional[Dict[str, Any]]:
         """
         Busca item por ID.
-        
+
         Parameters:
         -----------
         item_id: int
             ID do item
-            
+
         Returns:
         --------
         Optional[Dict[str, Any]]: Dados do item ou None
-        Busca item por ID.        -----------
+
+        pt-br
+        -----------
+        Busca item por ID.
+
+        Parâmetros:
+        -----------
         item_id: int
             ID do item
-            
+
         Retorna:
         --------
         Optional[Dict[str, Any]]: Dados do item ou None
         """
         try:
+            # nosec B608
             query = f"SELECT * FROM {self.items_table} WHERE id = ?"
             cursor = self._adapter.execute_query(query, (item_id,))
             row = cursor.fetchone()
-            
+
             if row:
                 if self.db_type == DatabaseType.SQLITE:
                     return dict(row)
                 else:
-                    return dict(row) if hasattr(row, 'keys') else row
+                    return dict(row) if hasattr(row, "keys") else row
             return None
-            
-        except Exception as e:
-            raise DatabaseError(f"Error fetching item: {str(e)}.") from e
 
-    def get_items(
-        self,
-        execution_id: int,
-        status: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+        except Exception as e:
+            raise DatabaseError(f"Erro ao buscar item: {str(e)}.") from e
+
+    def get_items(self, execution_id: int, status: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         Lista itens de uma execução.
-        
+
         Parameters:
         -----------
         execution_id: int
-            Execution ID
-            
+            ID da execução
+
         status: Optional[str]
             Filtrar por status
-            
+
         Returns:
         --------
         List[Dict[str, Any]]: Lista de itens
-        Lista itens de uma execução.        -----------
+
+        pt-br
+        -----------
+        Lista itens de uma execução.
+
+        Parâmetros:
+        -----------
         execution_id: int
-            Execution ID
-            
+            ID da execução
+
         status: Optional[str]
             Filtrar por status
-            
+
         Retorna:
         --------
         List[Dict[str, Any]]: Lista de itens
         """
         try:
+            # nosec B608
             query = f"SELECT * FROM {self.items_table} WHERE execution_id = ?"
             params = [execution_id]
-            
+
             if status:
                 query += " AND status = ?"
-                params.append(status)
-            
+                params.append(status)  # type: ignore
+
             query += " ORDER BY queue_position ASC"
-            
+
             cursor = self._adapter.execute_query(query, tuple(params))
             rows = cursor.fetchall()
-            
+
             if self.db_type == DatabaseType.SQLITE:
                 return [dict(row) for row in rows]
             else:
-                return [dict(row) if hasattr(row, 'keys') else row for row in rows]
-            
+                return [dict(row) if hasattr(row, "keys") else row for row in rows]
+
         except Exception as e:
-            raise DatabaseError(f"Error listing items: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao listar itens: {str(e)}.") from e
 
     def detect_and_mark_interrupted_items(self) -> List[int]:
         """
         Detecta e marca itens que não foram finalizados corretamente.
-        
+
         Returns:
         --------
         List[int]: Lista de IDs de itens marcados como interrompidos
+
+        pt-br
+        -----------
         Detecta e marca itens que não foram finalizados corretamente.
-        
+
         Retorna:
         --------
         List[int]: Lista de IDs de itens marcados como interrompidos
         """
         try:
+            # nosec B608
             query = f"""
                 UPDATE {self.items_table}
                 SET status = 'interrupted'
                 WHERE status = 'processing'
             """
-            
+
             self._adapter.execute_query(query)
-            
+
             # Busca IDs atualizados
+            # nosec B608
             query_ids = f"SELECT id FROM {self.items_table} WHERE status = 'interrupted'"
             cursor = self._adapter.execute_query(query_ids)
             rows = cursor.fetchall()
-            
-            interrupted_ids = [row[0] if isinstance(row, tuple) else row['id'] for row in rows]
-            
+
+            interrupted_ids = [row[0] if isinstance(row, tuple) else row["id"] for row in rows]
+
             self._adapter.commit()
             return interrupted_ids
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error detecting interrupted items: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao detectar itens interrompidos: {str(e)}.") from e
 
     # ========== MÉTODOS DE REPROCESSAMENTO ==========
+
+    def is_reprocessable(
+        self,
+        item: Dict[str, Any],
+        allow_failed: bool = True,
+        allow_interrupted: bool = True,
+        allow_pending_queued: bool = True,
+        transient_only_for_failed: bool = True,
+    ) -> bool:
+        """
+        Decide se um item é elegível para reprocessamento.
+
+        Regras:
+        - Exige allow_reprocess = 1
+        - Exige retry_count < max_retries (quando max_retries > 0)
+        - Itens interrupted são reprocessáveis (se habilitado)
+        - Itens failed são reprocessáveis opcionalmente, com filtro de falha transitória
+        - Itens pending/queued/retrying são reprocessáveis para retomada em nova execução
+        """
+        status = str(item.get("status", "")).lower()
+        allow_reprocess = int(item.get("allow_reprocess", 1)) == 1
+        retry_count = int(item.get("retry_count", 0) or 0)
+        max_retries = int(item.get("max_retries", 0) or 0)
+        error_message = str(item.get("error_message") or "").lower()
+
+        if not allow_reprocess:
+            return False
+
+        # max_retries <= 0 significa "sem limite" para manter compatibilidade.
+        if max_retries > 0 and retry_count >= max_retries:
+            return False
+
+        if status == "interrupted":
+            return allow_interrupted
+
+        if status == "failed":
+            if not allow_failed:
+                return False
+            if not transient_only_for_failed:
+                return True
+            return any(keyword in error_message for keyword in TRANSIENT_ERROR_KEYWORDS)
+
+        if status in ("pending", "queued", "retrying"):
+            return allow_pending_queued
+
+        return False
 
     def can_reprocess_execution(self, execution_id: int) -> bool:
         """
         Verifica se uma execução pode ser reprocessada.
-        
+
         Parameters:
         -----------
         execution_id: int
-            Execution ID
-            
+            ID da execução
+
         Returns:
         --------
         bool: True se pode reprocessar
-        Verifica se uma execução pode ser reprocessada.        -----------
+
+        pt-br
+        -----------
+        Verifica se uma execução pode ser reprocessada.
+
+        Parâmetros:
+        -----------
         execution_id: int
-            Execution ID
-            
+            ID da execução
+
         Retorna:
         --------
         bool: True se pode reprocessar
@@ -1847,52 +2193,55 @@ class Database:
             exec_data = self.get_execution(execution_id)
             if not exec_data:
                 return False
-            
+
             return (
-                exec_data.get('status') == 'interrupted' and
-                exec_data.get('allow_reprocess', 1) == 1 and
-                self.allow_reprocess_executions
+                exec_data.get("status") in ("interrupted", "failed")
+                and exec_data.get("allow_reprocess", 1) == 1
+                and self.allow_reprocess_executions
             )
         except Exception:
             return False
 
     def reprocess_interrupted_execution(
-        self,
-        execution_id: int,
-        keep_items: bool = True,
-        reset_items_status: bool = False
+        self, execution_id: int, keep_items: bool = True, reset_items_status: bool = False
     ) -> Optional[int]:
         """
-        Cria uma nova execução baseada em uma execução interrompida.
-        
+        Cria uma nova execução baseada em uma execução interrompida/falha.
+
         Parameters:
         -----------
         execution_id: int
-            Interrupted execution ID
-            
+            ID da execução interrompida/falha
+
         keep_items: bool
-            If True, keeps items from original execution
+            Se True, mantém os itens da execução original
             Default: True
-            
+
         reset_items_status: bool
             Se True, reseta status dos itens para 'pending'
             Default: False
-            
+
         Returns:
         --------
         Optional[int]: ID da nova execução ou None se não permitido
-        Cria uma nova execução baseada em uma execução interrompida.        -----------
+
+        pt-br
+        -----------
+        Cria uma nova execução baseada em uma execução interrompida/falha.
+
+        Parâmetros:
+        -----------
         execution_id: int
-            Interrupted execution ID
-            
+            ID da execução interrompida/falha
+
         keep_items: bool
-            If True, keeps items from original execution
+            Se True, mantém os itens da execução original
             Padrão: True
-            
+
         reset_items_status: bool
             Se True, reseta status dos itens para 'pending'
             Padrão: False
-            
+
         Retorna:
         --------
         Optional[int]: ID da nova execução ou None se não permitido
@@ -1900,77 +2249,88 @@ class Database:
         try:
             if not self.can_reprocess_execution(execution_id):
                 return None
-            
+
             exec_data = self.get_execution(execution_id)
             if not exec_data:
                 return None
-            
+
             # Cria nova execução
             new_exec_id = self.start_execution(
-                automation_name=exec_data['automation_name'],
+                automation_name=exec_data["automation_name"],
                 execution_id=None,  # Novo execution_id
-                metadata=json.loads(exec_data['metadata']) if exec_data.get('metadata') else None
+                metadata=json.loads(exec_data["metadata"]) if exec_data.get("metadata") else None,
             )
-            
+
             # Atualiza parent_execution_id e reprocess_count
+            # nosec B608
             update_query = f"""
                 UPDATE {self.executions_table}
                 SET parent_execution_id = ?, reprocess_count = reprocess_count + 1
                 WHERE id = ?
             """
             self._adapter.execute_query(update_query, (execution_id, new_exec_id))
-            
-            # Se manter itens, copia eles para nova execução
+
+            # Se manter itens, copia itens elegíveis para nova execução
             if keep_items:
                 items = self.get_items(execution_id)
                 for item in items:
-                    new_status = 'pending' if reset_items_status else item.get('status', 'pending')
-                    
-                    # Reseta campos de processamento se reset_items_status
-                    if reset_items_status:
-                        item_id_query = f"""
-                            INSERT INTO {self.items_table}
-                            (execution_id, item_identifier, status, priority, queue_position,
-                             processing_schema, item_data, allow_reprocess)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                        """
-                        self._adapter.execute_query(
-                            item_id_query,
-                            (
-                                new_exec_id,
-                                item.get('item_identifier'),
-                                new_status,
-                                item.get('priority', 0),
-                                item.get('queue_position'),
-                                item.get('processing_schema'),
-                                item.get('item_data'),
-                                item.get('allow_reprocess', 1)
-                            )
-                        )
-            
+                    should_copy = reset_items_status or self.is_reprocessable(
+                        item, allow_failed=True, allow_interrupted=True, allow_pending_queued=True
+                    )
+                    if not should_copy:
+                        continue
+
+                    new_status = "pending"
+                    # nosec B608
+                    item_id_query = f"""
+                        INSERT INTO {self.items_table}
+                        (execution_id, item_identifier, status, priority, queue_position,
+                         processing_schema, item_data, allow_reprocess)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """
+                    self._adapter.execute_query(
+                        item_id_query,
+                        (
+                            new_exec_id,
+                            item.get("item_identifier"),
+                            new_status,
+                            item.get("priority", 0),
+                            item.get("queue_position"),
+                            item.get("processing_schema"),
+                            item.get("item_data"),
+                            item.get("allow_reprocess", 1),
+                        ),
+                    )
+
             self._adapter.commit()
             return new_exec_id
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error reprocessing execution: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao reprocessar execução: {str(e)}.") from e
 
     def can_reprocess_item(self, item_id: int) -> bool:
         """
         Verifica se um item pode ser reprocessado.
-        
+
         Parameters:
         -----------
         item_id: int
             ID do item
-            
+
         Returns:
         --------
         bool: True se pode reprocessar
-        Verifica se um item pode ser reprocessado.        -----------
+
+        pt-br
+        -----------
+        Verifica se um item pode ser reprocessado.
+
+        Parâmetros:
+        -----------
         item_id: int
             ID do item
-            
+
         Retorna:
         --------
         bool: True se pode reprocessar
@@ -1979,39 +2339,44 @@ class Database:
             item_data = self.get_item(item_id)
             if not item_data:
                 return False
-            
-            return (
-                item_data.get('status') == 'interrupted' and
-                item_data.get('allow_reprocess', 1) == 1 and
-                self.allow_reprocess_items
-            )
+
+            if not self.allow_reprocess_items:
+                return False
+            return self.is_reprocessable(item_data)
         except Exception:
             return False
 
     def reprocess_interrupted_item(self, item_id: int) -> bool:
         """
-        Reprocessa um item interrompido.
-        
+        Reprocessa um item elegível (interrupted/failed/pending/queued).
+
         Parameters:
         -----------
         item_id: int
             ID do item
-            
+
         Returns:
         --------
         bool: True se sucesso
-        Reprocessa um item interrompido.        -----------
+
+        pt-br
+        -----------
+        Reprocessa um item elegível (interrupted/failed/pending/queued).
+
+        Parâmetros:
+        -----------
         item_id: int
             ID do item
-            
+
         Retorna:
         --------
         bool: True se sucesso
         """
         try:
             if not self.can_reprocess_item(item_id):
-                raise DatabaseError(f"Item {item_id} cannot be reprocessed")
-            
+                raise DatabaseError(f"Item {item_id} não pode ser reprocessado")
+
+            # nosec B608
             query = f"""
                 UPDATE {self.items_table}
                 SET status = 'pending',
@@ -2023,88 +2388,160 @@ class Database:
                     retry_count = retry_count + 1
                 WHERE id = ?
             """
-            
+
             self._adapter.execute_query(query, (item_id,))
             self._adapter.commit()
             return True
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error reprocessing item: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao reprocessar item: {str(e)}.") from e
+
+    def reprocess_items_from_execution(
+        self,
+        execution_id: int,
+        statuses: Optional[List[str]] = None,
+        transient_only_for_failed: bool = True,
+        limit: Optional[int] = None,
+    ) -> List[int]:
+        """
+        Reprocessa em lote itens elegíveis de uma execução.
+
+        Parameters:
+        -----------
+        execution_id: int
+            ID da execução origem
+
+        statuses: Optional[List[str]]
+            Filtra por status desejados (ex: ['failed', 'interrupted'])
+            Se None, usa todos os status elegíveis pela regra de reprocessamento.
+
+        transient_only_for_failed: bool
+            Se True, reprocessa item failed apenas quando erro for transitório.
+
+        limit: Optional[int]
+            Limita quantidade de itens reprocessados.
+
+        Returns:
+        --------
+        List[int]: IDs dos itens reprocessados
+        """
+        try:
+            if not self.allow_reprocess_items:
+                return []
+
+            items = self.get_items(execution_id)
+            reprocessed_ids: List[int] = []
+            allowed_statuses = {s.lower() for s in statuses} if statuses else None
+
+            for item in items:
+                status = str(item.get("status", "")).lower()
+                if allowed_statuses is not None and status not in allowed_statuses:
+                    continue
+
+                if not self.is_reprocessable(
+                    item,
+                    allow_failed=True,
+                    allow_interrupted=True,
+                    allow_pending_queued=True,
+                    transient_only_for_failed=transient_only_for_failed,
+                ):
+                    continue
+
+                item_id = int(item["id"])
+                self.reprocess_interrupted_item(item_id)
+                reprocessed_ids.append(item_id)
+
+                if limit and len(reprocessed_ids) >= limit:
+                    break
+
+            return reprocessed_ids
+
+        except Exception as e:
+            raise DatabaseError(f"Erro ao reprocessar itens em lote: {str(e)}.") from e
 
     # ========== MÉTODOS DE LIMPEZA - SEGUROS ==========
 
-    def clear_pending_items(
-        self,
-        execution_id: Optional[int] = None
-    ) -> int:
+    def clear_pending_items(self, execution_id: Optional[int] = None) -> int:
         """
         Remove itens com status 'pending' ou 'queued'.
-        
+
         Parameters:
         -----------
         execution_id: Optional[int]
-            Execution ID. If None, clears from all executions.
-            
+            ID da execução. Se não informado, tenta usar a execução atual iniciada
+            com start_execution. Se não houver execução atual, limpa de todas.
+
         Returns:
         --------
         int: Número de itens removidos
-        Remove itens com status 'pending' ou 'queued'.        -----------
+
+        pt-br
+        -----------
+        Remove itens com status 'pending' ou 'queued'.
+
+        Parâmetros:
+        -----------
         execution_id: Optional[int]
-            Execution ID. If None, clears from all executions.
-            
+            ID da execução. Se não informado, tenta usar a execução atual iniciada
+            com start_execution. Se não houver execução atual, limpa de todas.
+
         Retorna:
         --------
         int: Número de itens removidos
         """
         try:
             if execution_id:
+                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE execution_id = ? AND status IN ('pending', 'queued')
                 """
                 cursor = self._adapter.execute_query(query, (execution_id,))
             else:
+                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE status IN ('pending', 'queued')
                 """
                 cursor = self._adapter.execute_query(query)
-            
-            count = cursor.rowcount if hasattr(cursor, 'rowcount') else 0
+
+            count = cursor.rowcount if hasattr(cursor, "rowcount") else 0
             self._adapter.commit()
             return count
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing pending items: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar itens pendentes: {str(e)}.") from e
 
-    def clear_interrupted_items(
-        self,
-        execution_id: Optional[int] = None,
-        allow_reprocess_check: bool = True
-    ) -> int:
+    def clear_interrupted_items(self, execution_id: Optional[int] = None, allow_reprocess_check: bool = True) -> int:
         """
         Remove itens com status 'interrupted'.
-        
+
         Parameters:
         -----------
         execution_id: Optional[int]
-            Execution ID. If None, clears from all executions.
-            
+            ID da execução. Se None, limpa de todas.
+
         allow_reprocess_check: bool
             Se True, remove apenas os que NÃO podem ser reprocessados
-            
+
         Returns:
         --------
         int: Número de itens removidos
-        Remove itens com status 'interrupted'.        -----------
+
+        pt-br
+        -----------
+        Remove itens com status 'interrupted'.
+
+        Parâmetros:
+        -----------
         execution_id: Optional[int]
-            Execution ID. If None, clears from all executions.
-            
+            ID da execução. Se None, limpa de todas.
+
         allow_reprocess_check: bool
             Se True, remove apenas os que NÃO podem ser reprocessados
-            
+
         Retorna:
         --------
         int: Número de itens removidos
@@ -2114,47 +2551,52 @@ class Database:
                 filter_clause = " AND allow_reprocess = 0"
             else:
                 filter_clause = ""
-            
+
             if execution_id:
+                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE execution_id = ? AND status = 'interrupted'{filter_clause}
                 """
                 cursor = self._adapter.execute_query(query, (execution_id,))
             else:
+                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE status = 'interrupted'{filter_clause}
                 """
                 cursor = self._adapter.execute_query(query)
-            
-            count = cursor.rowcount if hasattr(cursor, 'rowcount') else 0
+
+            count = cursor.rowcount if hasattr(cursor, "rowcount") else 0
             self._adapter.commit()
             return count
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing interrupted items: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar itens interrompidos: {str(e)}.") from e
 
-    def clear_interrupted_executions(
-        self,
-        allow_reprocess_check: bool = True
-    ) -> int:
+    def clear_interrupted_executions(self, allow_reprocess_check: bool = True) -> int:
         """
         Remove execuções com status 'interrupted'.
-        
+
         Parameters:
         -----------
         allow_reprocess_check: bool
             Se True, remove apenas as que NÃO podem ser reprocessadas
-            
+
         Returns:
         --------
         int: Número de execuções removidas
-        Remove execuções com status 'interrupted'.        -----------
+
+        pt-br
+        -----------
+        Remove execuções com status 'interrupted'.
+
+        Parâmetros:
+        -----------
         allow_reprocess_check: bool
             Se True, remove apenas as que NÃO podem ser reprocessadas
-            
+
         Retorna:
         --------
         int: Número de execuções removidas
@@ -2164,490 +2606,514 @@ class Database:
                 filter_clause = " AND allow_reprocess = 0"
             else:
                 filter_clause = ""
-            
+
+            # nosec B608
             query = f"""
                 DELETE FROM {self.executions_table}
                 WHERE status = 'interrupted'{filter_clause}
             """
             cursor = self._adapter.execute_query(query)
-            
-            count = cursor.rowcount if hasattr(cursor, 'rowcount') else 0
+
+            count = cursor.rowcount if hasattr(cursor, "rowcount") else 0
             self._adapter.commit()
             return count
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing interrupted executions: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar execuções interrompidas: {str(e)}.") from e
 
     # ========== MÉTODOS DE LIMPEZA - PROTEGIDOS ==========
 
     def clear_successful_items(
-        self,
-        execution_id: Optional[int] = None,
-        confirm: bool = False,
-        confirmation_code: Optional[str] = None
+        self, execution_id: Optional[int] = None, confirm: bool = False, confirmation_code: Optional[str] = None
     ) -> int:
         """
         Remove itens com status 'success'.
-        
+
         PERIGO: Remove dados de sucesso permanentemente!
         Requer confirmação dupla para segurança.
-        
+
         Parameters:
         -----------
         execution_id: Optional[int]
-            Execution ID. If None, clears from all executions.
-            
+            ID da execução. Se None, limpa de todas.
+
         confirm: bool
             Deve ser True
-            
+
         confirmation_code: Optional[str]
             Deve ser "DELETE_SUCCESS" para executar
-            
+
         Returns:
         --------
         int: Número de itens removidos
-        
+
         Raises:
         ------
-        DatabaseError: If confirmation not provided correctly
+        DatabaseError: Se confirmação não fornecida corretamente
+
+        pt-br
+        -----------
         Remove itens com status 'success'.
-        
+
         PERIGO: Remove dados de sucesso permanentemente!
-        Requer confirmação dupla para segurança.        -----------
+        Requer confirmação dupla para segurança.
+
+        Parâmetros:
+        -----------
         execution_id: Optional[int]
-            Execution ID. If None, clears from all executions.
-            
+            ID da execução. Se None, limpa de todas.
+
         confirm: bool
             Deve ser True
-            
+
         confirmation_code: Optional[str]
             Deve ser "DELETE_SUCCESS" para executar
-            
+
         Retorna:
         --------
         int: Número de itens removidos
-        
+
         Raises:
         ------
-        DatabaseError: If confirmation not provided correctly
+        DatabaseError: Se confirmação não fornecida corretamente
         """
         if not confirm:
+            raise DatabaseError("Esta operação remove dados permanentemente! " "Passe confirm=True para executar.")
+
+        if confirmation_code != CONFIRMATION_CODES["DELETE_SUCCESS"]:
             raise DatabaseError(
-                "Esta operação remove dados permanentemente! "
-                "Passe confirm=True para executar."
+                f"Confirmação inválida! " f"Deve passar confirmation_code='{CONFIRMATION_CODES['DELETE_SUCCESS']}'"
             )
-        
-        if confirmation_code != CONFIRMATION_CODES['DELETE_SUCCESS']:
-            raise DatabaseError(
-                f"Invalid confirmation! "
-                f"Deve passar confirmation_code='{CONFIRMATION_CODES['DELETE_SUCCESS']}'"
-            )
-        
+
         try:
             if execution_id:
+                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE execution_id = ? AND status = 'success'
                 """
                 cursor = self._adapter.execute_query(query, (execution_id,))
             else:
+                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE status = 'success'
                 """
                 cursor = self._adapter.execute_query(query)
-            
-            count = cursor.rowcount if hasattr(cursor, 'rowcount') else 0
+
+            count = cursor.rowcount if hasattr(cursor, "rowcount") else 0
             self._adapter.commit()
             return count
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing successful items: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar itens de sucesso: {str(e)}.") from e
 
     def clear_failed_items(
-        self,
-        execution_id: Optional[int] = None,
-        confirm: bool = False,
-        confirmation_code: Optional[str] = None
+        self, execution_id: Optional[int] = None, confirm: bool = False, confirmation_code: Optional[str] = None
     ) -> int:
         """
         Remove itens com status 'failed'.
-        
+
         PERIGO: Remove dados de falha permanentemente!
         Requer confirmação dupla para segurança.
-        
+
         Parameters:
         -----------
         execution_id: Optional[int]
-            Execution ID. If None, clears from all executions.
-            
+            ID da execução. Se None, limpa de todas.
+
         confirm: bool
             Deve ser True
-            
+
         confirmation_code: Optional[str]
             Deve ser "DELETE_FAILED" para executar
-            
+
         Returns:
         --------
         int: Número de itens removidos
+
+        pt-br
+        -----------
         Remove itens com status 'failed'.
-        
+
         PERIGO: Remove dados de falha permanentemente!
-        Requer confirmação dupla para segurança.        -----------
+        Requer confirmação dupla para segurança.
+
+        Parâmetros:
+        -----------
         execution_id: Optional[int]
-            Execution ID. If None, clears from all executions.
-            
+            ID da execução. Se None, limpa de todas.
+
         confirm: bool
             Deve ser True
-            
+
         confirmation_code: Optional[str]
             Deve ser "DELETE_FAILED" para executar
-            
+
         Retorna:
         --------
         int: Número de itens removidos
         """
         if not confirm:
+            raise DatabaseError("Esta operação remove dados permanentemente! " "Passe confirm=True para executar.")
+
+        if confirmation_code != CONFIRMATION_CODES["DELETE_FAILED"]:
             raise DatabaseError(
-                "Esta operação remove dados permanentemente! "
-                "Passe confirm=True para executar."
+                f"Confirmação inválida! " f"Deve passar confirmation_code='{CONFIRMATION_CODES['DELETE_FAILED']}'"
             )
-        
-        if confirmation_code != CONFIRMATION_CODES['DELETE_FAILED']:
-            raise DatabaseError(
-                f"Invalid confirmation! "
-                f"Deve passar confirmation_code='{CONFIRMATION_CODES['DELETE_FAILED']}'"
-            )
-        
+
         try:
             if execution_id:
+                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE execution_id = ? AND status = 'failed'
                 """
                 cursor = self._adapter.execute_query(query, (execution_id,))
             else:
+                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE status = 'failed'
                 """
                 cursor = self._adapter.execute_query(query)
-            
-            count = cursor.rowcount if hasattr(cursor, 'rowcount') else 0
+
+            count = cursor.rowcount if hasattr(cursor, "rowcount") else 0
             self._adapter.commit()
             return count
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing failed items: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar itens de falha: {str(e)}.") from e
 
-    def clear_successful_executions(
-        self,
-        confirm: bool = False,
-        confirmation_code: Optional[str] = None
-    ) -> int:
+    def clear_successful_executions(self, confirm: bool = False, confirmation_code: Optional[str] = None) -> int:
         """
         Remove execuções com status 'completed'.
-        
+
         PERIGO: Remove execuções de sucesso permanentemente!
-        
+
         Parameters:
         -----------
         confirm: bool
             Deve ser True
-            
+
         confirmation_code: Optional[str]
             Deve ser "DELETE_SUCCESS_EXECUTIONS" para executar
-            
+
         Returns:
         --------
         int: Número de execuções removidas
+
+        pt-br
+        -----------
         Remove execuções com status 'completed'.
-        
-        PERIGO: Remove execuções de sucesso permanentemente!        -----------
+
+        PERIGO: Remove execuções de sucesso permanentemente!
+
+        Parâmetros:
+        -----------
         confirm: bool
             Deve ser True
-            
+
         confirmation_code: Optional[str]
             Deve ser "DELETE_SUCCESS_EXECUTIONS" para executar
-            
+
         Retorna:
         --------
         int: Número de execuções removidas
         """
         if not confirm:
+            raise DatabaseError("Esta operação remove dados permanentemente! " "Passe confirm=True para executar.")
+
+        if confirmation_code != CONFIRMATION_CODES["DELETE_SUCCESS_EXECUTIONS"]:
             raise DatabaseError(
-                "Esta operação remove dados permanentemente! "
-                "Passe confirm=True para executar."
-            )
-        
-        if confirmation_code != CONFIRMATION_CODES['DELETE_SUCCESS_EXECUTIONS']:
-            raise DatabaseError(
-                f"Invalid confirmation! "
+                f"Confirmação inválida! "
                 f"Deve passar confirmation_code='{CONFIRMATION_CODES['DELETE_SUCCESS_EXECUTIONS']}'"
             )
-        
-        try:
+
+        try: # nosec B608
             query = f"""
                 DELETE FROM {self.executions_table}
                 WHERE status = 'completed'
             """
             cursor = self._adapter.execute_query(query)
-            
-            count = cursor.rowcount if hasattr(cursor, 'rowcount') else 0
+
+            count = cursor.rowcount if hasattr(cursor, "rowcount") else 0
             self._adapter.commit()
             return count
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing successful executions: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar execuções de sucesso: {str(e)}.") from e
 
-    def clear_failed_executions(
-        self,
-        confirm: bool = False,
-        confirmation_code: Optional[str] = None
-    ) -> int:
+    def clear_failed_executions(self, confirm: bool = False, confirmation_code: Optional[str] = None) -> int:
         """
         Remove execuções com status 'failed'.
-        
+
         PERIGO: Remove execuções de falha permanentemente!
-        
+
         Parameters:
         -----------
         confirm: bool
             Deve ser True
-            
+
         confirmation_code: Optional[str]
             Deve ser "DELETE_FAILED_EXECUTIONS" para executar
-            
+
         Returns:
         --------
         int: Número de execuções removidas
+
+        pt-br
+        -----------
         Remove execuções com status 'failed'.
-        
-        PERIGO: Remove execuções de falha permanentemente!        -----------
+
+        PERIGO: Remove execuções de falha permanentemente!
+
+        Parâmetros:
+        -----------
         confirm: bool
             Deve ser True
-            
+
         confirmation_code: Optional[str]
             Deve ser "DELETE_FAILED_EXECUTIONS" para executar
-            
+
         Retorna:
         --------
         int: Número de execuções removidas
         """
         if not confirm:
+            raise DatabaseError("Esta operação remove dados permanentemente! " "Passe confirm=True para executar.")
+
+        if confirmation_code != CONFIRMATION_CODES["DELETE_FAILED_EXECUTIONS"]:
             raise DatabaseError(
-                "Esta operação remove dados permanentemente! "
-                "Passe confirm=True para executar."
-            )
-        
-        if confirmation_code != CONFIRMATION_CODES['DELETE_FAILED_EXECUTIONS']:
-            raise DatabaseError(
-                f"Invalid confirmation! "
+                f"Confirmação inválida! "
                 f"Deve passar confirmation_code='{CONFIRMATION_CODES['DELETE_FAILED_EXECUTIONS']}'"
             )
-        
-        try:
+
+        try: # nosec B608
             query = f"""
                 DELETE FROM {self.executions_table}
                 WHERE status = 'failed'
             """
             cursor = self._adapter.execute_query(query)
-            
-            count = cursor.rowcount if hasattr(cursor, 'rowcount') else 0
+
+            count = cursor.rowcount if hasattr(cursor, "rowcount") else 0
             self._adapter.commit()
             return count
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing failed executions: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar execuções de falha: {str(e)}.") from e
 
     # ========== MÉTODOS DE LIMPEZA - COMPLETOS ==========
 
     def clear_executions_table(self, confirm: bool = False) -> bool:
         """
         Remove TODA a tabela executions.
-        
+
         PERIGO: Remove todas as execuções permanentemente!
-        
+
         Parameters:
         -----------
         confirm: bool
             Deve ser True para executar
-            
+
         Returns:
         --------
         bool: True se executado com sucesso
+
+        pt-br
+        -----------
         Remove TODA a tabela executions.
-        
-        PERIGO: Remove todas as execuções permanentemente!        -----------
+
+        PERIGO: Remove todas as execuções permanentemente!
+
+        Parâmetros:
+        -----------
         confirm: bool
             Deve ser True para executar
-            
+
         Retorna:
         --------
         bool: True se executado com sucesso
         """
         if not confirm:
             raise DatabaseError(
-                "Esta operação remove TODOS os dados permanentemente! "
-                "Passe confirm=True para executar."
+                "Esta operação remove TODOS os dados permanentemente! " "Passe confirm=True para executar."
             )
-        
-        try:
+
+        try: # nosec B608
             query = f"DELETE FROM {self.executions_table}"
             self._adapter.execute_query(query)
             self._adapter.commit()
             return True
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing executions table: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar tabela execuções: {str(e)}.") from e
 
     def clear_items_table(self, confirm: bool = False) -> bool:
         """
         Remove TODA a tabela items.
-        
+
         PERIGO: Remove todos os itens permanentemente!
-        
+
         Parameters:
         -----------
         confirm: bool
             Deve ser True para executar
-            
+
         Returns:
         --------
         bool: True se executado com sucesso
+
+        pt-br
+        -----------
         Remove TODA a tabela items.
-        
-        PERIGO: Remove todos os itens permanentemente!        -----------
+
+        PERIGO: Remove todos os itens permanentemente!
+
+        Parâmetros:
+        -----------
         confirm: bool
             Deve ser True para executar
-            
+
         Retorna:
         --------
         bool: True se executado com sucesso
         """
         if not confirm:
             raise DatabaseError(
-                "Esta operação remove TODOS os dados permanentemente! "
-                "Passe confirm=True para executar."
+                "Esta operação remove TODOS os dados permanentemente! " "Passe confirm=True para executar."
             )
-        
-        try:
+
+        try: # nosec B608
             query = f"DELETE FROM {self.items_table}"
             self._adapter.execute_query(query)
             self._adapter.commit()
             return True
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing items table: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar tabela itens: {str(e)}.") from e
 
     def clear_logs_table(self, confirm: bool = False) -> bool:
         """
         Remove TODA a tabela logs.
-        
+
         PERIGO: Remove todos os logs permanentemente!
-        
+
         Parameters:
         -----------
         confirm: bool
             Deve ser True para executar
-            
+
         Returns:
         --------
         bool: True se executado com sucesso
+
+        pt-br
+        -----------
         Remove TODA a tabela logs.
-        
-        PERIGO: Remove todos os logs permanentemente!        -----------
+
+        PERIGO: Remove todos os logs permanentemente!
+
+        Parâmetros:
+        -----------
         confirm: bool
             Deve ser True para executar
-            
+
         Retorna:
         --------
         bool: True se executado com sucesso
         """
         if not confirm:
             raise DatabaseError(
-                "Esta operação remove TODOS os dados permanentemente! "
-                "Passe confirm=True para executar."
+                "Esta operação remove TODOS os dados permanentemente! " "Passe confirm=True para executar."
             )
-        
-        try:
+
+        try: # nosec B608
             query = f"DELETE FROM {self.logs_table}"
             self._adapter.execute_query(query)
             self._adapter.commit()
             return True
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing logs table: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar tabela logs: {str(e)}.") from e
 
     def clear_database(self, confirm: bool = False) -> bool:
         """
         Limpa TODO o banco de dados (todas as tabelas).
-        
+
         PERIGO: Remove todos os dados permanentemente!
-        
+
         Parameters:
         -----------
         confirm: bool
             Deve ser True para executar
-            
+
         Returns:
         --------
         bool: True se executado com sucesso
+
+        pt-br
+        -----------
         Limpa TODO o banco de dados (todas as tabelas).
-        
-        PERIGO: Remove todos os dados permanentemente!        -----------
+
+        PERIGO: Remove todos os dados permanentemente!
+
+        Parâmetros:
+        -----------
         confirm: bool
             Deve ser True para executar
-            
+
         Retorna:
         --------
         bool: True se executado com sucesso
         """
         if not confirm:
             raise DatabaseError(
-                "Esta operação remove TODOS os dados permanentemente! "
-                "Passe confirm=True para executar."
+                "Esta operação remove TODOS os dados permanentemente! " "Passe confirm=True para executar."
             )
-        
+
         try:
             self.clear_items_table(confirm=True)
             self.clear_logs_table(confirm=True)  # Limpa logs antes de execuções
             self.clear_executions_table(confirm=True)
             return True
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing database: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao limpar banco: {str(e)}.") from e
 
     # ========== UTILITÁRIOS ==========
 
-    def get_statistics(
-        self,
-        execution_id: Optional[int] = None
-    ) -> Dict[str, Any]:
+    def get_statistics(self, execution_id: Optional[int] = None) -> Dict[str, Any]:
         """
         Retorna estatísticas das execuções/itens.
-        
+
         Parameters:
         -----------
         execution_id: Optional[int]
-            Execution ID. If None, returns general statistics
-            
+            ID da execução. Se None, retorna estatísticas gerais
+
         Returns:
         --------
         Dict[str, Any]: Estatísticas
-        Retorna estatísticas das execuções/itens.        -----------
+
+        pt-br
+        -----------
+        Retorna estatísticas das execuções/itens.
+
+        Parâmetros:
+        -----------
         execution_id: Optional[int]
-            Execution ID. If None, returns general statistics
-            
+            ID da execução. Se None, retorna estatísticas gerais
+
         Retorna:
         --------
         Dict[str, Any]: Estatísticas
@@ -2658,19 +3124,20 @@ class Database:
                 exec_data = self.get_execution(execution_id)
                 if not exec_data:
                     return {}
-                
+
                 items = self.get_items(execution_id)
-                
+
                 return {
-                    'execution': exec_data,
-                    'total_items': len(items),
-                    'items_by_status': {
-                        status: len([i for i in items if i.get('status') == status])
-                        for status in ['pending', 'queued', 'processing', 'success', 'failed', 'interrupted']
-                    }
+                    "execution": exec_data,
+                    "total_items": len(items),
+                    "items_by_status": {
+                        status: len([i for i in items if i.get("status") == status])
+                        for status in ["pending", "queued", "processing", "success", "failed", "interrupted"]
+                    },
                 }
             else:
                 # Estatísticas gerais
+                # nosec B608
                 exec_query = f"""
                     SELECT 
                         COUNT(*) as total,
@@ -2682,7 +3149,8 @@ class Database:
                 """
                 exec_cursor = self._adapter.execute_query(exec_query)
                 exec_stats = exec_cursor.fetchone()
-                
+
+                # nosec B608
                 items_query = f"""
                     SELECT 
                         COUNT(*) as total,
@@ -2694,91 +3162,101 @@ class Database:
                 """
                 items_cursor = self._adapter.execute_query(items_query)
                 items_stats = items_cursor.fetchone()
-                
+
                 if self.db_type == DatabaseType.SQLITE:
-                    return {
-                        'executions': dict(exec_stats),
-                        'items': dict(items_stats)
-                    }
+                    return {"executions": dict(exec_stats), "items": dict(items_stats)}
                 else:
-                    exec_dict = dict(exec_stats) if hasattr(exec_stats, 'keys') else {i: v for i, v in enumerate(exec_stats)}
-                    items_dict = dict(items_stats) if hasattr(items_stats, 'keys') else {i: v for i, v in enumerate(items_stats)}
-                    return {
-                        'executions': exec_dict,
-                        'items': items_dict
-                    }
-                    
+                    exec_dict = (
+                        dict(exec_stats) if hasattr(exec_stats, "keys") else {i: v for i, v in enumerate(exec_stats)}
+                    )
+                    items_dict = (
+                        dict(items_stats) if hasattr(items_stats, "keys") else {i: v for i, v in enumerate(items_stats)}
+                    )
+                    return {"executions": exec_dict, "items": items_dict}
+
         except Exception as e:
-            raise DatabaseError(f"Error fetching statistics: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao buscar estatísticas: {str(e)}.") from e
 
     # ========== MÉTODOS DE LOGS ==========
 
     def add_log(
         self,
-        execution_id: int,
         message: str,
-        log_level: str = 'info',
-        step_name: Optional[str] = None
+        execution_id: Optional[int] = None,
+        log_level: str = LOG_LEVEL_INFO,
+        step_name: Optional[str] = None,
     ) -> int:
         """
         Adiciona um log à execução.
-        
+
         Parameters:
         -----------
-        execution_id: int
-            Execution ID
-            
         message: str
             Mensagem do log (pode ser texto longo)
-            
+
+        execution_id: Optional[int]
+            ID da execução. Se não informado, usa a execução atual iniciada
+            com start_execution.
+
         log_level: str
-            Nível do log: 'debug', 'info', 'warning', 'error', 'critical', 'success'
-            Default: 'info'
-            
+            Nível do log (use as constantes LOG_LEVEL_* da classe).
+            Default: LOG_LEVEL_INFO
+
         step_name: Optional[str]
             Nome da etapa/step (ex: "Etapa 1", "Fase 2", "Validação")
-            
+
         Returns:
         --------
         int: ID do log criado
-        Adiciona um log à execução.        -----------
-        execution_id: int
-            Execution ID
-            
+
+        pt-br
+        -----------
+        Adiciona um log à execução.
+
+        Parâmetros:
+        -----------
         message: str
             Mensagem do log (pode ser texto longo)
-            
+
+        execution_id: Optional[int]
+            ID da execução. Se não informado, usa a execução atual iniciada
+            com start_execution.
+
         log_level: str
-            Nível do log: 'debug', 'info', 'warning', 'error', 'critical', 'success'
-            Padrão: 'info'
-            
+            Nível do log (use as constantes LOG_LEVEL_* da classe).
+            Padrão: LOG_LEVEL_INFO
+
         step_name: Optional[str]
             Nome da etapa/step (ex: "Etapa 1", "Fase 2", "Validação")
-            
+
         Retorna:
         --------
         int: ID do log criado
         """
         try:
-            if log_level not in ['debug', 'info', 'warning', 'error', 'critical', 'success']:
-                raise DatabaseError(f"Invalid log level: {log_level}")
-            
+            if log_level not in self.VALID_LOG_LEVELS:
+                raise DatabaseError(f"Nível de log inválido: {log_level}")
+
+            resolved_execution_id = execution_id or self._current_execution_id
+            if not resolved_execution_id:
+                raise DatabaseError(
+                    "execution_id não informado e nenhuma execução ativa encontrada. "
+                    "Execute start_execution() antes de adicionar logs ou informe execution_id."
+                )
+
             now = datetime.now()
-            
+            # nosec B608
             query = f"""
                 INSERT INTO {self.logs_table}
                 (execution_id, log_level, step_name, message, timestamp)
                 VALUES (?, ?, ?, ?, ?)
             """
-            
-            cursor = self._adapter.execute_query(
-                query,
-                (execution_id, log_level, step_name, message, now)
-            )
-            
+
+            cursor = self._adapter.execute_query(query, (resolved_execution_id, log_level, step_name, message, now))
+
             log_id = self._adapter.get_last_insert_id(cursor, self.logs_table)
             self._adapter.commit()
-            
+
             # Se log_instance foi fornecido, dispara também no objeto Log
             if self.log_instance is not None:
                 try:
@@ -2786,11 +3264,11 @@ class Database:
                     formatted_message = message
                     if step_name:
                         formatted_message = f"[{step_name}] {message}"
-                    
+
                     # Captura o frame do arquivo que chamou add_log() (não do database.py)
                     caller_frame = None
                     current_file = os.path.normpath(__file__)
-                    
+
                     # Percorre a pilha de chamadas para encontrar o primeiro frame que não é do database.py
                     # Começa do frame atual (add_log) e vai para trás
                     frame = inspect.currentframe()
@@ -2803,7 +3281,7 @@ class Database:
                             if frame_file != current_file:
                                 caller_frame = frame
                                 break
-                    
+
                     # Se encontrou o caller, extrai filename e lineno
                     if caller_frame:
                         full_path_filename = caller_frame.f_code.co_filename
@@ -2812,196 +3290,254 @@ class Database:
                         file_name = os.path.basename(full_path_filename)
                         display_filename = f"{parent_folder}/{file_name}"
                         caller_lineno = caller_frame.f_lineno
-                        
+
                         # Mapeia níveis do Database para níveis do Log
                         log_level_mapping = {
-                            'debug': 'DEBUG',
-                            'info': 'INFO',
-                            'warning': 'WARNING',
-                            'error': 'ERROR',
-                            'critical': 'CRITICAL',
-                            'success': 'INFO'  # success usa INFO no Log
+                            self.LOG_LEVEL_DEBUG: "DEBUG",
+                            self.LOG_LEVEL_INFO: "INFO",
+                            self.LOG_LEVEL_WARNING: "WARNING",
+                            self.LOG_LEVEL_ERROR: "ERROR",
+                            self.LOG_LEVEL_CRITICAL: "CRITICAL",
+                            self.LOG_LEVEL_SUCCESS: "INFO",  # success usa INFO no Log
                         }
-                        
+
                         # Usa _log_with_context para passar o contexto correto
-                        log_level = log_level_mapping.get(log_level, 'INFO')
+                        log_level = log_level_mapping.get(log_level, "INFO")
                         self.log_instance._log_with_context(
-                            level=log_level,
-                            msg=formatted_message,
-                            filename=display_filename,
-                            lineno=caller_lineno
+                            level=log_level, msg=formatted_message, filename=display_filename, lineno=caller_lineno
                         )
                     else:
                         # Fallback: se não encontrou o caller, usa os métodos normais
                         log_level_mapping = {
-                            'debug': self.log_instance.log_debug,
-                            'info': self.log_instance.log_info,
-                            'warning': self.log_instance.log_warning,
-                            'error': self.log_instance.log_error,
-                            'critical': self.log_instance.log_critical,
-                            'success': self.log_instance.log_info  # success usa info no Log
+                            self.LOG_LEVEL_DEBUG: self.log_instance.log_debug,  # type: ignore
+                            self.LOG_LEVEL_INFO: self.log_instance.log_info,  # type: ignore
+                            self.LOG_LEVEL_WARNING: self.log_instance.log_warning,  # type: ignore
+                            self.LOG_LEVEL_ERROR: self.log_instance.log_error,  # type: ignore
+                            self.LOG_LEVEL_CRITICAL: self.log_instance.log_critical,  # type: ignore
+                            self.LOG_LEVEL_SUCCESS: self.log_instance.log_info,  # type: ignore # success usa info no Log
                         }
-                        
+
                         # Chama o método correspondente do Log
                         log_method = log_level_mapping.get(log_level, self.log_instance.log_info)
-                        log_method(formatted_message)
-                    
-                except Exception as log_error:
+                        log_method(formatted_message)  # type: ignore
+
+                except Exception as log_error: # nosec B110
                     # Não falha se o log externo falhar, apenas registra silenciosamente
                     # Isso evita que problemas no Log externo quebrem o fluxo principal
                     pass
-            
+
             return log_id
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error adding log: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao adicionar log: {str(e)}.") from e
+
+    def add_log_debug(self, message: str, execution_id: Optional[int] = None, step_name: Optional[str] = None) -> int:
+        """Adiciona log com nível DEBUG."""
+        return self.add_log(
+            message=message, execution_id=execution_id, log_level=self.LOG_LEVEL_DEBUG, step_name=step_name
+        )
+
+    def add_log_info(self, message: str, execution_id: Optional[int] = None, step_name: Optional[str] = None) -> int:
+        """Adiciona log com nível INFO."""
+        return self.add_log(
+            message=message, execution_id=execution_id, log_level=self.LOG_LEVEL_INFO, step_name=step_name
+        )
+
+    def add_log_warn(self, message: str, execution_id: Optional[int] = None, step_name: Optional[str] = None) -> int:
+        """Adiciona log com nível WARNING."""
+        return self.add_log(
+            message=message, execution_id=execution_id, log_level=self.LOG_LEVEL_WARNING, step_name=step_name
+        )
+
+    def add_log_warning(self, message: str, execution_id: Optional[int] = None, step_name: Optional[str] = None) -> int:
+        """Alias de add_log_warn para nível WARNING."""
+        return self.add_log_warn(message=message, execution_id=execution_id, step_name=step_name)
+
+    def add_log_error(self, message: str, execution_id: Optional[int] = None, step_name: Optional[str] = None) -> int:
+        """Adiciona log com nível ERROR."""
+        return self.add_log(
+            message=message, execution_id=execution_id, log_level=self.LOG_LEVEL_ERROR, step_name=step_name
+        )
+
+    def add_log_critical(
+        self, message: str, execution_id: Optional[int] = None, step_name: Optional[str] = None
+    ) -> int:
+        """Adiciona log com nível CRITICAL."""
+        return self.add_log(
+            message=message, execution_id=execution_id, log_level=self.LOG_LEVEL_CRITICAL, step_name=step_name
+        )
+
+    def add_log_success(self, message: str, execution_id: Optional[int] = None, step_name: Optional[str] = None) -> int:
+        """Adiciona log com nível SUCCESS."""
+        return self.add_log(
+            message=message, execution_id=execution_id, log_level=self.LOG_LEVEL_SUCCESS, step_name=step_name
+        )
 
     def get_logs(
         self,
-        execution_id: int,
+        execution_id: Optional[int] = None,
         log_level: Optional[str] = None,
         step_name: Optional[str] = None,
         limit: Optional[int] = None,
-        order_desc: bool = True
+        order_desc: bool = True,
     ) -> List[Dict[str, Any]]:
         """
         Busca logs de uma execução.
-        
+
         Parameters:
         -----------
-        execution_id: int
-            Execution ID
-            
+        execution_id: Optional[int]
+            ID da execução. Se não informado, usa a execução atual iniciada
+            com start_execution.
+
         log_level: Optional[str]
             Filtrar por nível de log
-            
+
         step_name: Optional[str]
             Filtrar por nome da etapa
-            
+
         limit: Optional[int]
             Limitar número de resultados
-            
+
         order_desc: bool
             Se True, ordena por timestamp DESC (mais recentes primeiro)
             Se False, ordena por timestamp ASC (mais antigos primeiro)
             Default: True
-            
+
         Returns:
         --------
         List[Dict[str, Any]]: Lista de logs
-        Busca logs de uma execução.        -----------
-        execution_id: int
-            Execution ID
-            
+
+        pt-br
+        -----------
+        Busca logs de uma execução.
+
+        Parâmetros:
+        -----------
+        execution_id: Optional[int]
+            ID da execução. Se não informado, usa a execução atual iniciada
+            com start_execution.
+
         log_level: Optional[str]
             Filtrar por nível de log
-            
+
         step_name: Optional[str]
             Filtrar por nome da etapa
-            
+
         limit: Optional[int]
             Limitar número de resultados
-            
+
         order_desc: bool
             Se True, ordena por timestamp DESC (mais recentes primeiro)
             Se False, ordena por timestamp ASC (mais antigos primeiro)
             Padrão: True
-            
+
         Retorna:
         --------
         List[Dict[str, Any]]: Lista de logs
         """
         try:
+            resolved_execution_id = execution_id or self._current_execution_id
+            if not resolved_execution_id:
+                raise DatabaseError(
+                    "execution_id não informado e nenhuma execução ativa encontrada. "
+                    "Execute start_execution() antes de buscar logs ou informe execution_id."
+                )
+            # nosec B608
             query = f"SELECT * FROM {self.logs_table} WHERE execution_id = ?"
-            params = [execution_id]
-            
+            params = [resolved_execution_id]
+
             if log_level:
                 query += " AND log_level = ?"
-                params.append(log_level)
-            
+                params.append(log_level)  # type: ignore
+
             if step_name:
                 query += " AND step_name = ?"
-                params.append(step_name)
-            
+                params.append(step_name)  # type: ignore
+
             query += f" ORDER BY timestamp {'DESC' if order_desc else 'ASC'}"
-            
+
             if limit:
                 query += f" LIMIT {limit}"
-            
+
             cursor = self._adapter.execute_query(query, tuple(params))
             rows = cursor.fetchall()
-            
+
             if self.db_type == DatabaseType.SQLITE:
                 return [dict(row) for row in rows]
             else:
-                return [dict(row) if hasattr(row, 'keys') else row for row in rows]
-            
+                return [dict(row) if hasattr(row, "keys") else row for row in rows]
+
         except Exception as e:
-            raise DatabaseError(f"Error fetching logs: {str(e)}.") from e
+            raise DatabaseError(f"Erro ao buscar logs: {str(e)}.") from e
 
     def clear_logs(
         self,
         execution_id: Optional[int] = None,
         log_level: Optional[str] = None,
         older_than_days: Optional[int] = None,
-        confirm: bool = False
+        confirm: bool = False,
     ) -> int:
         """
         Remove logs.
-        
+
         Parameters:
         -----------
         execution_id: Optional[int]
-            Execution ID. If None, clears from all executions.
-            
+            ID da execução. Se None, limpa de todas.
+
         log_level: Optional[str]
             Filtrar por nível de log
-            
+
         older_than_days: Optional[int]
             Remove apenas logs mais antigos que X dias
-            
+
         confirm: bool
             Deve ser True para executar (proteção contra limpeza acidental)
-            
+
         Returns:
         --------
         int: Número de logs removidos
-        Remove logs.        -----------
+
+        pt-br
+        -----------
+        Remove logs.
+
+        Parâmetros:
+        -----------
         execution_id: Optional[int]
-            Execution ID. If None, clears from all executions.
-            
+            ID da execução. Se None, limpa de todas.
+
         log_level: Optional[str]
             Filtrar por nível de log
-            
+
         older_than_days: Optional[int]
             Remove apenas logs mais antigos que X dias
-            
+
         confirm: bool
             Deve ser True para executar (proteção contra limpeza acidental)
-            
+
         Retorna:
         --------
         int: Número de logs removidos
         """
         if not confirm:
-            raise DatabaseError(
-                "Esta operação remove logs permanentemente! "
-                "Passe confirm=True para executar."
-            )
-        
-        try:
+            raise DatabaseError("Esta operação remove logs permanentemente! " "Passe confirm=True para executar.")
+
+        try: # nosec B608
             query = f"DELETE FROM {self.logs_table} WHERE 1=1"
             params = []
-            
-            if execution_id:
+            resolved_execution_id = execution_id or self._current_execution_id
+
+            if resolved_execution_id:
                 query += " AND execution_id = ?"
-                params.append(execution_id)
-            
+                params.append(resolved_execution_id)
+
             if log_level:
                 query += " AND log_level = ?"
-                params.append(log_level)
-            
+                params.append(log_level)  # type: ignore
+
             if older_than_days:
                 if self.db_type == DatabaseType.SQLITE:
                     query += " AND timestamp < datetime('now', '-' || ? || ' days')"
@@ -3010,14 +3546,13 @@ class Database:
                     query += f" AND timestamp < NOW() - INTERVAL '{older_than_days} days'"
                 elif self.db_type == DatabaseType.MYSQL:
                     query += f" AND timestamp < DATE_SUB(NOW(), INTERVAL {older_than_days} DAY)"
-            
+
             cursor = self._adapter.execute_query(query, tuple(params) if params else None)
-            
-            count = cursor.rowcount if hasattr(cursor, 'rowcount') else 0
+
+            count = cursor.rowcount if hasattr(cursor, "rowcount") else 0
             self._adapter.commit()
             return count
-            
+
         except Exception as e:
             self._adapter.rollback()
-            raise DatabaseError(f"Error clearing logs: {str(e)}.") from e
-
+            raise DatabaseError(f"Erro ao limpar logs: {str(e)}.") from e

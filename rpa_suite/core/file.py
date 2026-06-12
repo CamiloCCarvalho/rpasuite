@@ -31,10 +31,33 @@ class File:
         >>> from rpa_suite.core.file import File
         >>> file_util = File()
         >>> file_util.screen_shot('example')
+
+    pt-br:
+    Classe para utilidades de gerenciamento de arquivos: criar/excluir arquivos de flag, contar arquivos em diretórios e tirar screenshots.
+
+    Exemplo:
+        >>> from rpa_suite.core.file import File
+        >>> file_util = File()
+        >>> file_util.screen_shot('exemplo')
     """
 
     def __init__(self):
-        """Initialize the File class for file management utilities."""
+        """
+        Class for file management utilities: create/delete flag files, count files in directories, and take screenshots.
+
+        Example:
+            >>> from rpa_suite.core.file import File
+            >>> file_util = File()
+            >>> file_util.screen_shot('example')
+
+        pt-br:
+        Classe para utilidades de gerenciamento de arquivos: criar/excluir arquivos de flag, contar arquivos em diretórios e tirar screenshots.
+
+        Exemplo:
+            >>> from rpa_suite.core.file import File
+            >>> file_util = File()
+            >>> file_util.screen_shot('exemplo')
+        """
         try:
             self.__create_ss_dir = create_ss_dir
         except Exception as e:
@@ -53,46 +76,16 @@ class File:
         """
         Takes a screenshot and saves it to a directory. By default, uses the current date in the filename.
 
-        Parameters:
-        -----------
-        file_name : str, optional
-            Base name for the screenshot file. Default: "screenshot".
-
-        path_dir : str | None, optional
-            Path where the screenshot should be saved. If None, uses default screenshot directory.
-            Default: None.
-
-        save_with_date : bool, optional
-            Whether to append current date and time to the filename. Default: True.
-
-        delay : int, optional
-            Delay in seconds before taking the screenshot. Default: 1.
-
-        use_default_path_and_name : bool, optional
-            Whether to use default path and directory name. Default: True.
-
-        name_ss_dir : str | None, optional
-            Name of the screenshot directory if not using default. Default: None.
-
-        verbose : bool, optional
-            Whether to print the file path after saving. Default: False.
-
-        Returns:
-        --------
-        str | None
-            Path to the saved screenshot file, or None if an error occurred.
-
-        Raises:
-        -------
-        FileError
-            If there is an error taking or saving the screenshot.
-        ImportError
-            If pyautogui or Pillow libraries are not installed.
-
         Example:
-        --------
-        >>> file_util = File()
-        >>> file_util.screen_shot('my_screenshot', save_with_date=True)
+            >>> file_util = File()
+            >>> file_util.screen_shot('my_screenshot', save_with_date=True)
+
+        pt-br:
+        Tira uma captura de tela e salva em um diretório. Por padrão, usa a data atual no nome do arquivo.
+
+        Exemplo:
+            >>> file_util = File()
+            >>> file_util.screen_shot('minha_captura', save_with_date=True)
         """
 
         # proccess
@@ -150,26 +143,16 @@ class File:
         """
         Creates a flag file to indicate the robot is running.
 
-        Parameters:
-        -----------
-        name_file : str, optional
-            Name of the flag file to create. Default: "running.flag".
+        Example:
+            >>> file_util = File()
+            >>> file_util.flag_create('my.flag')
 
-        path_to_create : str | None, optional
-            Path where the flag file should be created. If None, uses current directory.
-            Default: None.
+        pt-br:
+        Cria um arquivo de flag para indicar que o robô está em execução.
 
-        verbose : bool, optional
-            Whether to print success messages. Default: True.
-
-        Returns:
-        --------
-        None
-
-        Raises:
-        -------
-        FileError
-            If there is an error creating the flag file.
+        Exemplo:
+            >>> file_util = File()
+            >>> file_util.flag_create('meu.flag')
         """
 
         try:
@@ -196,26 +179,16 @@ class File:
         """
         Deletes the flag file to indicate the robot has finished.
 
-        Parameters:
-        -----------
-        name_file : str, optional
-            Name of the flag file to delete. Default: "running.flag".
+        Example:
+            >>> file_util = File()
+            >>> file_util.flag_delete('my.flag')
 
-        path_to_delete : str | None, optional
-            Path where the flag file is located. If None, uses current directory.
-            Default: None.
+        pt-br:
+        Exclui o arquivo de flag para indicar que o robô terminou.
 
-        verbose : bool, optional
-            Whether to print success messages. Default: True.
-
-        Returns:
-        --------
-        None
-
-        Raises:
-        -------
-        FileError
-            If there is an error deleting the flag file.
+        Exemplo:
+            >>> file_util = File()
+            >>> file_util.flag_delete('meu.flag')
         """
 
         try:
@@ -245,36 +218,16 @@ class File:
         """
         Counts files in one or more directories, optionally filtering by extension.
 
-        Parameters:
-        -----------
-        dir_to_count : list[str] | None, optional
-            List of directory paths to count files in. If None or empty, counts in current directory.
-            Default: None.
-
-        type_extension : str, optional
-            File extension to filter by (e.g., 'txt', 'pdf'). Use "*" to count all files.
-            Default: "*".
-
-        verbose : bool, optional
-            Whether to print the count result. Default: False.
-
-        Returns:
-        --------
-        dict[str, Union[bool, int]]
-            Dictionary containing:
-            - 'success' (bool): Indicates if the count was performed successfully
-            - 'qt' (int): Total number of files counted
-
-        Raises:
-        -------
-        FileError
-            If there is an error counting files.
-
         Example:
-        --------
-        >>> file_util = File()
-        >>> result = file_util.count_files(['./myfolder'], type_extension='txt')
-        >>> print(result['qt'])  # Number of .txt files found
+            >>> file_util = File()
+            >>> file_util.count_files(['./myfolder'], type_extension='txt')
+
+        pt-br:
+        Conta arquivos em um ou mais diretórios, podendo filtrar por extensão.
+
+        Exemplo:
+            >>> file_util = File()
+            >>> file_util.count_files(['./minhapasta'], type_extension='txt')
         """
 
         # Local Variables

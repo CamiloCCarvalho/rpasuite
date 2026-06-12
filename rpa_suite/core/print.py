@@ -8,7 +8,7 @@ class PrintError(Exception):
     """Custom exception for Print errors."""
 
     def __init__(self, message):
-        super().__init__(f"Print Error: {message}")
+        super().__init__(f"PrintError: {message}")
 
 
 # Windows bash colors
@@ -50,7 +50,23 @@ class Print:
     colors: Colors = Colors
 
     def __init__(self) -> None:
-        """Initialize the Print class for formatted console output."""
+        """
+        Class that provides methods for formatted printing in the console, allowing for different types of messages to be displayed with specific colors.
+
+        This class offers functionalities for:
+            - Printing success messages in green
+            - Printing alert messages in yellow
+            - Printing information messages in cyan
+            - Printing error messages in red
+            - Additional printing methods for other message types
+
+        The Print class is part of the RPA Suite and can be used to enhance the visibility of console outputs.
+
+        Example:
+        ----------
+            >>> from rpa_suite import rpa
+            >>> rpa.alert_print('Hello World')
+        """
 
     def success_print(self, string_text: str, color=Colors.green, ending="\n") -> None:
         """
@@ -58,18 +74,18 @@ class Print:
 
         Parameters:
         -----------
-        string_text : str
+        ``string_text: str``
             The text to be printed.
 
-        color : str, optional
-            The color to use for printing. Default: Colors.green.
+        ``color``
+            The color to use for printing. Default is green.
 
-        ending : str, optional
-            The string appended after the text. Default: "\\n".
+        ``ending: str``
+            The string appended after the text. Default is newline.
 
-        Returns:
-        --------
-        None
+        Return:
+        ----------
+            >>> type: None
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
@@ -79,18 +95,18 @@ class Print:
 
         Parameters:
         -----------
-        string_text : str
+        ``string_text: str``
             The text to be printed.
 
-        color : str, optional
-            The color to use for printing. Default: Colors.yellow.
+        ``color``
+            The color to use for printing. Default is yellow.
 
-        ending : str, optional
-            The string appended after the text. Default: "\\n".
+        ``ending: str``
+            The string appended after the text. Default is newline.
 
-        Returns:
-        --------
-        None
+        Return:
+        ----------
+            >>> type: None
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
@@ -100,18 +116,18 @@ class Print:
 
         Parameters:
         -----------
-        string_text : str
+        ``string_text: str``
             The text to be printed.
 
-        color : str, optional
-            The color to use for printing. Default: Colors.cyan.
+        ``color``
+            The color to use for printing. Default is cyan.
 
-        ending : str, optional
-            The string appended after the text. Default: "\\n".
+        ``ending: str``
+            The string appended after the text. Default is newline.
 
-        Returns:
-        --------
-        None
+        Return:
+        ----------
+            >>> type: None
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
@@ -121,18 +137,18 @@ class Print:
 
         Parameters:
         -----------
-        string_text : str
+        ``string_text: str``
             The text to be printed.
 
-        color : str, optional
-            The color to use for printing. Default: Colors.red.
+        ``color``
+            The color to use for printing. Default is red.
 
-        ending : str, optional
-            The string appended after the text. Default: "\\n".
+        ``ending: str``
+            The string appended after the text. Default is newline.
 
-        Returns:
-        --------
-        None
+        Return:
+        ----------
+            >>> type: None
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
@@ -142,18 +158,18 @@ class Print:
 
         Parameters:
         -----------
-        string_text : str
+        ``string_text: str``
             The text to be printed.
 
-        color : str, optional
-            The color to use for printing. Default: Colors.magenta.
+        ``color``
+            The color to use for printing. Default is magenta.
 
-        ending : str, optional
-            The string appended after the text. Default: "\\n".
+        ``ending: str``
+            The string appended after the text. Default is newline.
 
-        Returns:
-        --------
-        None
+        Return:
+        ----------
+            >>> type: None
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
@@ -163,18 +179,18 @@ class Print:
 
         Parameters:
         -----------
-        string_text : str
+        ``string_text: str``
             The text to be printed.
 
-        color : str, optional
-            The color to use for printing. Default: Colors.blue.
+        ``color``
+            The color to use for printing. Default is blue.
 
-        ending : str, optional
-            The string appended after the text. Default: "\\n".
+        ``ending: str``
+            The string appended after the text. Default is newline.
 
-        Returns:
-        --------
-        None
+        Return:
+        ----------
+            >>> type: None
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
@@ -185,18 +201,18 @@ class Print:
 
         Parameters:
         -----------
-        string_text : str
+        ``string_text: str``
             The text to be printed.
 
-        color : str, optional
-            The color to use for printing. Default: Colors.call_fn.
+        ``color``
+            The color to use for printing. Default is light magenta.
 
-        ending : str, optional
-            The string appended after the text. Default: "\\n".
+        ``ending: str``
+            The string appended after the text. Default is newline.
 
-        Returns:
-        --------
-        None
+        Return:
+        ----------
+            >>> type: None
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)
 
@@ -207,17 +223,17 @@ class Print:
 
         Parameters:
         -----------
-        string_text : str
+        ``string_text: str``
             The text to be printed.
 
-        color : str, optional
-            The color to use for printing. Default: Colors.retur_fn.
+        ``color``
+            The color to use for printing. Default is light yellow.
 
-        ending : str, optional
-            The string appended after the text. Default: "\\n".
+        ``ending: str``
+            The string appended after the text. Default is newline.
 
-        Returns:
-        --------
-        None
+        Return:
+        ----------
+            >>> type: None
         """
         print(f"{color}{string_text}{Colors.default}", end=ending)

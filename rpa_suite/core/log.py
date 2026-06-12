@@ -87,7 +87,7 @@ class CustomHandler:
 
     def write(self, message) -> None:
         try:
-            frame = inspect.currentframe().f_back.f_back
+            frame = inspect.currentframe().f_back.f_back  # type: ignore
             log_msg = self.formatter.format(message, frame)
             sys.stderr.write(log_msg)
         except Exception as e:
@@ -137,14 +137,14 @@ class Log:
         try:
             self.logger = logger
         except Exception as e:
-            raise LogError(f"Error trying execute: {self.__init__.__name__}! {str(e)}.") from e
+            raise LogError(f"Error trying execute: {self.__init__.__name__}! {str(e)}.") from e  # type: ignore
 
     def config_logger(  # pylint: disable=too-many-positional-arguments
         self,
         path_dir: str = "default",
         name_log_dir: str = "logs",
         name_file_log: str = "log",
-        filter_words: list[str] = None,
+        filter_words: list[str] = None,  # type: ignore
         verbose: bool = False,
         enable_traceback: bool = False,
     ) -> str:
@@ -183,7 +183,7 @@ class Log:
             new_filter = None
             if filter_words is not None:
                 new_filter = Filters()
-                new_filter.word_filter = [filter_words]
+                new_filter.word_filter = [filter_words]  # type: ignore
 
             file_handler = os.path.join(self.full_path, f"{self.name_file_log}.log")
             self.logger.remove()
@@ -193,7 +193,7 @@ class Log:
             formatter = CustomFormatter()
 
             if new_filter:
-                self.logger.add(file_handler, filter=new_filter, level="DEBUG", format=log_format)
+                self.logger.add(file_handler, filter=new_filter, level="DEBUG", format=log_format)  # type: ignore
             else:
                 self.logger.add(file_handler, level="DEBUG", format=log_format)
 
@@ -217,22 +217,22 @@ class Log:
 
     def _log(self, level: str, msg: str, custom_filename: Op[str] = None, custom_lineno: Op[int] = None) -> None:
         """
-        Method to generate logs used internally.
+        Method to generate logs used from self.
 
         Parameters:
         -----------
-        level : str
+        level: str
             Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 
-        msg : str
+        msg: str
             Message to log
 
-        custom_filename : Optional[str]
-            Custom filename to display (optional, used when called via Database)
-            Expected format: "folder/file.py" or "file.py"
+        custom_filename: Optional[str]
+            Custom filename to display (opcional, usado quando chamado via Database)
+            Formato esperado: "pasta/arquivo.py" ou "arquivo.py"
 
-        custom_lineno : Optional[int]
-            Custom line number to display (optional, used when called via Database)
+        custom_lineno: Optional[int]
+            Custom line number to display (opcional, usado quando chamado via Database)
         """
         try:
             # Se filename e lineno customizados foram fornecidos, usa eles
@@ -251,14 +251,14 @@ class Log:
 
                 if not frame:
                     # Fallback if we can't find external caller
-                    frame = inspect.currentframe().f_back.f_back
+                    frame = inspect.currentframe().f_back.f_back  # type: ignore
 
-                full_path_filename = frame.f_code.co_filename
+                full_path_filename = frame.f_code.co_filename  # type: ignore
                 full_path_filename = os.path.normpath(full_path_filename)
                 parent_folder = os.path.basename(os.path.dirname(full_path_filename))
                 file_name = os.path.basename(full_path_filename)
                 display_filename = f"{parent_folder}/{file_name}"
-                lineno = frame.f_lineno
+                lineno = frame.f_lineno  # type: ignore
 
             # IF TRACEBACK IS ENABLED AND IT'S ERROR LEVEL, ADD TRACEBACK
             if self.enable_traceback and level in ["ERROR", "CRITICAL"]:
@@ -269,7 +269,7 @@ class Log:
                         # ESCAPE SPECIAL CHARACTERS IN TRACEBACK
                         escaped_traceback = self._escape_traceback(tb_string)
                         msg = f"{msg}\n{escaped_traceback}"
-                except Exception:
+                except Exception: # nosec B110
                     # If can't capture traceback, continue normally
                     pass
 
@@ -279,24 +279,45 @@ class Log:
 
     def _log_with_context(self, level: str, msg: str, filename: str, lineno: int) -> None:
         """
-        Helper method for log with custom context (used by Database).
+        Método auxiliar para log com contexto customizado (usado pelo Database).
 
-        Allows Database to pass the filename and lineno of the file that called add_log(),
-        instead of the filename/lineno from database.py.
+        Permite que o Database passe o filename e lineno do arquivo que chamou add_log(),
+        ao invés do filename/lineno do database.py.
 
         Parameters:
         -----------
-        level : str
+        level: str
             Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 
-        msg : str
+        msg: str
             Message to log
 
-        filename : str
-            Filename to display (format: "folder/file.py" or "file.py")
+        filename: str
+            Filename to display (formato: "pasta/arquivo.py" ou "arquivo.py")
 
-        lineno : int
+        lineno: int
             Line number to display
+
+        pt-br
+        -----------
+        Método auxiliar para log com contexto customizado (usado pelo Database).
+
+        Permite que o Database passe o filename e lineno do arquivo que chamou add_log(),
+        ao invés do filename/lineno do database.py.
+
+        Parâmetros:
+        -----------
+        level: str
+            Nível do log (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+
+        msg: str
+            Mensagem para logar
+
+        filename: str
+            Nome do arquivo para exibir (formato: "pasta/arquivo.py" ou "arquivo.py")
+
+        lineno: int
+            Número da linha para exibir
         """
         self._log(level, msg, custom_filename=filename, custom_lineno=lineno)
 
@@ -305,7 +326,7 @@ class Log:
         Log a debug message to start a new run session.
         """
         try:
-            with open(self.file_handler, "a", encoding="utf-8") as log_file:
+            with open(self.file_handler, "a", encoding="utf-8") as log_file:  # type: ignore
                 log_file.write("\n")
             self._log("DEBUG", msg_start_loggin)
         except Exception as e:

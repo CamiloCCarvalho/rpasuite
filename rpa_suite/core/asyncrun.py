@@ -27,7 +27,12 @@ class AsyncRunner(Generic[T]):
     """
 
     def __init__(self) -> None:
-        """Start AsyncRunner."""
+        """
+        Class to execute asynchronous functions while maintaining the main application flow.
+
+        Allows executing asynchronous functions and retrieving their results later.
+        Optimized for I/O bound operations (network, files, etc).
+        """
         self._task = None
         self._start_time = None
         self._result = {}
