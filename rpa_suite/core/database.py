@@ -219,12 +219,10 @@ class SQLiteAdapter(DatabaseAdapter):
 
     def get_table_exists_query(self, table_name: str) -> str:
         """Query para verificar se tabela existe no SQLite."""
-        # nosec B608
         return f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'"
 
     def escape_table_name(self, table_name: str) -> str:
         """SQLite não precisa escapar com backticks."""
-        # nosec B608
         return table_name
 
 
@@ -323,7 +321,6 @@ class PostgreSQLAdapter(DatabaseAdapter):
 
     def get_table_exists_query(self, table_name: str) -> str:
         """Query para verificar se tabela existe no PostgreSQL."""
-        # nosec B608
         return f"""
             SELECT EXISTS (
                 SELECT FROM information_schema.tables 
@@ -422,7 +419,6 @@ class MySQLAdapter(DatabaseAdapter):
 
     def get_table_exists_query(self, table_name: str) -> str:
         """Query para verificar se tabela existe no MySQL."""
-        # nosec B608
         return f"""
             SELECT EXISTS (
                 SELECT 1 FROM information_schema.tables 
@@ -1051,7 +1047,7 @@ class Database:
             for index_sql in create_indexes:
                 try:
                     self._adapter.execute_query(index_sql)
-                except Exception: # nosec B110
+                except Exception:
                     # Índice pode já existir, ignorar
                     pass
 
@@ -1065,7 +1061,7 @@ class Database:
         if self._current_execution_id:
             try:
                 self._mark_execution_interrupted(self._current_execution_id)
-            except Exception: # nosec B110
+            except Exception:
                 pass
 
     def _handle_signal(self, signum, frame) -> None:
@@ -1073,13 +1069,12 @@ class Database:
         if self._current_execution_id:
             try:
                 self._mark_execution_interrupted(self._current_execution_id)
-            except Exception: # nosec B110
+            except Exception:
                 pass
 
     def _mark_execution_interrupted(self, execution_id: int) -> None:
         """Marca execução como interrompida."""
         try:
-            # nosec B608
             query = f"""
                 UPDATE {self.executions_table}
                 SET status = 'interrupted', finished_properly = 0
@@ -1087,7 +1082,7 @@ class Database:
             """
             self._adapter.execute_query(query, (execution_id,))
             self._adapter.commit()
-        except Exception: # nosec B110
+        except Exception:
             pass
 
     # ========== MÉTODOS DE EXECUÇÃO ==========
@@ -1136,7 +1131,6 @@ class Database:
             metadata_str = json.dumps(metadata) if metadata else None
             now = datetime.now()
 
-            # nosec B608
             query = f"""
                 INSERT INTO {self.executions_table}
                 (execution_id, automation_name, status, started_at, metadata)
@@ -1215,7 +1209,6 @@ class Database:
             execution_time = (finished_at - started_at).total_seconds()
 
             # Busca contadores de itens
-            # nosec B608
             items_query = f"""
                 SELECT 
                     COUNT(*) as total,
@@ -1233,7 +1226,6 @@ class Database:
             failed_items = items_result[2] if items_result else 0
             interrupted_items = items_result[3] if items_result else 0
 
-            # nosec B608
             query = f"""
                 UPDATE {self.executions_table}
                 SET status = ?,
@@ -1301,7 +1293,6 @@ class Database:
         Optional[Dict[str, Any]]: Dados da execução ou None
         """
         try:
-            # nosec B608
             query = f"SELECT * FROM {self.executions_table} WHERE id = ?"
             cursor = self._adapter.execute_query(query, (execution_id,))
             row = cursor.fetchone()
@@ -1357,7 +1348,6 @@ class Database:
         List[Dict[str, Any]]: Lista de execuções
         """
         try:
-            # nosec B608
             query = f"SELECT * FROM {self.executions_table} WHERE 1=1"
             params = []
 
@@ -1402,7 +1392,6 @@ class Database:
         List[int]: Lista de IDs de execuções marcadas como interrompidas
         """
         try:
-            # nosec B608
             query = f"""
                 UPDATE {self.executions_table}
                 SET status = 'interrupted', finished_properly = 0
@@ -1412,7 +1401,6 @@ class Database:
             self._adapter.execute_query(query)
 
             # Busca IDs atualizados
-            # nosec B608
             query_ids = f"""
                 SELECT id FROM {self.executions_table}
                 WHERE status = 'interrupted' AND finished_properly = 0
@@ -1503,7 +1491,6 @@ class Database:
         """
         try:
             # Calcula próxima posição na fila
-            # nosec B608
             queue_query = f"""
                 SELECT COALESCE(MAX(queue_position), 0) + 1 as next_pos
                 FROM {self.items_table}
@@ -1516,7 +1503,6 @@ class Database:
             item_data_str = json.dumps(item_data) if item_data else None
             schema_str = json.dumps(processing_schema) if processing_schema else None
 
-            # nosec B608
             query = f"""
                 INSERT INTO {self.items_table}
                 (execution_id, item_identifier, status, priority, queue_position, 
@@ -1531,7 +1517,6 @@ class Database:
             item_id = self._adapter.get_last_insert_id(cursor, self.items_table)
 
             # Atualiza contador total de itens na execução
-            # nosec B608
             update_query = f"""
                 UPDATE {self.executions_table}
                 SET total_items = total_items + 1
@@ -1643,7 +1628,6 @@ class Database:
                 return []
 
             # Calcula posição inicial na fila
-            # nosec B608
             queue_query = f"""
                 SELECT COALESCE(MAX(queue_position), 0) as max_pos
                 FROM {self.items_table}
@@ -1671,7 +1655,6 @@ class Database:
                 )
 
             # Insere todos os itens em batch
-            # nosec B608
             query = f"""
                 INSERT INTO {self.items_table}
                 (execution_id, item_identifier, status, priority, queue_position, 
@@ -1683,7 +1666,6 @@ class Database:
 
             # Busca os IDs dos itens recém-inseridos usando queue_position
             # Busca todos os itens inseridos nesta execução com queue_position >= start_position
-            # nosec B608
             id_query = f"""
                 SELECT id FROM {self.items_table}
                 WHERE execution_id = ? AND queue_position >= ?
@@ -1700,7 +1682,6 @@ class Database:
                 item_ids = [(row[0] if isinstance(row, tuple) else row["id"]) for row in id_results]
 
             # Atualiza contador total de itens na execução (uma única vez)
-            # nosec B608
             update_query = f"""
                 UPDATE {self.executions_table}
                 SET total_items = total_items + ?
@@ -1761,7 +1742,6 @@ class Database:
             if include_interrupted:
                 status_filter = "('pending', 'queued', 'interrupted')"
 
-            # nosec B608
             query = f"""
                 SELECT * FROM {self.items_table}
                 WHERE execution_id = ? AND status IN {status_filter}
@@ -1809,7 +1789,6 @@ class Database:
         bool: True se sucesso
         """
         try:
-            # nosec B608
             query = f"""
                 UPDATE {self.items_table}
                 SET status = 'processing', started_at = ?
@@ -1857,7 +1836,6 @@ class Database:
         bool: True se sucesso
         """
         try:
-            # nosec B608
             query = f"""
                 UPDATE {self.items_table}
                 SET last_checkpoint = ?
@@ -1942,7 +1920,6 @@ class Database:
             if started_at:
                 execution_time = (finished_at - started_at).total_seconds()
 
-            # nosec B608
             query = f"""
                 UPDATE {self.items_table}
                 SET status = ?,
@@ -1956,7 +1933,6 @@ class Database:
             self._adapter.execute_query(query, (status, finished_at, execution_time, error_message, notes, item_id))
 
             # Atualiza contadores na execução
-            # nosec B608
             count_query = f"""
                 UPDATE {self.executions_table}
                 SET successful_items = (
@@ -2005,7 +1981,6 @@ class Database:
         Optional[Dict[str, Any]]: Dados do item ou None
         """
         try:
-            # nosec B608
             query = f"SELECT * FROM {self.items_table} WHERE id = ?"
             cursor = self._adapter.execute_query(query, (item_id,))
             row = cursor.fetchone()
@@ -2053,7 +2028,6 @@ class Database:
         List[Dict[str, Any]]: Lista de itens
         """
         try:
-            # nosec B608
             query = f"SELECT * FROM {self.items_table} WHERE execution_id = ?"
             params = [execution_id]
 
@@ -2091,7 +2065,6 @@ class Database:
         List[int]: Lista de IDs de itens marcados como interrompidos
         """
         try:
-            # nosec B608
             query = f"""
                 UPDATE {self.items_table}
                 SET status = 'interrupted'
@@ -2101,7 +2074,6 @@ class Database:
             self._adapter.execute_query(query)
 
             # Busca IDs atualizados
-            # nosec B608
             query_ids = f"SELECT id FROM {self.items_table} WHERE status = 'interrupted'"
             cursor = self._adapter.execute_query(query_ids)
             rows = cursor.fetchall()
@@ -2262,7 +2234,6 @@ class Database:
             )
 
             # Atualiza parent_execution_id e reprocess_count
-            # nosec B608
             update_query = f"""
                 UPDATE {self.executions_table}
                 SET parent_execution_id = ?, reprocess_count = reprocess_count + 1
@@ -2281,7 +2252,6 @@ class Database:
                         continue
 
                     new_status = "pending"
-                    # nosec B608
                     item_id_query = f"""
                         INSERT INTO {self.items_table}
                         (execution_id, item_identifier, status, priority, queue_position,
@@ -2376,7 +2346,6 @@ class Database:
             if not self.can_reprocess_item(item_id):
                 raise DatabaseError(f"Item {item_id} não pode ser reprocessado")
 
-            # nosec B608
             query = f"""
                 UPDATE {self.items_table}
                 SET status = 'pending',
@@ -2492,14 +2461,12 @@ class Database:
         """
         try:
             if execution_id:
-                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE execution_id = ? AND status IN ('pending', 'queued')
                 """
                 cursor = self._adapter.execute_query(query, (execution_id,))
             else:
-                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE status IN ('pending', 'queued')
@@ -2553,14 +2520,12 @@ class Database:
                 filter_clause = ""
 
             if execution_id:
-                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE execution_id = ? AND status = 'interrupted'{filter_clause}
                 """
                 cursor = self._adapter.execute_query(query, (execution_id,))
             else:
-                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE status = 'interrupted'{filter_clause}
@@ -2607,7 +2572,6 @@ class Database:
             else:
                 filter_clause = ""
 
-            # nosec B608
             query = f"""
                 DELETE FROM {self.executions_table}
                 WHERE status = 'interrupted'{filter_clause}
@@ -2688,14 +2652,12 @@ class Database:
 
         try:
             if execution_id:
-                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE execution_id = ? AND status = 'success'
                 """
                 cursor = self._adapter.execute_query(query, (execution_id,))
             else:
-                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE status = 'success'
@@ -2766,14 +2728,12 @@ class Database:
 
         try:
             if execution_id:
-                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE execution_id = ? AND status = 'failed'
                 """
                 cursor = self._adapter.execute_query(query, (execution_id,))
             else:
-                # nosec B608
                 query = f"""
                     DELETE FROM {self.items_table}
                     WHERE status = 'failed'
@@ -2833,7 +2793,7 @@ class Database:
                 f"Deve passar confirmation_code='{CONFIRMATION_CODES['DELETE_SUCCESS_EXECUTIONS']}'"
             )
 
-        try: # nosec B608
+        try:
             query = f"""
                 DELETE FROM {self.executions_table}
                 WHERE status = 'completed'
@@ -2893,7 +2853,7 @@ class Database:
                 f"Deve passar confirmation_code='{CONFIRMATION_CODES['DELETE_FAILED_EXECUTIONS']}'"
             )
 
-        try: # nosec B608
+        try:
             query = f"""
                 DELETE FROM {self.executions_table}
                 WHERE status = 'failed'
@@ -2945,7 +2905,7 @@ class Database:
                 "Esta operação remove TODOS os dados permanentemente! " "Passe confirm=True para executar."
             )
 
-        try: # nosec B608
+        try:
             query = f"DELETE FROM {self.executions_table}"
             self._adapter.execute_query(query)
             self._adapter.commit()
@@ -2990,7 +2950,7 @@ class Database:
                 "Esta operação remove TODOS os dados permanentemente! " "Passe confirm=True para executar."
             )
 
-        try: # nosec B608
+        try:
             query = f"DELETE FROM {self.items_table}"
             self._adapter.execute_query(query)
             self._adapter.commit()
@@ -3035,7 +2995,7 @@ class Database:
                 "Esta operação remove TODOS os dados permanentemente! " "Passe confirm=True para executar."
             )
 
-        try: # nosec B608
+        try:
             query = f"DELETE FROM {self.logs_table}"
             self._adapter.execute_query(query)
             self._adapter.commit()
@@ -3137,7 +3097,6 @@ class Database:
                 }
             else:
                 # Estatísticas gerais
-                # nosec B608
                 exec_query = f"""
                     SELECT 
                         COUNT(*) as total,
@@ -3150,7 +3109,6 @@ class Database:
                 exec_cursor = self._adapter.execute_query(exec_query)
                 exec_stats = exec_cursor.fetchone()
 
-                # nosec B608
                 items_query = f"""
                     SELECT 
                         COUNT(*) as total,
@@ -3245,7 +3203,7 @@ class Database:
                 )
 
             now = datetime.now()
-            # nosec B608
+
             query = f"""
                 INSERT INTO {self.logs_table}
                 (execution_id, log_level, step_name, message, timestamp)
@@ -3321,7 +3279,7 @@ class Database:
                         log_method = log_level_mapping.get(log_level, self.log_instance.log_info)
                         log_method(formatted_message)  # type: ignore
 
-                except Exception as log_error: # nosec B110
+                except Exception as log_error:
                     # Não falha se o log externo falhar, apenas registra silenciosamente
                     # Isso evita que problemas no Log externo quebrem o fluxo principal
                     pass
@@ -3444,7 +3402,7 @@ class Database:
                     "execution_id não informado e nenhuma execução ativa encontrada. "
                     "Execute start_execution() antes de buscar logs ou informe execution_id."
                 )
-            # nosec B608
+
             query = f"SELECT * FROM {self.logs_table} WHERE execution_id = ?"
             params = [resolved_execution_id]
 
@@ -3525,7 +3483,7 @@ class Database:
         if not confirm:
             raise DatabaseError("Esta operação remove logs permanentemente! " "Passe confirm=True para executar.")
 
-        try: # nosec B608
+        try:
             query = f"DELETE FROM {self.logs_table} WHERE 1=1"
             params = []
             resolved_execution_id = execution_id or self._current_execution_id

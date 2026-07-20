@@ -4,7 +4,7 @@
 import hashlib
 
 # imports third-party
-import subprocess # nosec B404
+import subprocess
 import sys
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Optional
@@ -400,7 +400,7 @@ class Suite:
         ]
 
         for lib in libs:
-            try: # nosec B603
+            try:
                 subprocess.check_call([sys.executable, "-m", "pip", "install", lib])
                 self.success_print(f"Suite RPA: Library {lib} installed successfully!")
 

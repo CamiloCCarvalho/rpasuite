@@ -317,27 +317,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - LinkedIn: [camilocostac](https://www.linkedin.com/in/camilocostac/)
 - Email: camilo.costa1993@gmail.com
 
-## Release Notes
-
-### Version 1.7.0
-
-**New Features:**
-- ✨ Added Database module for complete execution tracking and lifecycle management
-- ✨ Multi-database support (SQLite, PostgreSQL, MySQL)
-- ✨ Automatic interruption detection and recovery
-- ✨ Item queue processing system
-- ✨ Comprehensive statistics and reporting
-
-**Improvements:**
-- 🔧 Enhanced Suite instance initialization with proper type hints
-- 🔧 Improved autocomplete and IDE support
-- 🔧 Better docstrings and module descriptions
-- 🔧 Refactored module structure for better maintainability
-
-### Version 1.7.0
-
-- Initial release with core functionality
-
 ---
 
 <div align="center">

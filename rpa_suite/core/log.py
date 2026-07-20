@@ -269,7 +269,7 @@ class Log:
                         # ESCAPE SPECIAL CHARACTERS IN TRACEBACK
                         escaped_traceback = self._escape_traceback(tb_string)
                         msg = f"{msg}\n{escaped_traceback}"
-                except Exception: # nosec B110
+                except Exception:
                     # If can't capture traceback, continue normally
                     pass
 
