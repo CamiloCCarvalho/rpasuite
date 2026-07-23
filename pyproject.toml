@@ -1,3 +1,13 @@
+[project]
+name = "rpa_suite"
+version = "1.7.5"
+description = "Comprehensive Python toolkit for RPA automation: email, logging, database tracking, browser automation, OCR, desktop automation, and more. Essential utilities for building robust automation workflows with Selenium, Botcity, and custom solutions."
+readme = "README.md"
+authors = [
+    { name = "CamiloCarvalho", email = "camilo.costa1993@gmail.com" }
+]
+requires-python = ">=3.11"
+
 [tool.isort]
 profile = "black"
 multi_line_output = 3
@@ -15,7 +25,6 @@ max-line-length = 120
 
 [tool.pylint.'MESSAGES CONTROL']
 disable = [
-    "C0114", # missing-module-docstring
     "C0115", # missing-class-docstring
     "C0116", # missing-function-docstring
     "R0903", # too-many-instance-attributes

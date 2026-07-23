@@ -56,25 +56,6 @@ class Iris:
         >>> content = iris.read_document("document.pdf", ExportFormats.MARKDOWN)
         >>> print(content)
 
-    ---
-    pt-br:
-    Iris (OCR-AI) - Conversor de documentos com suporte a múltiplas extensões.
-
-    Esta classe fornece uma interface simplificada para converter documentos em vários formatos (PDF, imagens, texto) para formatos estruturados como Markdown, HTML, texto simples, entre outros.
-
-    Atributos:
-        engine: Instância do IrisEngine.
-        last_result: Último resultado de conversão processado.
-        list_results: Lista de resultados gerados por processamento em lote com: read_documents
-
-    Em caso de erro:
-        Lança IrisError se a conversão do documento falhar.
-
-    Exemplo:
-        >>> from rpa_suite.core import ExportFormats
-        >>> iris = Iris()
-        >>> conteudo = iris.read_document("documento.pdf", ExportFormats.MARKDOWN)
-        >>> print(conteudo)
     """
 
     engine: Optional[IrisEngine]
@@ -101,25 +82,6 @@ class Iris:
             >>> content = iris.read_document("document.pdf", ExportFormats.MARKDOWN)
             >>> print(content)
 
-        ---
-        pt-br:
-        Iris (OCR-AI) - Conversor de documentos com suporte a múltiplas extensões.
-
-        Esta classe fornece uma interface simplificada para converter documentos em vários formatos (PDF, imagens, texto) para formatos estruturados como Markdown, HTML, texto simples, entre outros.
-
-        Atributos:
-            engine: Instância do IrisEngine.
-            last_result: Último resultado de conversão processado.
-            list_results: Lista de resultados gerados por processamento em lote com: read_documents
-
-        Em caso de erro:
-            Lança IrisError se a conversão do documento falhar.
-
-        Exemplo:
-            >>> from rpa_suite.core import ExportFormats
-            >>> iris = Iris()
-            >>> conteudo = iris.read_document("documento.pdf", ExportFormats.MARKDOWN)
-            >>> print(conteudo)
         """
         try:
             self.engine = IrisEngine()
@@ -166,25 +128,6 @@ class Iris:
             >>> content = iris.read_document("doc.pdf", ExportFormats.TEXT)
             >>> print(content)
 
-        ---
-        pt-br:
-        Lê e converte um documento para o formato especificado.
-
-        Parâmetros:
-            file_path: Caminho para o arquivo do documento.
-            result_format: Formato de exportação desejado.
-            verbose: Se True, exibe mensagens de sucesso.
-
-        Retorno:
-            Documento convertido para o formato especificado, ou None se falhar.
-
-        Exceções:
-            IrisError: Se ocorrer um erro durante a validação, conversão ou exportação.
-
-        Exemplo:
-            >>> iris = Iris()
-            >>> conteudo = iris.read_document("doc.pdf", ExportFormats.TEXT)
-            >>> print(conteudo)
         """
         try:
             self.__convert_document(file_path)
@@ -236,25 +179,6 @@ class Iris:
             >>> contents = iris.read_documents(["doc.pdf", "doc2.docx"], ExportFormats.TEXT)
             >>> print(contents)
 
-        ---
-        pt-br:
-        Lê e converte múltiplos documentos para o formato especificado.
-
-        Parâmetros:
-            list_file_path: Lista de caminhos dos documentos.
-            result_format: Formato de exportação desejado.
-            verbose: Se True, exibe mensagens de sucesso.
-
-        Retorno:
-            Lista de documentos convertidos para o formato especificado, ou None se falhar.
-
-        Exceções:
-            IrisError: Se ocorrer um erro durante a validação, conversão ou exportação.
-
-        Exemplo:
-            >>> iris = Iris()
-            >>> conteudos = iris.read_documents(["doc.pdf", "doc2.docx"], ExportFormats.TEXT)
-            >>> print(conteudos)
         """
         self.list_results = []
 

@@ -27,43 +27,13 @@ Available modules:
     ``printer``: Functions for formatted output
     ``regex``: Operations with regular expressions
     ``validate``: Data validation functions
+    ``database``: RPA execution tracking (SQLite/PostgreSQL/MySQL)
+    ``utils``: System utility helpers
     ``ParallelRunner``: Object ParallelRunner functions to run in parallel
     ``AsyncRunner``: Object AsyncRunner functions to run in Assyncronous
     ``Browser``: Object Browser automation functions (neeeds Selenium and Webdriver_Manager)
     ``Iris``: Object Iris automation functions to convert documents with OCR + IA based on ``docling``
 
-pt-br
------
-RPA Suite é um módulo Python que fornece um conjunto de ferramentas para automação de processos.
-
-Para utilizar o módulo, importe-o da seguinte forma:
-    >>> from rpa_suite import rpa
-
-Exemplo de uso:
-    >>> from rpa_suite import rpa
-    >>> rpa.email.send_smtp(
-    ...     email_user="seu@email.com",
-    ...     email_password="123",
-    ...     email_to="destino@email.com",
-    ...     subject_title="Teste",
-    ...     body_message="<p>Mensagem de teste</p>"
-    ... )
-    >>> rpa.alert_print("Hello World")
-
-Módulos disponíveis:
-    ``clock``: Utilitários para manipulação de tempo e cronômetro
-    ``date``: Funções para manipulação de datas
-    ``email``: Funcionalidades para envio de emails via SMTP
-    ``directory``: Operações com diretórios
-    ``file``: Manipulação de arquivos
-    ``log``: Sistema de logging
-    ``printer``: Funções para output formatado
-    ``regex``: Operações com expressões regulares
-    ``validate``: Funções de validação de dados
-    ``ParallelRunner``: Objeto ParallelRunner funções para rodar processos em paralelo
-    ``AsyncRunner``: Objeto AsyncRunner funções para rodar processos em assincronicidade
-    ``Browser``: Objeto de Automação de Navegadores (necessario Selenium e Webdriver_Manager)
-    ``Iris``: Objeto Iris Automação de funções para converter documentos com OCR + IA baseado em ``docling``
 """
 
 __version__ = "1.6.5"

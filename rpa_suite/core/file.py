@@ -32,13 +32,6 @@ class File:
         >>> file_util = File()
         >>> file_util.screen_shot('example')
 
-    pt-br:
-    Classe para utilidades de gerenciamento de arquivos: criar/excluir arquivos de flag, contar arquivos em diretórios e tirar screenshots.
-
-    Exemplo:
-        >>> from rpa_suite.core.file import File
-        >>> file_util = File()
-        >>> file_util.screen_shot('exemplo')
     """
 
     def __init__(self):
@@ -50,13 +43,6 @@ class File:
             >>> file_util = File()
             >>> file_util.screen_shot('example')
 
-        pt-br:
-        Classe para utilidades de gerenciamento de arquivos: criar/excluir arquivos de flag, contar arquivos em diretórios e tirar screenshots.
-
-        Exemplo:
-            >>> from rpa_suite.core.file import File
-            >>> file_util = File()
-            >>> file_util.screen_shot('exemplo')
         """
         try:
             self.__create_ss_dir = create_ss_dir
@@ -80,12 +66,6 @@ class File:
             >>> file_util = File()
             >>> file_util.screen_shot('my_screenshot', save_with_date=True)
 
-        pt-br:
-        Tira uma captura de tela e salva em um diretório. Por padrão, usa a data atual no nome do arquivo.
-
-        Exemplo:
-            >>> file_util = File()
-            >>> file_util.screen_shot('minha_captura', save_with_date=True)
         """
 
         # proccess
@@ -147,12 +127,6 @@ class File:
             >>> file_util = File()
             >>> file_util.flag_create('my.flag')
 
-        pt-br:
-        Cria um arquivo de flag para indicar que o robô está em execução.
-
-        Exemplo:
-            >>> file_util = File()
-            >>> file_util.flag_create('meu.flag')
         """
 
         try:
@@ -183,12 +157,6 @@ class File:
             >>> file_util = File()
             >>> file_util.flag_delete('my.flag')
 
-        pt-br:
-        Exclui o arquivo de flag para indicar que o robô terminou.
-
-        Exemplo:
-            >>> file_util = File()
-            >>> file_util.flag_delete('meu.flag')
         """
 
         try:
@@ -222,12 +190,6 @@ class File:
             >>> file_util = File()
             >>> file_util.count_files(['./myfolder'], type_extension='txt')
 
-        pt-br:
-        Conta arquivos em um ou mais diretórios, podendo filtrar por extensão.
-
-        Exemplo:
-            >>> file_util = File()
-            >>> file_util.count_files(['./minhapasta'], type_extension='txt')
         """
 
         # Local Variables

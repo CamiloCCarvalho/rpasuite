@@ -97,7 +97,14 @@ class AsyncRunner(Generic[T]):
             self._start_time = time.time()
 
             # Creates and schedules the asynchronous task
-            loop = asyncio.get_event_loop()
+            # For Python 3.10+, use asyncio.new_event_loop() and set it
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                # No running loop, create a new one
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+
             self._task = loop.create_task(self._execute_function(function, args, kwargs))
 
             return self

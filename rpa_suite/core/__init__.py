@@ -10,17 +10,6 @@ or
 >>> clock = Clock()
 >>> clock.wait_for_exec()
 
-pt-br
-----------
-O módulo Core é de onde podemos importar todos os Sub-Objetos usados pelo módulo rpa_suite de forma separada, categorizados por suas respectivas classes com base na funcionalidade. No entanto, também podemos usá-los através do objeto principal rpa usando a seguinte sintaxe:
->>> from rpa_suite import rpa
->>> rpa.clock.wait_for_exec()
->>> rpa.file.screen_shot() ...
-ou
->>> from rpa_suite.core.clock import Clock
->>> clock = Clock()
->>> clock.wait_for_exec(foo)
-
 """
 
 # On this case, we are importing the (Browser|Iris) class only if the (selenium and webdriver_manager| docling) modules are installed.
@@ -29,7 +18,7 @@ import importlib.util
 
 from .asyncrun import AsyncRunner
 from .clock import Clock
-from .database import Database
+from .database import Database, DatabaseType
 from .date import Date
 from .dir import Directory
 from .email import Email

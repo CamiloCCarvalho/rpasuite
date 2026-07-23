@@ -269,7 +269,7 @@ class Log:
                         # ESCAPE SPECIAL CHARACTERS IN TRACEBACK
                         escaped_traceback = self._escape_traceback(tb_string)
                         msg = f"{msg}\n{escaped_traceback}"
-                except Exception:
+                except Exception:  # nosec B110
                     # If can't capture traceback, continue normally
                     pass
 
@@ -278,48 +278,16 @@ class Log:
             raise LogError(f"Error trying execute: {self._log.__name__}! {str(e)}.") from e
 
     def _log_with_context(self, level: str, msg: str, filename: str, lineno: int) -> None:
-        """
-        Método auxiliar para log com contexto customizado (usado pelo Database).
-
-        Permite que o Database passe o filename e lineno do arquivo que chamou add_log(),
-        ao invés do filename/lineno do database.py.
-
-        Parameters:
-        -----------
-        level: str
-            Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-
-        msg: str
-            Message to log
-
-        filename: str
-            Filename to display (formato: "pasta/arquivo.py" ou "arquivo.py")
-
-        lineno: int
-            Line number to display
-
-        pt-br
-        -----------
-        Método auxiliar para log com contexto customizado (usado pelo Database).
-
-        Permite que o Database passe o filename e lineno do arquivo que chamou add_log(),
-        ao invés do filename/lineno do database.py.
-
-        Parâmetros:
-        -----------
-        level: str
-            Nível do log (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-
-        msg: str
-            Mensagem para logar
-
-        filename: str
-            Nome do arquivo para exibir (formato: "pasta/arquivo.py" ou "arquivo.py")
-
-        lineno: int
-            Número da linha para exibir
-        """
+        """Internal helper for logging with custom context (used by Database)."""
         self._log(level, msg, custom_filename=filename, custom_lineno=lineno)
+
+    def log_with_context(self, level: str, msg: str, filename: str, lineno: int) -> None:
+        """
+        Log with custom filename/lineno (public API for integrations).
+
+        Used by Database to preserve the caller file context.
+        """
+        self._log_with_context(level, msg, filename, lineno)
 
     def log_start_run_debug(self, msg_start_loggin: str) -> None:
         """

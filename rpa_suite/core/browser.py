@@ -2,6 +2,7 @@
 
 # imports standard
 import os
+import subprocess  # nosec B404
 from time import sleep
 
 import requests
@@ -57,37 +58,6 @@ class Browser:
         close_browser(verbose: bool = False):
             Closes the browser instance and terminates the associated Chrome processes.
 
-    pt-br
-    ----------
-    Objeto Browser para Automação (Em Desenvolvimento)
-    Esta classe fornece uma interface para automação de interações com o navegador
-    Google Chrome utilizando uma porta de depuração. Inclui métodos para iniciar,
-    configurar, navegar e interagir com o navegador. A implementação ainda está em
-    desenvolvimento e pode requerer melhorias adicionais.
-
-    Atributos:
-        driver: A instância do WebDriver usada para controlar o navegador.
-        port (int): A porta de depuração usada para conectar ao navegador. O padrão é 9393.
-        path_driver (str): O caminho para o executável do ChromeDriver.
-
-    Métodos:
-        __init__(port: int = 9393, close_all_chrome_on_this_port: bool = False):
-            Inicializa o objeto Browser com a porta de depuração especificada e,
-            opcionalmente, fecha todas as instâncias do Chrome que estão sendo executadas
-            na mesma porta.
-        configure_browser() -> None:
-            Configura o navegador com opções de depuração e inicializa o WebDriver.
-        start_browser(close_chrome_on_this_port: bool = True, verbose: bool = False):
-            Inicia o navegador Chrome com a porta de depuração especificada e inicializa
-            o WebDriver.
-        find_ele(value, by=By.XPATH, timeout=12, verbose=True):
-            Localiza um único elemento na página usando a estratégia de localização especificada.
-        get(url: str, verbose: bool = False):
-            Navega o navegador para a URL especificada.
-        _close_all_browsers():
-            Fecha todos os processos do Chrome de forma forçada.
-        close_browser(verbose: bool = False):
-            Fecha a instância do navegador e termina os processos associados do Chrome.
     """
 
     driver: None
@@ -156,10 +126,16 @@ class Browser:
             if close_chrome_on_this_port:
                 self.close_browser()
 
-            # Inicia o Chrome com debugging port
-            os.system(
-                f'start chrome.exe --remote-debugging-port={str(self.port)} --user-data-dir="C:/temp/chrome_profile"'
-            )
+            # Inicia o Chrome com debugging port (usando subprocess seguro)
+            chrome_cmd = [
+                "cmd.exe",
+                "/c",
+                "start",
+                "chrome.exe",
+                f"--remote-debugging-port={str(self.port)}",
+                "--user-data-dir=C:/temp/chrome_profile",
+            ]
+            subprocess.run(chrome_cmd, shell=False, check=False)
 
             # Aguardar até que o Chrome esteja realmente aberto
             while True:
@@ -234,15 +210,21 @@ class Browser:
     def _close_all_browsers(self):
         """
         Forcefully closes all instances of Google Chrome running on the system.
-        This method uses the `taskkill` command to terminate all processes with the name
+        This method uses subprocess to terminate all processes with the name
         "chrome.exe". Any errors during the execution of the command are silently ignored.
         Note:
             This method is specific to Windows operating systems and will not work on other platforms.
         """
 
         try:
-            os.system("taskkill /F /IM chrome.exe >nul 2>&1")
-        except:  # pylint: disable=bare-except
+            subprocess.run(
+                ["taskkill", "/F", "/IM", "chrome.exe"],
+                shell=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            )
+        except:  # pylint: disable=bare-except #nosec B110
             pass
 
     def close_browser(self, verbose: bool = False):
@@ -269,32 +251,61 @@ class Browser:
             # Primeiro tenta fechar todas as janelas via Selenium
             try:
                 self.driver.close()
-            except:  # pylint: disable=bare-except
+            except:  # pylint: disable=bare-except #nosec B110
                 pass
 
             # Depois tenta encerrar a sessão
             try:
                 self.driver.quit()
-            except:  # pylint: disable=bare-except
+            except:  # pylint: disable=bare-except #nosec B110
                 pass
 
             # Aguarda um momento para o processo ser liberado
             sleep(0.6)
 
-            # Força o fechamento do processo específico do Chrome
-            os.system(
-                f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" >nul 2>&1'
+            # Força o fechamento do processo específico do Chrome (usando subprocess seguro)
+            subprocess.run(
+                [
+                    "taskkill",
+                    "/f",
+                    "/im",
+                    "chrome.exe",
+                    f'/fi "commandline like *--remote-debugging-port={str(self.port)}*"',
+                ],
+                shell=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
             )
 
             # Verifica se o processo foi realmente terminado
-            check = os.system(
-                f'tasklist /fi "imagename eq chrome.exe" /fi "commandline like *--remote-debugging-port={str(self.port)}*" >nul 2>&1'
+            check_result = subprocess.run(
+                [
+                    "tasklist",
+                    f'/fi "imagename eq chrome.exe"',
+                    f'/fi "commandline like *--remote-debugging-port={str(self.port)}*"',
+                ],
+                shell=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
             )
 
-            if check == 0:
+            if check_result.returncode == 0:
                 # Processo ainda existe, tenta método mais agressivo
-                os.system(
-                    f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" /t >nul 2>&1'
+                subprocess.run(
+                    [
+                        "taskkill",
+                        "/f",
+                        "/im",
+                        "chrome.exe",
+                        f'/fi "commandline like *--remote-debugging-port={str(self.port)}*"',
+                        "/t",
+                    ],
+                    shell=False,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    check=False,
                 )
                 if verbose:
                     alert_print("Browser: Closed forcefully!")
@@ -310,8 +321,19 @@ class Browser:
                     alert_print(f"Error closing browser: {str(e)}, Trying stronger method!")
 
                 # Último recurso - mata todos os processos do Chrome (use com cautela)
-                os.system(
-                    f'taskkill /f /im chrome.exe /fi "commandline like *--remote-debugging-port={str(self.port)}*" /t >nul 2>&1'
+                subprocess.run(
+                    [
+                        "taskkill",
+                        "/f",
+                        "/im",
+                        "chrome.exe",
+                        f'/fi "commandline like *--remote-debugging-port={str(self.port)}*"',
+                        "/t",
+                    ],
+                    shell=False,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    check=False,
                 )
                 if verbose:
                     alert_print("Browser: Closed with extreme force!")

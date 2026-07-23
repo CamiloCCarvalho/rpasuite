@@ -30,21 +30,6 @@ class Date:
         >>> from rpa_suite import rpa
         >>> hour, minute, second = rpa.date.get_hms()
 
-    pt-br
-    ----------
-    Classe que fornece utilitários para manipulação e formatação de datas.
-
-    Esta classe oferece funcionalidades para:
-        - Obtenção de componentes do tempo atual (horas, minutos, segundos)
-        - Formatação e manipulação de datas
-        - Validação e conversão de datas
-
-    Métodos:
-        get_hms: Retorna o horário atual como tupla de hora, minuto, segundo
-
-    A classe Date é parte do RPA Suite e pode ser acessada através do objeto rpa:
-        >>> from rpa_suite import rpa
-        >>> hora, minuto, segundo = rpa.date.get_hms()
     """
 
     def __init__(self) -> None:
@@ -63,21 +48,6 @@ class Date:
             >>> from rpa_suite import rpa
             >>> hour, minute, second = rpa.date.get_hms()
 
-        pt-br
-        ----------
-        Classe que fornece utilitários para manipulação e formatação de datas.
-
-        Esta classe oferece funcionalidades para:
-            - Obtenção de componentes do tempo atual (horas, minutos, segundos)
-            - Formatação e manipulação de datas
-            - Validação e conversão de datas
-
-        Métodos:
-            get_hms: Retorna o horário atual como tupla de hora, minuto, segundo
-
-        A classe Date é parte do RPA Suite e pode ser acessada através do objeto rpa:
-            >>> from rpa_suite import rpa
-            >>> hora, minuto, segundo = rpa.date.get_hms()
         """
 
     def get_hms(self) -> Tuple[Op[str], Op[str], Op[str]]:
@@ -98,23 +68,6 @@ class Date:
         >>> hour, minute, second = get_hms() \n
             * NOTE:  Note that it is possible to destructure the return to store simultaneously.
 
-        Description: pt-br
-        ----------
-        Função para retornar hora, minuto e segundo. O retorno é em forma de tupla com strings podendo armazenar e usar os valores de forma individual.
-
-        Tratamento:
-        ----------
-        A função já faz o tratamento para valores abaixo de 10 mantendo sempre 2 casas decimais em todos resultados, os valores individuais são sempre em formato string
-
-        Retorno:
-        ----------
-        >>> type:tuple
-            * tuple('hh', 'mm', 'ss') - tupla com os valores de hora, minuto e segundo podendo ser armazenados individualmente, os valores são em string
-
-        Exemplo:
-        ---------
-        >>> hora, minuto, segundo = get_hms() \n
-            * OBS.:  Note que é possivel desestruturar o retorno para armazenar de forma simultânea.
         """
 
         # Local Variables
@@ -162,19 +115,6 @@ class Date:
         >>> day, month, year = get_dmy() \n
             * NOTE:  Note that it is possible to destructure the return to store simultaneously.
 
-        Description: pt-br
-        ----------
-        Função para retornar dia, mes e ano. O retorno é em forma de tupla com strings podendo armazenar e usar os valores de forma individual.
-
-        Retorno:
-        ----------
-        >>> type:tuple
-            * tuple('dd', 'mm', 'yy') - tupla com os valores de dia, mes e ano podendo ser armazenados individualmente
-
-        Exemplo:
-        ---------
-        >>> dia, mes, ano = get_dmy() \n
-            * OBS.:  Note que é possivel desestruturar o retorno para armazenar de forma simultânea.
         """
         try:
             # Local Variables

@@ -35,21 +35,6 @@ def __create_ss_dir(
         * 'success': bool - represents case the action was performed successfully
         * 'path_created': str - path of the directory that was created on the process
 
-    Description: pt-br
-    ----------
-    Função responsavel por criar diretório de screenshots para trabalhar com seus arquivos de sreenshot. \n
-
-    Parametros:
-    ----------
-    ``path_to_create: str`` - deve ser uma string com o path completo apontando para a pasta onde deve ser criada a pasta temporaria, se estiver vazio sera usado valor ``default`` que criará pasta no diretório atual onde o arquivo contendo esta função foi chamada.
-
-    ``name_ss_dir: str`` - deve ser uma string representando o nome do diretório de screenshots a ser criado. Se estiver vazio, o valor ``screenshots`` será usado como o nome padrão do diretório.
-
-    Retorno:
-    ----------
-    >>> type:dict
-        * 'success': bool - representa se ação foi realizada com sucesso
-        * 'path_created': str - path do diretório que foi criado no processo
     """
 
     # Variáveis locais

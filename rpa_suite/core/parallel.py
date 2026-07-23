@@ -22,15 +22,6 @@ class ParallelRunnerError(Exception):
     Traceback (most recent call last):
         ...
     ParallelRunnerError: ParallelRunner Error: Some error
-
-    Exceção personalizada para erros do ParallelRunner.
-
-    Exemplo:
-    ----------
-    >>> raise ParallelRunnerError("Algum erro")
-    Traceback (most recent call last):
-        ...
-    ParallelRunnerError: ParallelRunner Error: Algum erro
     """
 
     def __init__(self, message):
@@ -53,21 +44,6 @@ class ParallelRunner(Generic[T]):
     >>> runner.run(slow_add, 2, 3)
     >>> result = runner.get_result(timeout=5)
     >>> print(result['result'])
-    5
-
-    Classe responsável por executar funções em processos paralelos, permitindo que o fluxo principal da aplicação continue enquanto a função é executada em segundo plano.
-
-    Esta classe permite iniciar uma função em um processo separado, verificar se ainda está em execução, obter seu resultado (com timeout e tratamento de erros) e liberar recursos. É útil para executar operações demoradas ou bloqueantes sem travar o programa principal.
-
-    Exemplo:
-    ----------
-    >>> def soma_lenta(a, b):
-    ...     import time; time.sleep(2)
-    ...     return a + b
-    >>> runner = ParallelRunner(verbose=True)
-    >>> runner.run(soma_lenta, 2, 3)
-    >>> resultado = runner.get_result(timeout=5)
-    >>> print(resultado['result'])
     5
     """
 
@@ -93,25 +69,6 @@ class ParallelRunner(Generic[T]):
         >>> result = runner.get_result(timeout=5)
         >>> print(result['result'])
         5
-
-        Classe responsável por executar funções em processos paralelos, permitindo que o fluxo principal da aplicação continue enquanto a função é executada em segundo plano.
-
-        Esta classe permite iniciar uma função em um processo separado, verificar se ainda está em execução, obter seu resultado (com timeout e tratamento de erros) e liberar recursos. É útil para executar operações demoradas ou bloqueantes sem travar o programa principal.
-
-        Parâmetros:
-        ----------
-            verbose (bool): Se True, exibe mensagens de depuração durante a execução.
-
-        Exemplo:
-        ----------
-        >>> def soma_lenta(a, b):
-        ...     import time; time.sleep(2)
-        ...     return a + b
-        >>> runner = ParallelRunner(verbose=True)
-        >>> runner.run(soma_lenta, 2, 3)
-        >>> resultado = runner.get_result(timeout=5)
-        >>> print(resultado['result'])
-        5
         """
         try:
             self._manager = Manager()
@@ -136,14 +93,6 @@ class ParallelRunner(Generic[T]):
         Example:
         ----------
         (Internal use only)
-
-        Método estático que executa a função alvo e armazena o resultado.
-
-        Esta função é usada internamente para executar a função do usuário em um processo separado e armazenar seu resultado ou erro em um dicionário compartilhado.
-
-        Exemplo:
-        ----------
-        (Uso interno apenas)
         """
         try:
             # Execute the user function with the provided arguments
@@ -172,14 +121,6 @@ class ParallelRunner(Generic[T]):
         Example:
         ----------
         (Internal use only)
-
-        Método estático que executa a função alvo e armazena o resultado, exibindo mensagens de depuração.
-
-        Esta função é usada internamente para executar a função do usuário em um processo separado, armazenar seu resultado ou erro em um dicionário compartilhado e imprimir mensagens de depuração.
-
-        Exemplo:
-        ----------
-        (Uso interno apenas)
         """
         try:
             # Execute the user function with the provided arguments
@@ -225,28 +166,6 @@ class ParallelRunner(Generic[T]):
         ...     return a + b
         >>> runner = ParallelRunner()
         >>> runner.run(slow_add, 2, 3)
-
-        Inicia a execução da função fornecida em um processo paralelo.
-
-        Este método executa a função especificada em um processo separado, permitindo que o programa principal continue rodando. O resultado pode ser obtido depois usando `get_result()`.
-
-        Parâmetros:
-        ----------
-            function: Função a ser executada em paralelo.
-            *args: Argumentos posicionais para a função.
-            **kwargs: Argumentos nomeados para a função.
-
-        Retorno:
-        ----------
-            self: Retorna a própria instância para permitir chamadas encadeadas.
-
-        Exemplo:
-        ----------
-        >>> def soma_lenta(a, b):
-        ...     import time; time.sleep(2)
-        ...     return a + b
-        >>> runner = ParallelRunner()
-        >>> runner.run(soma_lenta, 2, 3)
         """
         try:
             # Clear previous result, if any
@@ -292,17 +211,6 @@ class ParallelRunner(Generic[T]):
         ----------
         >>> runner.is_running()
         True
-
-        Verifica se o processo paralelo ainda está em execução.
-
-        Retorno:
-        ----------
-            bool: True se o processo ainda está rodando, False caso contrário.
-
-        Exemplo:
-        ----------
-        >>> runner.is_running()
-        True
         """
         try:
             if self._process is None:
@@ -340,30 +248,6 @@ class ParallelRunner(Generic[T]):
         ----------
         >>> result = runner.get_result(timeout=5)
         >>> print(result['success'], result.get('result'))
-
-        Obtém o resultado da execução paralela, aguardando até o tempo limite especificado.
-
-        Este método espera o processo paralelo terminar, até o tempo limite informado. Se o processo não terminar a tempo e `terminate_on_timeout` for True, ele será encerrado. O resultado inclui status de sucesso, resultado ou erro, tempo de execução e se o processo foi terminado.
-
-        Parâmetros:
-        ----------
-            timeout: Tempo máximo (em segundos) para aguardar o término do processo. None significa aguardar indefinidamente.
-            terminate_on_timeout: Se True, encerra o processo se o tempo limite for atingido.
-
-        Retorno:
-        ----------
-            dict: Contém:
-                * 'success': bool - True se a operação foi bem-sucedida.
-                * 'result': resultado da função (se bem-sucedida).
-                * 'error': mensagem de erro (se houver).
-                * 'traceback': stack trace completo (se ocorreu erro).
-                * 'execution_time': tempo de execução em segundos.
-                * 'terminated': True se o processo foi encerrado por timeout.
-
-        Exemplo:
-        ----------
-        >>> resultado = runner.get_result(timeout=5)
-        >>> print(resultado['success'], resultado.get('result'))
         """
         try:
             if self._process is None:
@@ -463,14 +347,6 @@ class ParallelRunner(Generic[T]):
         Example:
         ----------
         >>> runner.terminate()
-
-        Encerra o processo paralelo em execução, se houver.
-
-        Este método interrompe o processo caso ainda esteja rodando e libera os recursos.
-
-        Exemplo:
-        ----------
-        >>> runner.terminate()
         """
         try:
             if self._process and self._process.is_alive():
@@ -494,14 +370,6 @@ class ParallelRunner(Generic[T]):
         Example:
         ----------
         (Internal use only)
-
-        Limpa os recursos utilizados pelo processo.
-
-        Este método é chamado internamente para liberar recursos após o término ou encerramento do processo.
-
-        Exemplo:
-        ----------
-        (Uso interno apenas)
         """
         try:
             if hasattr(self, "_manager") and self._manager is not None:
@@ -529,17 +397,9 @@ class ParallelRunner(Generic[T]):
         Example:
         ----------
         (Internal use only)
-
-        Destrutor da classe, garante que os recursos sejam liberados.
-
-        Este método é chamado quando o objeto é destruído para garantir que todos os recursos sejam liberados corretamente.
-
-        Exemplo:
-        ----------
-        (Uso interno apenas)
         """
         try:
             self.terminate()
-        except Exception:
+        except Exception:  # nosec B110
             # Silently handle any errors during destruction
             pass

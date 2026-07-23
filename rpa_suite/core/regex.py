@@ -74,36 +74,6 @@ class Regex:
         >>> r.check_pattern_in_text("Hello World", "world", case_sensitive=False)
         True
 
-        Descrição: pt-br
-        ----------
-        Verifica se um padrão regex existe dentro de uma string de texto e retorna True se encontrado, caso contrário False.
-
-        Parâmetros:
-        ----------
-        origin_text : str
-            O texto onde a busca será realizada.
-        pattern_to_search : str
-            O padrão regex a ser buscado no texto.
-        case_sensitive : bool, opcional
-            Se True, a busca diferencia maiúsculas de minúsculas. Padrão é True.
-        verbose : bool, opcional
-            Se True, imprime uma mensagem indicando se o padrão foi encontrado. Padrão é False.
-
-        Retorno:
-        ----------
-        bool
-            True se o padrão for encontrado no texto, False caso contrário.
-
-        Exemplo:
-        ----------
-        >>> from rpa_suite.core.regex import Regex
-        >>> r = Regex()
-        >>> r.check_pattern_in_text("Olá Mundo", "Mundo")
-        True
-        >>> r.check_pattern_in_text("Olá Mundo", "mundo", case_sensitive=True)
-        False
-        >>> r.check_pattern_in_text("Olá Mundo", "mundo", case_sensitive=False)
-        True
         """
         try:
             if case_sensitive:

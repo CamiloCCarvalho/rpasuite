@@ -75,41 +75,6 @@ class Validate:
             'map_validation': [<ValidationResult object>, ...]
         }
 
-        Descrição: pt-br
-        ----------
-        Valida uma lista de e-mails utilizando a biblioteca email_validator.
-
-        Parâmetros:
-        ----------
-        email_list : list
-            Lista de strings contendo os e-mails a serem validados.
-        verbose : bool, opcional
-            Se True, imprime uma mensagem de sucesso após a execução. Padrão é False.
-
-        Retorno:
-        ----------
-        dict
-            Retorna um dicionário com os seguintes dados:
-                * 'success': bool - True se todos os e-mails são válidos, False caso contrário
-                * 'valid_emails': list - lista de e-mails válidos
-                * 'invalid_emails': list - lista de e-mails inválidos
-                * 'qt_valids': int - quantidade de e-mails válidos
-                * 'qt_invalids': int - quantidade de e-mails inválidos
-                * 'map_validation': list - resultado da validação de cada e-mail
-
-        Exemplo:
-        ----------
-        >>> from rpa_suite.core.validate import Validate
-        >>> v = Validate()
-        >>> v.emails(['teste@exemplo.com', 'email-invalido'])
-        {
-            'success': False,
-            'valid_emails': ['teste@exemplo.com'],
-            'invalid_emails': ['email-invalido'],
-            'qt_valids': 1,
-            'qt_invalids': 1,
-            'map_validation': [<ValidationResult object>, ...]
-        }
         """
 
         # Local Variables
@@ -203,45 +168,6 @@ class Validate:
         >>> v.word("Hello world, hello!", "hello", case_sensitivy=False, search_by="word")
         {'is_found': True, 'number_occurrences': 2, 'positions': []}
 
-        Descrição: pt-br
-        ----------
-        Procura por uma string, substring ou palavra dentro de um texto fornecido.
-
-        Parâmetros:
-        ----------
-        origin_text : str
-            Texto onde a busca deve ser realizada.
-        searched_word : str
-            Palavra, substring ou padrão a ser buscado.
-        case_sensitivy : bool, opcional
-            Se True, a busca diferencia maiúsculas de minúsculas. Padrão é True.
-        search_by : str, opcional
-            Aceita os valores:
-                * 'string' - encontra o trecho solicitado (padrão)
-                * 'word' - encontra apenas a palavra exata
-                * 'regex' - encontra padrões regex [EM DESENVOLVIMENTO...]
-        verbose : bool, opcional
-            Se True, imprime uma mensagem com o resultado. Padrão é False.
-
-        Retorno:
-        ----------
-        dict
-            Retorna um dicionário com as seguintes informações:
-                * 'is_found': bool - True se o padrão foi encontrado ao menos uma vez
-                * 'number_occurrences': int - número de vezes que o padrão foi encontrado
-                * 'positions': list[set(int, int), ...] - todas as posições onde o padrão apareceu no texto original
-
-        Sobre `positions`:
-        ----------
-        list[set(int, int), ...]
-            No índice 0 está a primeira ocorrência (como um par de números em um set), outros índices representam outras ocorrências encontradas.
-
-        Exemplo:
-        ----------
-        >>> from rpa_suite.core.validate import Validate
-        >>> v = Validate()
-        >>> v.word("Olá mundo, olá!", "olá", case_sensitivy=False, search_by="word")
-        {'is_found': True, 'number_occurrences': 2, 'positions': []}
         """
 
         # Local Variables

@@ -1047,7 +1047,7 @@ class Database:
             for index_sql in create_indexes:
                 try:
                     self._adapter.execute_query(index_sql)
-                except Exception:
+                except Exception:  # nosec B110
                     # Índice pode já existir, ignorar
                     pass
 
@@ -1061,7 +1061,7 @@ class Database:
         if self._current_execution_id:
             try:
                 self._mark_execution_interrupted(self._current_execution_id)
-            except Exception:
+            except Exception:  # nosec B110
                 pass
 
     def _handle_signal(self, signum, frame) -> None:
@@ -1069,7 +1069,7 @@ class Database:
         if self._current_execution_id:
             try:
                 self._mark_execution_interrupted(self._current_execution_id)
-            except Exception:
+            except Exception:  # nosec B110
                 pass
 
     def _mark_execution_interrupted(self, execution_id: int) -> None:
@@ -1082,7 +1082,7 @@ class Database:
             """
             self._adapter.execute_query(query, (execution_id,))
             self._adapter.commit()
-        except Exception:
+        except Exception:  # nosec B110
             pass
 
     # ========== MÉTODOS DE EXECUÇÃO ==========
@@ -3279,7 +3279,7 @@ class Database:
                         log_method = log_level_mapping.get(log_level, self.log_instance.log_info)
                         log_method(formatted_message)  # type: ignore
 
-                except Exception as log_error:
+                except Exception as log_error:  # nosec B110
                     # Não falha se o log externo falhar, apenas registra silenciosamente
                     # Isso evita que problemas no Log externo quebrem o fluxo principal
                     pass

@@ -33,21 +33,6 @@ class Clock:
         >>> from rpa_suite import rpa
         >>> rpa.clock.exec_at_hour("14:30", my_function)
 
-    pt-br
-    ----------
-    Classe que fornece utilitários para manipulação de tempo e cronômetro.
-
-    Esta classe oferece funcionalidades para:
-        - Execução temporizada de funções
-        - Controle de tempo de execução
-        - Agendamento de tarefas
-
-    Métodos:
-        exec_at_hour: Executa uma função em um horário específico
-
-    A classe Clock é parte do RPA Suite e pode ser acessada através do objeto rpa:
-        >>> from rpa_suite import rpa
-        >>> rpa.clock.exec_at_hour("14:30", minha_funcao)
     """
 
     def __init__(self) -> None:
@@ -66,21 +51,6 @@ class Clock:
             >>> from rpa_suite import rpa
             >>> rpa.clock.exec_at_hour("14:30", my_function)
 
-        pt-br
-        ----------
-        Classe que fornece utilitários para manipulação de tempo e cronômetro.
-
-        Esta classe oferece funcionalidades para:
-            - Execução temporizada de funções
-            - Controle de tempo de execução
-            - Agendamento de tarefas
-
-        Métodos:
-            exec_at_hour: Executa uma função em um horário específico
-
-        A classe Clock é parte do RPA Suite e pode ser acessada através do objeto rpa:
-            >>> from rpa_suite import rpa
-            >>> rpa.clock.exec_at_hour("14:30", minha_funcao)
         """
 
     def exec_at_hour(
@@ -111,27 +81,6 @@ class Clock:
         >>> exec_at_hour("11:00", sum, 10, 5) -> 15 \n
             * NOTE:  `exec_at_hour` receives as first parameter the function that should be executed, then it can receive the arguments of the function, and explicitly we can define the time for execution.
 
-        Description: pt-br
-        ----------
-        Função temporizada, executa a função no horário especificado, por ``default`` executa no momento da chamada em tempo de execução, opcionalmente pode escolher o horário para execução.
-
-        Parâmetros:
-        ----------
-            `hour_to_exec: 'xx:xx'` - horário para execução da função, se não for passado o valor será por ``default`` em tempo de execução no momento da chamada desta função pelo cógido principal.
-
-            ``fn_to_exec: function`` - (função) a ser chamada pelo handler, se houver parâmetros nessa função podem ser passados como próximos argumentos em ``*args`` e ``**kwargs``
-
-        Retorno:
-        ----------
-        >>> type:dict
-            * 'tried': bool - representa se tentou executar a função passada no argumento
-            * 'success': bool - representa se houve sucesso ao tentar executar a função solicitada
-
-        Exemplo:
-        ---------
-        Vamos executar a função ``soma`` responsável por somar os valores de a e b e retornar x``soma(a, b) -> x`` e queremos que o código aguarde o horário especifico para ser executado de ``11:00``
-        >>> exec_at_hour("11:00", sum, 10, 5) -> 15 \n
-            * OBS.:  `exec_at_hour` recebe como primeiro parâmetro a função que deve ser executada, em seguida pode receber os argumentos da função, e de forma explicitada podemos definir o horário para execução.
         """
 
         # Local Variables
@@ -221,26 +170,6 @@ class Clock:
             * NOTE:  `wait_for_exec` receives as first argument the time to wait (sec), then the function `sum` and finally the arguments that the function will use.
 
 
-        pt-br
-        ----------
-        Função temporizadora, aguardar um valor em ``segundos`` para executar a função do argumento.
-
-        Parametros:
-        ----------
-            `wait_time: int` - (segundos) representa o tempo que deve aguardar antes de executar a função passada como argumento.
-
-            ``fn_to_exec: function`` - (função) a ser chamada depois do tempo aguardado, se houver parametros nessa função podem ser passados como próximos argumentos desta função em ``*args`` e ``**kwargs``
-
-        Retorno:
-        ----------
-        >>> type:dict
-            * 'success': bool - representa se ação foi realizada com sucesso
-
-        Exemplo:
-        ---------
-        Temos uma função de soma no seguinte formato ``soma(a, b) -> return x``, onde ``x`` é o resultado da soma. Queremos aguardar `30 segundos` para executar essa função, logo:
-        >>> wait_for_exec(30, soma, 10, 5) -> 15 \n
-            * OBS.:  `wait_for_exec` recebe como primeiro argumento o tempo a aguardar (seg), depois a função `soma` e por fim os argumentos que a função ira usar.
         """
 
         # Local Variables
@@ -283,26 +212,6 @@ class Clock:
             * NOTE:  `wait_for_exec` receives as first argument the time to wait (sec), then the function `sum` and finally the arguments that the function will use.
 
 
-        pt-br
-        ----------
-        Função temporizadora, executa uma função e aguarda o tempo em ``segundos``
-
-        Parametros:
-        ----------
-            `wait_time: int` - (segundos) representa o tempo que deve aguardar após executar a função solicitada
-
-            ``fn_to_exec: function`` - (função) a ser chamada antes do tempo para aguardar, se houver parametros nessa função podem ser passados como argumento depois da função, sendo: ``*args`` e ``**kwargs``
-
-        Retorno:
-        ----------
-        >>> type:dict
-            * 'success': bool - representa se ação foi realizada com sucesso
-
-        Exemplo:
-        ---------
-        Temos uma função de soma no seguinte formato ``soma(a, b) -> return x``, onde ``x`` é o resultado da soma. Queremos executar a soma e então aguardar `30 segundos` para continuar o código principal:
-        >>> wait_for_exec(30, soma, 10, 5) -> 15 \n
-            * OBS.:  `wait_for_exec` recebe como primeiro argumento o tempo a aguardar (seg), depois a função `soma` e por fim os argumentos que a função ira usar.
         """
 
         # Local Variables

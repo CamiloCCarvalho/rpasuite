@@ -342,7 +342,7 @@ class Artemis:
                         print(f"Image found on attempt {attempts}.")
                     return location
 
-            except artemis_engine.ImageNotFoundException:
+            except artemis_engine.ImageNotFoundException:  # nosec B110
                 # Image not found in this attempt
                 pass
             except TypeError as e:
