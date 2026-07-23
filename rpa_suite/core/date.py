@@ -70,34 +70,12 @@ class Date:
 
         """
 
-        # Local Variables
-        hours: str
-        minutes: str
-        seconds: str
-
         try:
-            # Preprocessing
             now = dt.datetime.now()
-            hours: str = str(now.hour) if now.hour >= 10 else f"0{now.hour}"
-            minutes: str = str(now.minute) if now.minute >= 10 else f"0{now.minute}"
-            seconds: str = str(now.second) if now.second >= 10 else f"0{now.second}"
-
-            # Process
-            try:
-                if len(hours) == 3 or len(minutes) == 3 or len(seconds) == 3:
-                    if len(seconds) == 3:
-                        seconds[1:]  # pylint: disable=pointless-statement
-                    if len(minutes) == 3:
-                        minutes[1:]  # pylint: disable=pointless-statement
-                    if len(hours) == 3:
-                        hours[1:]  # pylint: disable=pointless-statement
-
-                return hours, minutes, seconds
-
-            except Exception as e:
-                raise DateError(
-                    f"Error trying process hours, minutes or seconds convert strings: [{hours}, {minutes}, {seconds}]! {str(e)}."
-                ) from e
+            hours = f"{now.hour:02d}"
+            minutes = f"{now.minute:02d}"
+            seconds = f"{now.second:02d}"
+            return hours, minutes, seconds
         except Exception as e:
             raise DateError(f"Error function: {self.get_hms.__name__}! {str(e)}.") from e
 
@@ -117,25 +95,10 @@ class Date:
 
         """
         try:
-            # Local Variables
-            day_got: str
-            month_got: str
-            year_got: str
-
-            # Preprocessing
             now = dt.datetime.now()
-
-            # Process
-            try:
-                day_got: str = str(now.day) if now.day >= 10 else f"0{now.day}"
-                month_got: str = str(now.month) if now.month >= 10 else f"0{now.month}"
-                year_got: str = str(now.year) if now.year >= 10 else f"0{now.year}"
-
-                return day_got, month_got, year_got
-
-            except Exception as e:
-                raise DateError(
-                    f"Error trying process day, month or year convert strings: [{day_got}, {month_got}, {year_got}]! {str(e)}."
-                ) from e
+            day_got = f"{now.day:02d}"
+            month_got = f"{now.month:02d}"
+            year_got = f"{now.year:04d}"
+            return day_got, month_got, year_got
         except Exception as e:
-            raise DateError(f"Erro function: {self.get_dmy.__name__}! {str(e)}.") from e
+            raise DateError(f"Error function: {self.get_dmy.__name__}! {str(e)}.") from e

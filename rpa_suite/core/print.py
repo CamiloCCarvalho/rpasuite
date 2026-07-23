@@ -1,7 +1,17 @@
 # rpa_suite/core/print.py
 
-# imports third party
-from colorama import Fore
+# imports internal
+from rpa_suite.functions._printer import (
+    Colors,
+)
+from rpa_suite.functions._printer import alert_print as _alert_print
+from rpa_suite.functions._printer import blue_print as _blue_print
+from rpa_suite.functions._printer import error_print as _error_print
+from rpa_suite.functions._printer import info_print as _info_print
+from rpa_suite.functions._printer import magenta_print as _magenta_print
+from rpa_suite.functions._printer import print_call_fn as _print_call_fn
+from rpa_suite.functions._printer import print_retur_fn as _print_retur_fn
+from rpa_suite.functions._printer import success_print as _success_print
 
 
 class PrintError(Exception):
@@ -11,35 +21,14 @@ class PrintError(Exception):
         super().__init__(f"PrintError: {message}")
 
 
-# Windows bash colors
-class Colors:
-    """Color constants for console output formatting."""
-
-    black = f"{Fore.BLACK}"
-    blue = f"{Fore.BLUE}"
-    green = f"{Fore.GREEN}"
-    cyan = f"{Fore.CYAN}"
-    red = f"{Fore.RED}"
-    magenta = f"{Fore.MAGENTA}"
-    yellow = f"{Fore.YELLOW}"
-    white = f"{Fore.WHITE}"
-    default = f"{Fore.WHITE}"
-    call_fn = f"{Fore.LIGHTMAGENTA_EX}"
-    retur_fn = f"{Fore.LIGHTYELLOW_EX}"
-
-
 class Print:
     """
-    Class that provides methods for formatted printing in the console, allowing for different types of messages to be displayed with specific colors.
+    Thin OO wrapper over `rpa_suite.functions._printer`.
 
-    This class offers functionalities for:
-        - Printing success messages in green
-        - Printing alert messages in yellow
-        - Printing information messages in cyan
-        - Printing error messages in red
-        - Additional printing methods for other message types
-
-    The Print class is part of the RPA Suite and can be used to enhance the visibility of console outputs.
+    Both surfaces share a single implementation to keep colors/formatting
+    consistent across the library. `_printer` is the source of truth; this
+    class simply exposes the same behavior as instance methods so the
+    `rpa.print_*` calls stay ergonomic.
 
     Example:
     ----------
@@ -50,190 +39,36 @@ class Print:
     colors: Colors = Colors
 
     def __init__(self) -> None:
-        """
-        Class that provides methods for formatted printing in the console, allowing for different types of messages to be displayed with specific colors.
+        """Instantiate the printer facade. No state is kept."""
 
-        This class offers functionalities for:
-            - Printing success messages in green
-            - Printing alert messages in yellow
-            - Printing information messages in cyan
-            - Printing error messages in red
-            - Additional printing methods for other message types
+    def success_print(self, string_text: str, color=Colors.green, ending: str = "\n") -> None:
+        """Print in green (success)."""
+        _success_print(string_text, color=color, ending=ending)
 
-        The Print class is part of the RPA Suite and can be used to enhance the visibility of console outputs.
+    def alert_print(self, string_text: str, color=Colors.yellow, ending: str = "\n") -> None:
+        """Print in yellow (alert)."""
+        _alert_print(string_text, color=color, ending=ending)
 
-        Example:
-        ----------
-            >>> from rpa_suite import rpa
-            >>> rpa.alert_print('Hello World')
-        """
+    def info_print(self, string_text: str, color=Colors.cyan, ending: str = "\n") -> None:
+        """Print in cyan (informational)."""
+        _info_print(string_text, color=color, ending=ending)
 
-    def success_print(self, string_text: str, color=Colors.green, ending="\n") -> None:
-        """
-        Print that indicates SUCCESS. Customized with the color Green.
+    def error_print(self, string_text: str, color=Colors.red, ending: str = "\n") -> None:
+        """Print in red (error)."""
+        _error_print(string_text, color=color, ending=ending)
 
-        Parameters:
-        -----------
-        ``string_text: str``
-            The text to be printed.
+    def magenta_print(self, string_text: str, color=Colors.magenta, ending: str = "\n") -> None:
+        """Print in magenta."""
+        _magenta_print(string_text, color=color, ending=ending)
 
-        ``color``
-            The color to use for printing. Default is green.
+    def blue_print(self, string_text: str, color=Colors.blue, ending: str = "\n") -> None:
+        """Print in blue."""
+        _blue_print(string_text, color=color, ending=ending)
 
-        ``ending: str``
-            The string appended after the text. Default is newline.
+    def print_call_fn(self, string_text: str, color=Colors.call_fn, ending: str = "\n") -> None:
+        """Print in light magenta (used for logging function calls)."""
+        _print_call_fn(string_text, color=color, ending=ending)
 
-        Return:
-        ----------
-            >>> type: None
-        """
-        print(f"{color}{string_text}{Colors.default}", end=ending)
-
-    def alert_print(self, string_text: str, color=Colors.yellow, ending="\n") -> None:
-        """
-        Print that indicates ALERT. Customized with the color Yellow.
-
-        Parameters:
-        -----------
-        ``string_text: str``
-            The text to be printed.
-
-        ``color``
-            The color to use for printing. Default is yellow.
-
-        ``ending: str``
-            The string appended after the text. Default is newline.
-
-        Return:
-        ----------
-            >>> type: None
-        """
-        print(f"{color}{string_text}{Colors.default}", end=ending)
-
-    def info_print(self, string_text: str, color=Colors.cyan, ending="\n") -> None:
-        """
-        Print that indicates INFORMATION. Customized with the color Cyan.
-
-        Parameters:
-        -----------
-        ``string_text: str``
-            The text to be printed.
-
-        ``color``
-            The color to use for printing. Default is cyan.
-
-        ``ending: str``
-            The string appended after the text. Default is newline.
-
-        Return:
-        ----------
-            >>> type: None
-        """
-        print(f"{color}{string_text}{Colors.default}", end=ending)
-
-    def error_print(self, string_text: str, color=Colors.red, ending="\n") -> None:
-        """
-        Print that indicates ERROR. Customized with the color Red.
-
-        Parameters:
-        -----------
-        ``string_text: str``
-            The text to be printed.
-
-        ``color``
-            The color to use for printing. Default is red.
-
-        ``ending: str``
-            The string appended after the text. Default is newline.
-
-        Return:
-        ----------
-            >>> type: None
-        """
-        print(f"{color}{string_text}{Colors.default}", end=ending)
-
-    def magenta_print(self, string_text: str, color=Colors.magenta, ending="\n") -> None:
-        """
-        Print customized with the color Magenta.
-
-        Parameters:
-        -----------
-        ``string_text: str``
-            The text to be printed.
-
-        ``color``
-            The color to use for printing. Default is magenta.
-
-        ``ending: str``
-            The string appended after the text. Default is newline.
-
-        Return:
-        ----------
-            >>> type: None
-        """
-        print(f"{color}{string_text}{Colors.default}", end=ending)
-
-    def blue_print(self, string_text: str, color=Colors.blue, ending="\n") -> None:
-        """
-        Print customized with the color Blue.
-
-        Parameters:
-        -----------
-        ``string_text: str``
-            The text to be printed.
-
-        ``color``
-            The color to use for printing. Default is blue.
-
-        ``ending: str``
-            The string appended after the text. Default is newline.
-
-        Return:
-        ----------
-            >>> type: None
-        """
-        print(f"{color}{string_text}{Colors.default}", end=ending)
-
-    def print_call_fn(self, string_text: str, color=Colors.call_fn, ending="\n") -> None:
-        """
-        Print customized for function called (log).
-        Color: Light Magenta
-
-        Parameters:
-        -----------
-        ``string_text: str``
-            The text to be printed.
-
-        ``color``
-            The color to use for printing. Default is light magenta.
-
-        ``ending: str``
-            The string appended after the text. Default is newline.
-
-        Return:
-        ----------
-            >>> type: None
-        """
-        print(f"{color}{string_text}{Colors.default}", end=ending)
-
-    def print_retur_fn(self, string_text: str, color=Colors.retur_fn, ending="\n") -> None:
-        """
-        Print customized for function return (log).
-        Color: Light Yellow
-
-        Parameters:
-        -----------
-        ``string_text: str``
-            The text to be printed.
-
-        ``color``
-            The color to use for printing. Default is light yellow.
-
-        ``ending: str``
-            The string appended after the text. Default is newline.
-
-        Return:
-        ----------
-            >>> type: None
-        """
-        print(f"{color}{string_text}{Colors.default}", end=ending)
+    def print_retur_fn(self, string_text: str, color=Colors.retur_fn, ending: str = "\n") -> None:
+        """Print in light yellow (used for logging function returns)."""
+        _print_retur_fn(string_text, color=color, ending=ending)

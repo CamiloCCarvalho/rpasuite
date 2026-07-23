@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel">
+    <div class="panel-title">Something went wrong</div>
+    <p class="muted">{{ message }}</p>
+    <p><a class="btn" href="{{ url_for('index') }}">Back to overview</a></p>
+</div>
+{% endblock %}

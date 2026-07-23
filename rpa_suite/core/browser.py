@@ -2,7 +2,8 @@
 
 # imports standard
 import os
-import subprocess  # nosec B404
+import subprocess
+import time as _time
 from time import sleep
 
 import requests
@@ -126,7 +127,6 @@ class Browser:
             if close_chrome_on_this_port:
                 self.close_browser()
 
-            # Inicia o Chrome com debugging port (usando subprocess seguro)
             chrome_cmd = [
                 "cmd.exe",
                 "/c",
@@ -137,17 +137,25 @@ class Browser:
             ]
             subprocess.run(chrome_cmd, shell=False, check=False)
 
-            # Aguardar até que o Chrome esteja realmente aberto
-            while True:
+            # Wait for Chrome to be reachable on the debugging port, with an
+            # upper bound so this call cannot hang forever if Chrome fails to
+            # start (bad path, missing binary, blocked port, etc).
+            deadline = _time.time() + max(1, int(timeout))
+            connected = False
+            while _time.time() < deadline:
                 try:
-                    # Tenta conectar ao Chrome na porta de depuração
-                    response = requests.get(f"http://127.0.0.1:{self.port}/json", timeout=timeout)
+                    response = requests.get(
+                        f"http://127.0.0.1:{self.port}/json",
+                        timeout=2,
+                    )
                     if response.status_code == 200:
-                        break  # O Chrome está aberto
-                except requests.ConnectionError:
-                    sleep(0.3)  # Espera um segundo antes de tentar novamente
+                        connected = True
+                        break
+                except requests.RequestException:
+                    sleep(0.3)
+            if not connected:
+                raise BrowserError(f"Timed out after {timeout}s waiting for Chrome DevTools on " f"port {self.port}.")
 
-            # Inicializa o Chrome com as opções
             self.configure_browser()
 
             if verbose:
@@ -209,22 +217,28 @@ class Browser:
 
     def _close_all_browsers(self):
         """
-        Forcefully closes all instances of Google Chrome running on the system.
-        This method uses subprocess to terminate all processes with the name
-        "chrome.exe". Any errors during the execution of the command are silently ignored.
-        Note:
-            This method is specific to Windows operating systems and will not work on other platforms.
+        Forcefully close only the Chrome instance bound to `self.port`.
+
+        Uses a `taskkill` filter on the debugging-port command line so we do not
+        kill unrelated Chrome windows the user may have open. Windows-only.
         """
 
         try:
             subprocess.run(
-                ["taskkill", "/F", "/IM", "chrome.exe"],
+                [
+                    "taskkill",
+                    "/F",
+                    "/IM",
+                    "chrome.exe",
+                    "/FI",
+                    f"COMMANDLINE eq *--remote-debugging-port={self.port}*",
+                ],
                 shell=False,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 check=False,
             )
-        except:  # pylint: disable=bare-except #nosec B110
+        except OSError:
             pass
 
     def close_browser(self, verbose: bool = False):
@@ -251,26 +265,28 @@ class Browser:
             # Primeiro tenta fechar todas as janelas via Selenium
             try:
                 self.driver.close()
-            except:  # pylint: disable=bare-except #nosec B110
+            except:  # pylint: disable=bare-except
                 pass
 
             # Depois tenta encerrar a sessão
             try:
                 self.driver.quit()
-            except:  # pylint: disable=bare-except #nosec B110
+            except:  # pylint: disable=bare-except
                 pass
 
             # Aguarda um momento para o processo ser liberado
             sleep(0.6)
 
-            # Força o fechamento do processo específico do Chrome (usando subprocess seguro)
+            port_filter = f"COMMANDLINE eq *--remote-debugging-port={self.port}*"
+
             subprocess.run(
                 [
                     "taskkill",
-                    "/f",
-                    "/im",
+                    "/F",
+                    "/IM",
                     "chrome.exe",
-                    f'/fi "commandline like *--remote-debugging-port={str(self.port)}*"',
+                    "/FI",
+                    port_filter,
                 ],
                 shell=False,
                 stdout=subprocess.DEVNULL,
@@ -278,29 +294,32 @@ class Browser:
                 check=False,
             )
 
-            # Verifica se o processo foi realmente terminado
             check_result = subprocess.run(
                 [
                     "tasklist",
-                    f'/fi "imagename eq chrome.exe"',
-                    f'/fi "commandline like *--remote-debugging-port={str(self.port)}*"',
+                    "/FI",
+                    "IMAGENAME eq chrome.exe",
+                    "/FI",
+                    port_filter,
                 ],
                 shell=False,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                capture_output=True,
+                text=True,
                 check=False,
             )
 
-            if check_result.returncode == 0:
-                # Processo ainda existe, tenta método mais agressivo
+            still_alive = "chrome.exe" in (check_result.stdout or "")
+
+            if still_alive:
                 subprocess.run(
                     [
                         "taskkill",
-                        "/f",
-                        "/im",
+                        "/F",
+                        "/T",
+                        "/IM",
                         "chrome.exe",
-                        f'/fi "commandline like *--remote-debugging-port={str(self.port)}*"',
-                        "/t",
+                        "/FI",
+                        port_filter,
                     ],
                     shell=False,
                     stdout=subprocess.DEVNULL,
@@ -309,7 +328,6 @@ class Browser:
                 )
                 if verbose:
                     alert_print("Browser: Closed forcefully!")
-
             else:
                 if verbose:
                     success_print("Browser: Closed successfully!")
@@ -320,15 +338,16 @@ class Browser:
                 if verbose:
                     alert_print(f"Error closing browser: {str(e)}, Trying stronger method!")
 
-                # Último recurso - mata todos os processos do Chrome (use com cautela)
+                port_filter = f"COMMANDLINE eq *--remote-debugging-port={self.port}*"
                 subprocess.run(
                     [
                         "taskkill",
-                        "/f",
-                        "/im",
+                        "/F",
+                        "/T",
+                        "/IM",
                         "chrome.exe",
-                        f'/fi "commandline like *--remote-debugging-port={str(self.port)}*"',
-                        "/t",
+                        "/FI",
+                        port_filter,
                     ],
                     shell=False,
                     stdout=subprocess.DEVNULL,

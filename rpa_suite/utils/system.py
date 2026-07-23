@@ -30,7 +30,7 @@ class Utils:
 
         Does not require specific initialization parameters.
         """
-        try:  # nosec B110
+        try:
             pass
         except Exception as e:
             raise UtilsError(f"Error during Utils class initialization: {str(e)}.") from e

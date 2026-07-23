@@ -1,0 +1,17 @@
+<nav class="pagination">
+    <div class="pagination-info">
+        Page <strong>{{ data.page }}</strong> of <strong>{{ data.pages }}</strong>
+        · <span class="muted">{{ data.total }} total row(s)</span>
+    </div>
+    <div class="pagination-controls">
+        {% set prefix = (base_qs ~ '&') if base_qs else '' %}
+        {% if data.page > 1 %}
+            <a class="btn" href="?{{ prefix }}page=1">« First</a>
+            <a class="btn" href="?{{ prefix }}page={{ data.page - 1 }}">‹ Prev</a>
+        {% endif %}
+        {% if data.page < data.pages %}
+            <a class="btn" href="?{{ prefix }}page={{ data.page + 1 }}">Next ›</a>
+            <a class="btn" href="?{{ prefix }}page={{ data.pages }}">Last »</a>
+        {% endif %}
+    </div>
+</nav>

@@ -136,6 +136,10 @@ class Log:
         """
         try:
             self.logger = logger
+            # Track only handler ids registered by this Log instance so we do
+            # not blow away sinks the caller registered elsewhere. loguru's
+            # `logger.remove()` with no arg is process-wide.
+            self._own_handler_ids: list[int] = []
         except Exception as e:
             raise LogError(f"Error trying execute: {self.__init__.__name__}! {str(e)}.") from e  # type: ignore
 
@@ -186,18 +190,31 @@ class Log:
                 new_filter.word_filter = [filter_words]  # type: ignore
 
             file_handler = os.path.join(self.full_path, f"{self.name_file_log}.log")
-            self.logger.remove()
+
+            # Remove only the handlers this Log instance had previously
+            # registered, preserving user-added sinks on the global logger.
+            for handler_id in self._own_handler_ids:
+                try:
+                    self.logger.remove(handler_id)
+                except ValueError:
+                    pass
+            self._own_handler_ids.clear()
 
             log_format = "<green>{time:DD.MM.YY.HH:mm}</green> <level>{level: <8}</level> <green>{extra[filename]}</green>:<cyan>{extra[lineno]: <4}</cyan> <level>{message}</level>"
 
             formatter = CustomFormatter()
 
             if new_filter:
-                self.logger.add(file_handler, filter=new_filter, level="DEBUG", format=log_format)  # type: ignore
+                file_id = self.logger.add(
+                    file_handler, filter=new_filter, level="DEBUG", format=log_format  # type: ignore
+                )
             else:
-                self.logger.add(file_handler, level="DEBUG", format=log_format)
+                file_id = self.logger.add(file_handler, level="DEBUG", format=log_format)
+            self._own_handler_ids.append(file_id)
 
-            self.logger.add(sys.stderr, level="DEBUG", format=formatter.format)
+            stderr_id = self.logger.add(sys.stderr, level="DEBUG", format=formatter.format)
+            self._own_handler_ids.append(stderr_id)
+
             self.file_handler = file_handler
             return file_handler
 
@@ -269,7 +286,7 @@ class Log:
                         # ESCAPE SPECIAL CHARACTERS IN TRACEBACK
                         escaped_traceback = self._escape_traceback(tb_string)
                         msg = f"{msg}\n{escaped_traceback}"
-                except Exception:  # nosec B110
+                except Exception:
                     # If can't capture traceback, continue normally
                     pass
 

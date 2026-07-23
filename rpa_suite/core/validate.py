@@ -1,5 +1,8 @@
 # rpa_suite/core/mail_validator.py
 
+# imports standard
+import re
+
 # imports third party
 import email_validator
 
@@ -79,12 +82,12 @@ class Validate:
 
         # Local Variables
         result: dict = {
-            "success": bool,
-            "valid_emails": list,
-            "invalid_emails": list,
-            "qt_valids": int,
-            "qt_invalids": int,
-            "map_validation": list[dict],
+            "success": False,
+            "valid_emails": [],
+            "invalid_emails": [],
+            "qt_valids": 0,
+            "qt_invalids": 0,
+            "map_validation": [],
         }
 
         # Preprocessing
@@ -154,63 +157,44 @@ class Validate:
             Returns a dictionary with the following information:
                 * 'is_found': bool - True if the pattern was found at least once
                 * 'number_occurrences': int - number of times the pattern was found
-                * 'positions': list[set(int, int), ...] - all positions where the pattern appeared in the original text
-
-        About `positions`:
-        ----------
-        list[set(int, int), ...]
-            At index 0 is the first occurrence (as a pair of numbers in a set), other indexes represent other found occurrences.
+                * 'positions': list[tuple[int, int]] - `(start, end)` character
+                  offsets in the original text for each occurrence
 
         Example:
         ----------
         >>> from rpa_suite.core.validate import Validate
         >>> v = Validate()
         >>> v.word("Hello world, hello!", "hello", case_sensitivy=False, search_by="word")
-        {'is_found': True, 'number_occurrences': 2, 'positions': []}
+        {'is_found': True, 'number_occurrences': 2, 'positions': [(0, 5), (13, 18)]}
 
         """
 
-        # Local Variables
         result: dict = {"is_found": False, "number_occurrences": 0, "positions": []}
 
-        # Preprocessing
-        result["is_found"] = False
-
-        # Process
         try:
+            flags = 0 if case_sensitivy else re.IGNORECASE
+
             if search_by == "word":
-                origin_words = origin_text.split()
-                try:
-                    if case_sensitivy:
-                        result["number_occurrences"] = origin_words.count(searched_word)
-                        result["is_found"] = result["number_occurrences"] > 0
-                    else:
-                        words_lowercase = [word.lower() for word in origin_words]
-                        searched_word_lower = searched_word.lower()
-                        result["number_occurrences"] = words_lowercase.count(searched_word_lower)
-                        result["is_found"] = result["number_occurrences"] > 0
-
-                except Exception as e:
-                    raise ValidateError(f"Unable to complete the search: {searched_word}. Error: {str(e)}") from e
-
+                pattern = re.compile(rf"\b{re.escape(searched_word)}\b", flags)
             elif search_by == "string":
-                try:
-                    if case_sensitivy:
-                        result["number_occurrences"] = origin_text.count(searched_word)
-                        result["is_found"] = result["number_occurrences"] > 0
-                    else:
-                        origin_text_lower = origin_text.lower()
-                        searched_word_lower = searched_word.lower()
-                        result["number_occurrences"] = origin_text_lower.count(searched_word_lower)
-                        result["is_found"] = result["number_occurrences"] > 0
+                pattern = re.compile(re.escape(searched_word), flags)
+            elif search_by == "regex":
+                pattern = re.compile(searched_word, flags)
+            else:
+                raise ValidateError(f"Invalid search_by value: {search_by!r}. Use 'string', 'word' or 'regex'.")
 
-                except Exception as e:
-                    raise ValidateError(f"Unable to complete the search: {searched_word}. Error: {str(e)}") from e
+            matches = list(pattern.finditer(origin_text))
+            result["positions"] = [(m.start(), m.end()) for m in matches]
+            result["number_occurrences"] = len(matches)
+            result["is_found"] = result["number_occurrences"] > 0
 
+        except ValidateError:
+            raise
+        except re.error as e:
+            raise ValidateError(f"Invalid regex for: {searched_word!r}. Error: {str(e)}") from e
         except Exception as e:
             raise ValidateError(f"Unable to search for: {searched_word}. Error: {str(e)}") from e
 
-        # Postprocessing
         if result["is_found"]:
             if verbose:
                 success_print(
@@ -223,3 +207,88 @@ class Validate:
                 )
 
         return result
+
+    @staticmethod
+    def _only_digits(value: str) -> str:
+        return re.sub(r"\D", "", value or "")
+
+    def cpf(self, value: str) -> bool:
+        """
+        Validate a Brazilian CPF (Cadastro de Pessoas Físicas).
+
+        Accepts formatted (`123.456.789-09`) or unformatted (`12345678909`)
+        inputs. Rejects sequences with all equal digits (e.g. `11111111111`).
+
+        Returns:
+            True if the CPF is structurally and check-digit valid, False otherwise.
+        """
+        digits = self._only_digits(value)
+        if len(digits) != 11 or digits == digits[0] * 11:
+            return False
+
+        def _dv(nums: list[int], weights: range) -> int:
+            total = sum(n * w for n, w in zip(nums, weights))
+            rest = total % 11
+            return 0 if rest < 2 else 11 - rest
+
+        nums = [int(d) for d in digits]
+        dv1 = _dv(nums[:9], range(10, 1, -1))
+        dv2 = _dv(nums[:9] + [dv1], range(11, 1, -1))
+        return nums[9] == dv1 and nums[10] == dv2
+
+    def cnpj(self, value: str) -> bool:
+        """
+        Validate a Brazilian CNPJ (Cadastro Nacional da Pessoa Jurídica).
+
+        Accepts formatted (`12.345.678/0001-95`) or unformatted (`12345678000195`)
+        inputs. Rejects sequences with all equal digits.
+        """
+        digits = self._only_digits(value)
+        if len(digits) != 14 or digits == digits[0] * 14:
+            return False
+
+        weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        weights2 = [6] + weights1
+
+        def _dv(nums: list[int], weights: list[int]) -> int:
+            total = sum(n * w for n, w in zip(nums, weights))
+            rest = total % 11
+            return 0 if rest < 2 else 11 - rest
+
+        nums = [int(d) for d in digits]
+        dv1 = _dv(nums[:12], weights1)
+        dv2 = _dv(nums[:12] + [dv1], weights2)
+        return nums[12] == dv1 and nums[13] == dv2
+
+    def cep(self, value: str) -> bool:
+        """
+        Validate a Brazilian CEP (Código de Endereçamento Postal).
+
+        Accepts formatted (`12345-678`) or unformatted (`12345678`) inputs.
+        Only the structure (8 digits) is validated; existence in Correios' base
+        is not checked.
+        """
+        digits = self._only_digits(value)
+        return len(digits) == 8
+
+    def phone_br(self, value: str) -> bool:
+        """
+        Validate a Brazilian phone number.
+
+        Accepted formats (with or without country code `+55`):
+            * 10 digits: landline `AA XXXX-XXXX`
+            * 11 digits: mobile `AA 9XXXX-XXXX` (the ninth digit must be 9)
+
+        Area codes (`AA`) are constrained to the 11-99 range used by ANATEL.
+        """
+        digits = self._only_digits(value)
+        if digits.startswith("55") and len(digits) in (12, 13):
+            digits = digits[2:]
+        if len(digits) not in (10, 11):
+            return False
+        area_code = int(digits[:2])
+        if not 11 <= area_code <= 99:
+            return False
+        if len(digits) == 11 and digits[2] != "9":
+            return False
+        return True

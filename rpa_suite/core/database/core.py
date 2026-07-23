@@ -30,6 +30,8 @@ from .item_dedup import (
     json_extract_sql,
     resolve_item_identifier_for_storage,
 )
+from .retention import RetentionPolicy
+from .schema_migrations import run_schema_migrations
 from .signals import register_database, unregister_database
 from .sql_generator import SQLGenerator
 from .validation import (
@@ -49,15 +51,21 @@ except ImportError:
 
 from .mixins import (
     CleanupMixin,
+    DashboardQueriesMixin,
     ExecutionsMixin,
     ItemsMixin,
     LogsMixin,
+    ProcessQueueMixin,
     ReprocessMixin,
+    RetentionMixin,
     StatisticsMixin,
 )
 
 
 class Database(
+    RetentionMixin,
+    ProcessQueueMixin,
+    DashboardQueriesMixin,
     ExecutionsMixin,
     ItemsMixin,
     ReprocessMixin,
@@ -104,6 +112,7 @@ class Database(
         duplicate_item_behavior: str = "skip",
         log_instance: Log | None = None,
         verbose: bool = False,
+        retention_policy: RetentionPolicy | dict | None = None,
     ):
         """
         Initialize the database manager.
@@ -200,8 +209,17 @@ class Database(
         verbose : bool
             Print informational messages during initialization.
             Default: False
+
+        retention_policy : RetentionPolicy | dict | None
+            Automatic table retention (TTL + row caps). Pass a dict or
+            ``RetentionPolicy`` instance. Use ``enabled=True`` to activate.
+            Default: disabled.
         """
         try:
+            if isinstance(retention_policy, RetentionPolicy):
+                self.retention_policy = retention_policy
+            else:
+                self.retention_policy = RetentionPolicy.from_mapping(retention_policy)
             self.db_type = db_type
             # Validar nomes de tabelas para prevenir SQL injection
             self.executions_table = validate_table_name(executions_table)
@@ -281,6 +299,9 @@ class Database(
                     self.detect_and_mark_interrupted_executions(scope="all")
                     self.detect_and_mark_interrupted_items(scope="all")
 
+            if self.retention_policy.enabled and self.retention_policy.auto_on_init:
+                self.apply_retention_policy(dry_run=False)
+
         except Exception as e:
             raise DatabaseError(f"Failed to initialize Database: {str(e)}.") from e
 
@@ -303,7 +324,7 @@ class Database(
     def __del__(self) -> None:
         try:
             self.close()
-        except Exception:  # nosec B110
+        except Exception:
             pass
 
     def _ensure_open(self) -> None:
@@ -366,11 +387,17 @@ class Database(
             for index_sql in create_indexes:
                 try:
                     self._adapter.execute_query(index_sql)
-                except Exception:  # nosec B110
+                except Exception:
                     pass
 
             if self.prevent_duplicate_items:
                 self._sync_unique_item_index()
+
+            run_schema_migrations(
+                self.db_type,
+                self._adapter,
+                self.items_table,
+            )
 
             self._adapter.commit()
 
@@ -388,7 +415,7 @@ class Database(
         index_name = f"idx_{self.items_table}_unique_item_identifier"
         try:
             self._adapter.execute_query(f"DROP INDEX IF EXISTS {index_name}")
-        except Exception:  # nosec B110
+        except Exception:
             pass
 
         if not self.prevent_duplicate_items:
@@ -403,5 +430,5 @@ class Database(
         )
         try:
             self._adapter.execute_query(index_sql)
-        except Exception:  # nosec B110
+        except Exception:
             pass

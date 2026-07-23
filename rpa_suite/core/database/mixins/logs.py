@@ -148,7 +148,7 @@ class LogsMixin:
                         log_method = log_level_mapping.get(log_level, self.log_instance.log_info)
                         log_method(formatted_message)  # type: ignore
 
-                except Exception as log_error:  # nosec B110
+                except Exception as log_error:
                     # Não falha se o log externo falhar, apenas registra silenciosamente
                     # Isso evita que problemas no Log externo quebrem o fluxo principal
                     pass

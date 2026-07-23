@@ -71,17 +71,29 @@ class ParallelRunner(Generic[T]):
         5
         """
         try:
-            self._manager = Manager()
-            self._result_dict = self._manager.dict()
+            self._manager = None
+            self._result_dict = None
             self._process = None
             self._start_time = None
             self.verbose = verbose
+            self._ensure_manager()
 
             if self.verbose:
                 success_print("ParallelRunner initialized successfully")
 
         except Exception as e:
             raise ParallelRunnerError(f"Error initializing ParallelRunner: {str(e)}") from e
+
+    def _ensure_manager(self) -> None:
+        """Ensure a live multiprocessing Manager and shared dict are available.
+
+        The runner can be reused across multiple `run()` calls, so we (re)create
+        the Manager on demand instead of leaving the instance in a broken state
+        after `_cleanup()` has been called.
+        """
+        if self._manager is None:
+            self._manager = Manager()
+            self._result_dict = self._manager.dict()
 
     @staticmethod
     def _execute_function(function, args, kwargs, result_dict):
@@ -168,11 +180,11 @@ class ParallelRunner(Generic[T]):
         >>> runner.run(slow_add, 2, 3)
         """
         try:
-            # Clear previous result, if any
+            self._ensure_manager()
+
             if self._result_dict:
                 self._result_dict.clear()
 
-            # Configure initial values in the shared dictionary
             self._result_dict["status"] = "running"
 
             # Start the process with the static helper function
@@ -277,7 +289,7 @@ class ParallelRunner(Generic[T]):
                         self._process.join(timeout=1)  # Small timeout to ensure process terminates
                         result["terminated"] = True
                         result["success"] = False
-                        result["error"] = "Operation cancelled due to timeout after {execution_time:.2f} seconds"
+                        result["error"] = f"Operation cancelled due to timeout after {execution_time:.2f} seconds"
 
                         if self.verbose:
                             alert_print("Process terminated due to timeout")
@@ -400,6 +412,6 @@ class ParallelRunner(Generic[T]):
         """
         try:
             self.terminate()
-        except Exception:  # nosec B110
+        except Exception:
             # Silently handle any errors during destruction
             pass

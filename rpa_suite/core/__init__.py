@@ -24,9 +24,11 @@ from .dir import Directory
 from .email import Email
 from .file import File
 from .log import Log
+from .notify import Notifier, NotifierError
 from .parallel import ParallelRunner
 from .print import Print
 from .regex import Regex
+from .retry import RetryError, retry
 from .validate import Validate
 
 # from .browser import Browser

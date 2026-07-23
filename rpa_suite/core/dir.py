@@ -73,14 +73,12 @@ class Directory:
             * 'path_created': str - path of the directory that was created on the process
         """
 
-        # Local Variables
         result: dict = {  # pylint: disable=duplicate-code
-            "success": bool,
-            "path_created": str,
+            "success": False,
+            "path_created": None,
         }
 
         try:
-            # by 'default', defines path to local script execution path
             if path_to_create == "default":  # pylint: disable=duplicate-code
                 path_to_create: str = os.getcwd()
 
@@ -142,10 +140,9 @@ class Directory:
             * 'path_deleted': str - path of the directory that was deleted on the process
         """
 
-        # Local Variables
         result: dict = {  # pylint: disable=duplicate-code
-            "success": bool,
-            "path_deleted": str,
+            "success": False,
+            "path_deleted": None,
         }
 
         try:

@@ -125,6 +125,7 @@ class SQLGenerator:
                 max_retries INTEGER DEFAULT 0,
                 allow_reprocess {bool_type} DEFAULT 1,
                 created_at {datetime_type} NOT NULL {default_timestamp},
+                updated_at {datetime_type} NOT NULL {default_timestamp},
                 FOREIGN KEY (execution_id) REFERENCES {self.executions_table}(id) ON DELETE CASCADE,
                 CHECK (status IN ('pending', 'queued', 'processing', 'success', 'failed', 'skipped', 'interrupted', 'retrying'))
             )
@@ -167,6 +168,7 @@ class SQLGenerator:
             f"CREATE INDEX IF NOT EXISTS idx_{self.items_table}_status ON {self.items_table}(status)",
             f"CREATE INDEX IF NOT EXISTS idx_{self.items_table}_queue ON {self.items_table}(execution_id, queue_position, status)",
             f"CREATE INDEX IF NOT EXISTS idx_{self.items_table}_priority ON {self.items_table}(priority DESC, status)",
+            f"CREATE INDEX IF NOT EXISTS idx_{self.items_table}_updated_at ON {self.items_table}(updated_at)",
             f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_execution_id ON {self.logs_table}(execution_id)",
             f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_timestamp ON {self.logs_table}(timestamp)",
             f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_log_level ON {self.logs_table}(log_level)",

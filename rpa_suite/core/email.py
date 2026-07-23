@@ -1,16 +1,20 @@
 # rpa_suite/core/email.py
 
 # imports standard
+import email as email_pkg
+import imaplib
 import os
 import smtplib
 import warnings
 from email import encoders
+from email.header import decode_header, make_header
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from typing import Any, Dict, List, Optional
 
 # imports internal
-from rpa_suite.functions._printer import alert_print, success_print
+from rpa_suite.functions._printer import success_print
 
 
 class EmailError(Exception):
@@ -194,19 +198,20 @@ class Email:
                         raise EmailError(f"Error attaching file {attachment_path}: {str(e)}") from e
 
             try:
+                # Use a context manager so the connection is closed even when
+                # login/sendmail raise, preventing leaked SMTP sockets.
                 if auth_tls:
-                    server = smtplib.SMTP(smtp_server, smtp_port)
-                    server.starttls()
-                    server.login(email_user, smtp_password)
+                    with smtplib.SMTP(smtp_server, smtp_port) as server:
+                        server.starttls()
+                        server.login(email_user, smtp_password)
+                        server.sendmail(email_user, email_to, msg.as_string())
                 else:
-                    server = smtplib.SMTP_SSL(smtp_server, smtp_port)
-                    server.login(email_user, smtp_password)
+                    with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
+                        server.login(email_user, smtp_password)
+                        server.sendmail(email_user, email_to, msg.as_string())
 
-                server.sendmail(email_user, email_to, msg.as_string())
                 if verbose:
                     success_print("Email sent successfully!")
-
-                server.quit()
 
             except Exception as e:
                 raise EmailError(f"Failed to send email: {str(e)}") from e
@@ -216,3 +221,209 @@ class Email:
         finally:
             if "smtp_password" in locals():
                 smtp_password = ""
+
+    def _decode_header_value(self, raw: Optional[str]) -> str:
+        """Best-effort decode of a MIME header (subject, from, ...) into a str."""
+        if not raw:
+            return ""
+        try:
+            return str(make_header(decode_header(raw)))
+        except Exception:  # noqa: BLE001
+            return raw
+
+    def _extract_body(self, msg: email_pkg.message.Message, prefer_html: bool = False) -> str:
+        """Extract a text/plain (or text/html) body from an email.message.Message."""
+        target = "text/html" if prefer_html else "text/plain"
+        candidates: List[str] = []
+        try:
+            if msg.is_multipart():
+                for part in msg.walk():
+                    ctype = part.get_content_type()
+                    disp = str(part.get("Content-Disposition", "")).lower()
+                    if "attachment" in disp:
+                        continue
+                    if ctype == target:
+                        payload = part.get_payload(decode=True) or b""
+                        charset = part.get_content_charset() or "utf-8"
+                        candidates.append(payload.decode(charset, errors="replace"))
+                if not candidates and target != "text/plain":
+                    return self._extract_body(msg, prefer_html=False)
+                return "\n".join(candidates)
+            payload = msg.get_payload(decode=True) or b""
+            charset = msg.get_content_charset() or "utf-8"
+            return payload.decode(charset, errors="replace")
+        except Exception:  # noqa: BLE001
+            return ""
+
+    def read_inbox(  # pylint: disable=too-many-positional-arguments
+        self,
+        email_user: str,
+        email_password: Optional[str] = None,
+        imap_server: str = "imap.hostinger.com",
+        imap_port: int = 993,
+        mailbox: str = "INBOX",
+        limit: int = 20,
+        unread_only: bool = False,
+        prefer_html: bool = False,
+        password_from_env: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Read messages from an IMAP mailbox and return them as dictionaries.
+
+        Parameters:
+        ----------
+        email_user : str
+            Login user (email address) for IMAP authentication.
+        email_password : str, optional
+            Password. Prefer using `password_from_env` for security.
+        imap_server : str
+            IMAP server host. Default: "imap.hostinger.com".
+        imap_port : int
+            IMAP over SSL port. Default: 993.
+        mailbox : str
+            Mailbox to open. Default: "INBOX".
+        limit : int
+            Maximum number of most-recent messages to fetch. Default: 20.
+        unread_only : bool
+            If True, only messages flagged UNSEEN are returned.
+        prefer_html : bool
+            If True, return the HTML body when available; otherwise plain text.
+        password_from_env : str, optional
+            Name of an environment variable that holds the password.
+
+        Returns:
+        ----------
+        list[dict] with keys:
+            * 'uid'         : IMAP UID of the message
+            * 'subject'     : decoded subject line
+            * 'from'        : decoded From header
+            * 'to'          : decoded To header
+            * 'date'        : Date header as string
+            * 'body'        : text body (plain or HTML depending on `prefer_html`)
+            * 'attachments' : list of attachment filenames (no payload loaded)
+
+        Raises:
+        ----------
+        EmailError: on authentication, connection or fetch errors.
+        """
+        password = _resolve_smtp_password(email_password, password_from_env)
+        try:
+            with imaplib.IMAP4_SSL(imap_server, imap_port) as imap:
+                imap.login(email_user, password)
+                imap.select(mailbox, readonly=True)
+
+                criterion = "UNSEEN" if unread_only else "ALL"
+                status, data = imap.search(None, criterion)
+                if status != "OK":
+                    raise EmailError(f"IMAP search failed: {status}")
+
+                uids = data[0].split()
+                if not uids:
+                    return []
+                uids = uids[-max(1, limit) :][::-1]  # newest first
+
+                messages: List[Dict[str, Any]] = []
+                for uid in uids:
+                    status, msg_data = imap.fetch(uid, "(RFC822)")
+                    if status != "OK" or not msg_data or not msg_data[0]:
+                        continue
+                    raw_email = msg_data[0][1]
+                    msg = email_pkg.message_from_bytes(raw_email)
+
+                    attachments: List[str] = []
+                    if msg.is_multipart():
+                        for part in msg.walk():
+                            disp = str(part.get("Content-Disposition", "")).lower()
+                            if "attachment" in disp:
+                                fname = part.get_filename()
+                                if fname:
+                                    attachments.append(self._decode_header_value(fname))
+
+                    messages.append(
+                        {
+                            "uid": uid.decode() if isinstance(uid, bytes) else str(uid),
+                            "subject": self._decode_header_value(msg.get("Subject")),
+                            "from": self._decode_header_value(msg.get("From")),
+                            "to": self._decode_header_value(msg.get("To")),
+                            "date": msg.get("Date", ""),
+                            "body": self._extract_body(msg, prefer_html=prefer_html),
+                            "attachments": attachments,
+                        }
+                    )
+                return messages
+        except imaplib.IMAP4.error as e:
+            raise EmailError(f"IMAP error: {str(e)}") from e
+        except Exception as e:
+            raise EmailError(f"Failed to read inbox: {str(e)}") from e
+        finally:
+            password = ""  # noqa: F841 - best-effort clearing
+
+    def search_emails(  # pylint: disable=too-many-positional-arguments
+        self,
+        email_user: str,
+        query: str,
+        email_password: Optional[str] = None,
+        imap_server: str = "imap.hostinger.com",
+        imap_port: int = 993,
+        mailbox: str = "INBOX",
+        limit: int = 20,
+        prefer_html: bool = False,
+        password_from_env: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        Search messages using a raw IMAP search query string.
+
+        `query` follows the IMAP SEARCH grammar (RFC 3501). Examples:
+            * `'FROM "boss@example.com"'`
+            * `'SUBJECT "invoice" SINCE 01-Jan-2026'`
+            * `'UNSEEN FROM "no-reply@bank.com"'`
+
+        Returns the same shape as `read_inbox`.
+        """
+        password = _resolve_smtp_password(email_password, password_from_env)
+        try:
+            with imaplib.IMAP4_SSL(imap_server, imap_port) as imap:
+                imap.login(email_user, password)
+                imap.select(mailbox, readonly=True)
+
+                status, data = imap.search(None, query)
+                if status != "OK":
+                    raise EmailError(f"IMAP search failed: {status}")
+
+                uids = data[0].split()
+                if not uids:
+                    return []
+                uids = uids[-max(1, limit) :][::-1]
+
+                messages: List[Dict[str, Any]] = []
+                for uid in uids:
+                    status, msg_data = imap.fetch(uid, "(RFC822)")
+                    if status != "OK" or not msg_data or not msg_data[0]:
+                        continue
+                    msg = email_pkg.message_from_bytes(msg_data[0][1])
+                    attachments = []
+                    if msg.is_multipart():
+                        for part in msg.walk():
+                            disp = str(part.get("Content-Disposition", "")).lower()
+                            if "attachment" in disp:
+                                fname = part.get_filename()
+                                if fname:
+                                    attachments.append(self._decode_header_value(fname))
+                    messages.append(
+                        {
+                            "uid": uid.decode() if isinstance(uid, bytes) else str(uid),
+                            "subject": self._decode_header_value(msg.get("Subject")),
+                            "from": self._decode_header_value(msg.get("From")),
+                            "to": self._decode_header_value(msg.get("To")),
+                            "date": msg.get("Date", ""),
+                            "body": self._extract_body(msg, prefer_html=prefer_html),
+                            "attachments": attachments,
+                        }
+                    )
+                return messages
+        except imaplib.IMAP4.error as e:
+            raise EmailError(f"IMAP error: {str(e)}") from e
+        except Exception as e:
+            raise EmailError(f"Failed to search emails: {str(e)}") from e
+        finally:
+            password = ""  # noqa: F841

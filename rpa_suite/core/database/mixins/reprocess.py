@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from typing import Any
 
 from ..constants import CONFIRMATION_CODES, TRANSIENT_ERROR_KEYWORDS, DatabaseType
@@ -219,6 +220,7 @@ class ReprocessMixin:
             if not self.can_reprocess_item(item_id):
                 raise DatabaseError(f"Item {item_id} cannot be reprocessed")
 
+            now = datetime.now()
             query = f"""
                 UPDATE {self.items_table}
                 SET status = 'pending',
@@ -227,11 +229,12 @@ class ReprocessMixin:
                     execution_time_seconds = NULL,
                     error_message = NULL,
                     last_checkpoint = NULL,
-                    retry_count = retry_count + 1
+                    retry_count = retry_count + 1,
+                    updated_at = ?
                 WHERE id = ?
             """
 
-            self._adapter.execute_query(query, (item_id,))
+            self._adapter.execute_query(query, (now, item_id))
             self._adapter.commit()
             return True
 

@@ -151,12 +151,13 @@ class ItemsMixin:
 
             item_data_str = json.dumps(item_data) if item_data else None
             schema_str = json.dumps(processing_schema) if processing_schema else None
+            now = datetime.now()
 
             query = f"""
                 INSERT INTO {self.items_table}
                 (execution_id, item_identifier, status, priority, queue_position, 
-                 processing_schema, item_data, max_retries)
-                VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+                 processing_schema, item_data, max_retries, created_at, updated_at)
+                VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)
             """
 
             cursor = self._adapter.execute_query(
@@ -169,6 +170,8 @@ class ItemsMixin:
                     schema_str,
                     item_data_str,
                     max_retries,
+                    now,
+                    now,
                 ),
             )
 
@@ -281,6 +284,7 @@ class ItemsMixin:
 
             # Prepara dados para batch insert
             params_list = []
+            insert_now = datetime.now()
             for idx, item in enumerate(items):
                 item_identifier = item.get("item_identifier")
                 item_data = item.get("item_data")
@@ -301,6 +305,8 @@ class ItemsMixin:
                         schema_str,
                         item_data_str,
                         max_retries,
+                        insert_now,
+                        insert_now,
                     )
                 )
 
@@ -308,8 +314,8 @@ class ItemsMixin:
             query = f"""
                 INSERT INTO {self.items_table}
                 (execution_id, item_identifier, status, priority, queue_position, 
-                 processing_schema, item_data, max_retries)
-                VALUES (?, ?, 'pending', ?, ?, ?, ?, ?)
+                 processing_schema, item_data, max_retries, created_at, updated_at)
+                VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)
             """
 
             self._adapter.execute_many(query, params_list)
@@ -412,13 +418,14 @@ class ItemsMixin:
 
         """
         try:
+            now = datetime.now()
             query = f"""
                 UPDATE {self.items_table}
-                SET status = 'processing', started_at = ?
+                SET status = 'processing', started_at = ?, updated_at = ?
                 WHERE id = ? AND status IN ('pending', 'queued', 'interrupted')
             """
 
-            cursor = self._adapter.execute_query(query, (datetime.now(), item_id))
+            cursor = self._adapter.execute_query(query, (now, now, item_id))
             updated = self._adapter.rowcount(cursor) > 0
             self._adapter.commit()
             return updated
@@ -444,9 +451,10 @@ class ItemsMixin:
         status_filter = "('pending', 'queued', 'interrupted')" if include_interrupted else "('pending', 'queued')"
 
         try:
+            now = datetime.now()
             update_query = f"""
                 UPDATE {self.items_table}
-                SET status = 'processing', started_at = ?
+                SET status = 'processing', started_at = ?, updated_at = ?
                 WHERE id = (
                     SELECT id FROM {self.items_table}
                     WHERE execution_id = ? AND status IN {status_filter}
@@ -458,7 +466,7 @@ class ItemsMixin:
             with self._adapter._lock:
                 cursor = self._adapter._execute_query_impl(
                     self._adapter._prepare_query(update_query),
-                    (datetime.now(), execution_id),
+                    (now, now, execution_id),
                 )
                 row = cursor.fetchone()
                 if not row:
@@ -489,13 +497,14 @@ class ItemsMixin:
 
         """
         try:
+            now = datetime.now()
             query = f"""
                 UPDATE {self.items_table}
-                SET last_checkpoint = ?
+                SET last_checkpoint = ?, updated_at = ?
                 WHERE id = ?
             """
 
-            self._adapter.execute_query(query, (checkpoint, item_id))
+            self._adapter.execute_query(query, (checkpoint, now, item_id))
             self._adapter.commit()
             return True
 
@@ -557,11 +566,14 @@ class ItemsMixin:
                     finished_at = ?,
                     execution_time_seconds = ?,
                     error_message = ?,
-                    notes = ?
+                    notes = ?,
+                    updated_at = ?
                 WHERE id = ?
             """
 
-            self._adapter.execute_query(query, (status, finished_at, execution_time, error_message, notes, item_id))
+            self._adapter.execute_query(
+                query, (status, finished_at, execution_time, error_message, notes, finished_at, item_id)
+            )
 
             # Atualiza contadores na execução
             count_query = f"""
@@ -727,13 +739,14 @@ class ItemsMixin:
             if target_id is None and scope == "current":
                 return []
 
+            now = datetime.now()
             if target_id is not None:
                 query = f"""
                     UPDATE {self.items_table}
-                    SET status = 'interrupted'
+                    SET status = 'interrupted', updated_at = ?
                     WHERE execution_id = ? AND status = 'processing'
                 """
-                self._adapter.execute_query(query, (target_id,))
+                self._adapter.execute_query(query, (now, target_id))
                 query_ids = f"""
                     SELECT id FROM {self.items_table}
                     WHERE execution_id = ? AND status = 'interrupted'
@@ -742,10 +755,10 @@ class ItemsMixin:
             else:
                 query = f"""
                     UPDATE {self.items_table}
-                    SET status = 'interrupted'
+                    SET status = 'interrupted', updated_at = ?
                     WHERE status = 'processing'
                 """
-                self._adapter.execute_query(query)
+                self._adapter.execute_query(query, (now,))
                 query_ids = f"SELECT id FROM {self.items_table} WHERE status = 'interrupted'"
                 cursor = self._adapter.execute_query(query_ids)
 

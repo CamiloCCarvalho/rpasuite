@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Executions</h1>
+
+<form class="filters" method="get" action="{{ url_for('executions_page') }}">
+    <div class="filter">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+            <option value="">Any</option>
+            {% for opt in ["running","completed","failed","cancelled","interrupted"] %}
+            <option value="{{ opt }}" {% if filters.status == opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter grow">
+        <label for="automation_name">Automation name</label>
+        <input id="automation_name" name="automation_name" type="text" value="{{ filters.automation_name }}" placeholder="contains…">
+    </div>
+    <div class="filter">
+        <label for="started_after">Started after</label>
+        <input id="started_after" name="started_after" type="date" value="{{ filters.started_after }}">
+    </div>
+    <div class="filter">
+        <label for="started_before">Started before</label>
+        <input id="started_before" name="started_before" type="date" value="{{ filters.started_before }}">
+    </div>
+    <div class="filter">
+        <label for="page_size">Page size</label>
+        <select id="page_size" name="page_size">
+            {% for opt in [10,25,50,100] %}
+            <option value="{{ opt }}" {% if filters.page_size == opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter buttons">
+        <button class="btn primary" type="submit">Apply</button>
+        <a class="btn" href="{{ url_for('executions_page') }}">Reset</a>
+    </div>
+</form>
+
+<div class="table-wrap">
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Automation</th>
+            <th>Status</th>
+            <th>Started</th>
+            <th>Finished</th>
+            <th class="right">Items</th>
+            <th class="right">Success</th>
+            <th class="right">Failed</th>
+            <th class="right">Duration (s)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data.rows %}
+        <tr>
+            <td class="mono">{{ row.id }}</td>
+            <td>{{ row.automation_name }}</td>
+            <td><span class="badge status-{{ row.status }}">{{ row.status }}</span></td>
+            <td class="mono">{{ row.started_at or "—" }}</td>
+            <td class="mono">{{ row.finished_at or "—" }}</td>
+            <td class="right mono">{{ row.total_items or 0 }}</td>
+            <td class="right mono">{{ row.successful_items or 0 }}</td>
+            <td class="right mono">{{ row.failed_items or 0 }}</td>
+            <td class="right mono">{{ "%.2f"|format(row.execution_time_seconds) if row.execution_time_seconds else "—" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="muted center">No executions matched the current filters.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% include "_pagination.html" %}
+{% endblock %}

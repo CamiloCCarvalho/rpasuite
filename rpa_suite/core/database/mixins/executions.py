@@ -30,7 +30,7 @@ class ExecutionsMixin:
             """
             self._adapter.execute_query(query, (execution_id,))
             self._adapter.commit()
-        except Exception:  # nosec B110
+        except Exception:
             pass
 
     def check_interrupted(self) -> bool:
@@ -48,7 +48,7 @@ class ExecutionsMixin:
             try:
                 self._mark_execution_interrupted(self._current_execution_id)
                 return True
-            except Exception:  # nosec B110
+            except Exception:
                 pass
         return False
 

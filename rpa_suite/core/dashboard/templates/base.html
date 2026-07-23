@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="dot"></span>
+            <span class="brand-name">{{ title }}</span>
+        </div>
+        <nav class="nav">
+            <a class="nav-link {% if active == 'overview' %}active{% endif %}" href="{{ url_for('index') }}">Overview</a>
+            <a class="nav-link {% if active == 'executions' %}active{% endif %}" href="{{ url_for('executions_page') }}">Executions</a>
+            <a class="nav-link {% if active == 'items' %}active{% endif %}" href="{{ url_for('items_page') }}">Items</a>
+            <a class="nav-link {% if active == 'logs' %}active{% endif %}" href="{{ url_for('logs_page') }}">Logs</a>
+        </nav>
+    </header>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

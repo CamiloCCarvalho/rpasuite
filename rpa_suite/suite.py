@@ -4,7 +4,8 @@
 import hashlib
 
 # imports third-party
-import subprocess  # nosec B404
+import importlib.util
+import subprocess
 import sys
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Optional
@@ -20,9 +21,11 @@ from .core.dir import Directory
 from .core.email import Email
 from .core.file import File
 from .core.log import Log
+from .core.notify import Notifier
 from .core.parallel import ParallelRunner
 from .core.print import Print
 from .core.regex import Regex
+from .core.retry import RetryError, retry
 from .core.validate import Validate
 from .utils.system import Utils
 
@@ -107,6 +110,7 @@ class Suite:
         self.printer: Print = Print()
         self.regex: Regex = Regex()
         self.validate: Validate = Validate()
+        self.notifier: Notifier = Notifier()
         self.utils: Utils = Utils()
 
         # Classes que não são instanciadas
@@ -114,8 +118,19 @@ class Suite:
         self.asyn: type[AsyncRunner] = AsyncRunner
         self.database: type[Database] = Database
 
-        # Importação condicional para módulos opcionais
-        import importlib.util  # pylint: disable=import-outside-toplevel
+        # Retry decorator (exposed as a callable on the suite)
+        self.retry = retry
+        self.RetryError = RetryError
+
+        # Dashboard helpers (Flask is an optional dep; import lazily)
+        if importlib.util.find_spec("flask"):
+            from .core.dashboard import create_app, run_dashboard  # pylint: disable=import-outside-toplevel
+
+            self.dashboard_create_app = create_app
+            self.dashboard_run = run_dashboard
+        else:
+            self.dashboard_create_app = None
+            self.dashboard_run = None
 
         # Browser - importação condicional
         if importlib.util.find_spec("selenium") and importlib.util.find_spec("webdriver_manager"):

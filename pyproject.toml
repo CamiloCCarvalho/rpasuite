@@ -1,6 +1,6 @@
 [project]
 name = "rpa_suite"
-version = "1.7.5"
+version = "1.8.0"
 description = "Comprehensive Python toolkit for RPA automation: email, logging, database tracking, browser automation, OCR, desktop automation, and more. Essential utilities for building robust automation workflows with Selenium, Botcity, and custom solutions."
 readme = "README.md"
 authors = [

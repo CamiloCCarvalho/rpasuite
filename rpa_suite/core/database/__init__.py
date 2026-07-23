@@ -27,11 +27,13 @@ from .constants import (
 )
 from .core import Database
 from .exceptions import DatabaseError
+from .retention import RetentionPolicy
 
 __all__ = [
     "Database",
     "DatabaseType",
     "DatabaseError",
+    "RetentionPolicy",
     "CONFIRMATION_CODES",
     "DEFAULT_DB_NAME",
     "DEFAULT_EXECUTIONS_TABLE",

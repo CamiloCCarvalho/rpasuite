@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Overview</h1>
+
+<section class="cards">
+    <div class="card">
+        <div class="card-label">Executions</div>
+        <div class="card-value">{{ summary["storage"]["executions"]["rows"] if summary["storage"]["executions"] else 0 }}</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Items</div>
+        <div class="card-value">{{ summary["storage"]["items"]["rows"] if summary["storage"]["items"] else 0 }}</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Logs</div>
+        <div class="card-value">{{ summary["storage"]["logs"]["rows"] if summary["storage"]["logs"] else 0 }}</div>
+    </div>
+    {% if summary["storage"].get("database") %}
+    <div class="card">
+        <div class="card-label">Database size</div>
+        <div class="card-value">{{ summary["storage"]["database"]["approx_mb"] }} MB</div>
+    </div>
+    {% endif %}
+</section>
+
+<section class="grid grid-2">
+    <div class="panel">
+        <div class="panel-title">Executions per day (last 14 days)</div>
+        <div class="chart-wrap"><canvas id="chart-timeseries"></canvas></div>
+    </div>
+    <div class="panel">
+        <div class="panel-title">Items by status</div>
+        <div class="chart-wrap"><canvas id="chart-items"></canvas></div>
+    </div>
+</section>
+
+<section class="grid grid-2">
+    <div class="panel">
+        <div class="panel-title">Logs by level</div>
+        <div class="chart-wrap"><canvas id="chart-logs"></canvas></div>
+    </div>
+    <div class="panel">
+        <div class="panel-title">Top automations</div>
+        <div class="chart-wrap"><canvas id="chart-top"></canvas></div>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="panel-title">Executions by status</div>
+    <table class="table compact">
+        <thead><tr><th>Status</th><th class="right">Count</th></tr></thead>
+        <tbody>
+            {% for status, count in summary["executions_by_status"].items() %}
+            <tr>
+                <td><span class="badge status-{{ status }}">{{ status }}</span></td>
+                <td class="right mono">{{ count }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2" class="muted">No executions yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.__DASHBOARD_INIT__ = "overview";
+</script>
+{% endblock %}

@@ -1,10 +1,11 @@
 # rpa_suite/core/file.py
 
 # imports standard
+import csv
 import os
 import time
 from datetime import datetime
-from typing import Dict, List, Union
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Union
 
 # imports third party
 from colorama import Fore
@@ -176,6 +177,182 @@ class File:
 
         except Exception as e:
             raise FileError(f"Error in function file_scheduling_delete: {str(e)}") from e
+
+    def wait_for_file(
+        self,
+        file_path: str,
+        timeout: float = 60.0,
+        poll_interval: float = 0.5,
+        stable_for: float = 1.0,
+        verbose: bool = False,
+    ) -> Dict[str, Union[bool, str, int, float]]:
+        """
+        Wait for a file to exist and have a stable size (useful for downloads).
+
+        Parameters:
+        ----------
+        file_path : str
+            Absolute or relative path to the file being monitored.
+        timeout : float
+            Maximum seconds to wait before giving up. Must be > 0.
+        poll_interval : float
+            Seconds between checks. Must be > 0.
+        stable_for : float
+            The file size must remain unchanged for at least this many seconds
+            before we consider the file "ready" (avoids reading half-written
+            downloads). Set to 0 to skip stability checks.
+        verbose : bool
+            If True, prints a success/timeout summary.
+
+        Returns:
+        ----------
+        dict with:
+            * 'success' (bool): whether the file appeared and stabilized in time.
+            * 'path' (str): the path checked.
+            * 'size' (int): last observed file size in bytes (0 if not found).
+            * 'waited' (float): seconds actually waited.
+        """
+        if timeout <= 0 or poll_interval <= 0:
+            raise FileError("`timeout` and `poll_interval` must be > 0")
+
+        start = time.time()
+        result: Dict[str, Union[bool, str, int, float]] = {
+            "success": False,
+            "path": file_path,
+            "size": 0,
+            "waited": 0.0,
+        }
+
+        last_size: Optional[int] = None
+        stable_since: Optional[float] = None
+        try:
+            while (time.time() - start) < timeout:
+                if os.path.isfile(file_path):
+                    try:
+                        current = os.path.getsize(file_path)
+                    except OSError:
+                        current = None
+                    if current is not None:
+                        result["size"] = current
+                        if stable_for <= 0:
+                            result["success"] = True
+                            break
+                        now = time.time()
+                        if last_size is None or current != last_size:
+                            last_size = current
+                            stable_since = now
+                        elif stable_since is not None and (now - stable_since) >= stable_for:
+                            result["success"] = True
+                            break
+                time.sleep(poll_interval)
+
+            result["waited"] = time.time() - start
+
+            if verbose:
+                if result["success"]:
+                    success_print(
+                        f"File ready: {file_path} ({result['size']} bytes, " f"waited {result['waited']:.2f}s)"
+                    )
+                else:
+                    alert_print(f"Timed out waiting for file: {file_path} (waited {result['waited']:.2f}s)")
+
+            return result
+
+        except Exception as e:
+            raise FileError(f"Error waiting for file '{file_path}': {str(e)}") from e
+
+    def read_csv(
+        self,
+        file_path: str,
+        delimiter: str = ",",
+        encoding: str = "utf-8",
+        as_dict: bool = True,
+        **reader_kwargs: Any,
+    ) -> List[Dict[str, str] | List[str]]:
+        """
+        Read a CSV file using the stdlib `csv` module (no pandas required).
+
+        Parameters:
+        ----------
+        file_path : str
+            Path to the CSV file.
+        delimiter : str
+            Field delimiter (default ",").
+        encoding : str
+            File encoding (default "utf-8").
+        as_dict : bool
+            If True (default), use `csv.DictReader` and return `list[dict]`
+            keyed by the header row. If False, return `list[list[str]]`.
+        **reader_kwargs :
+            Extra keyword arguments forwarded to the underlying reader.
+
+        Returns:
+        ----------
+        list of rows (dicts or lists depending on `as_dict`).
+        """
+        try:
+            with open(file_path, encoding=encoding, newline="") as f:
+                if as_dict:
+                    reader = csv.DictReader(f, delimiter=delimiter, **reader_kwargs)
+                    return [dict(row) for row in reader]
+                reader = csv.reader(f, delimiter=delimiter, **reader_kwargs)
+                return [list(row) for row in reader]
+        except Exception as e:
+            raise FileError(f"Error reading CSV '{file_path}': {str(e)}") from e
+
+    def write_csv(
+        self,
+        file_path: str,
+        rows: Iterable[Dict[str, Any] | Sequence[Any]],
+        headers: Optional[Sequence[str]] = None,
+        delimiter: str = ",",
+        encoding: str = "utf-8",
+        append: bool = False,
+    ) -> str:
+        """
+        Write rows to a CSV file using the stdlib `csv` module.
+
+        Parameters:
+        ----------
+        file_path : str
+            Destination path.
+        rows : iterable
+            Iterable of dicts (uses `csv.DictWriter`) or sequences
+            (uses `csv.writer`). If both `headers` are provided and rows are
+            sequences, `headers` is written as the first line.
+        headers : sequence of str, optional
+            Column names. Required when rows are dicts (unless the first row's
+            keys are used) or when writing a header for sequence rows.
+        delimiter : str
+            Field delimiter (default ",").
+        encoding : str
+            File encoding (default "utf-8").
+        append : bool
+            If True, appends to the file (headers are only written for a new file).
+
+        Returns:
+        ----------
+        The absolute path of the written file.
+        """
+        mode = "a" if append else "w"
+        file_is_new = not (append and os.path.isfile(file_path))
+        try:
+            rows = list(rows)
+            with open(file_path, mode, encoding=encoding, newline="") as f:
+                if rows and isinstance(rows[0], dict):
+                    dict_headers = list(headers) if headers else list(rows[0].keys())
+                    writer = csv.DictWriter(f, fieldnames=dict_headers, delimiter=delimiter)
+                    if file_is_new:
+                        writer.writeheader()
+                    writer.writerows(rows)
+                else:
+                    writer = csv.writer(f, delimiter=delimiter)
+                    if headers and file_is_new:
+                        writer.writerow(list(headers))
+                    writer.writerows(rows)
+            return os.path.abspath(file_path)
+        except Exception as e:
+            raise FileError(f"Error writing CSV '{file_path}': {str(e)}") from e
 
     def count_files(
         self,

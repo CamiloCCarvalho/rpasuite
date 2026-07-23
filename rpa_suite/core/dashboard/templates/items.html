@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Items</h1>
+
+<form class="filters" method="get" action="{{ url_for('items_page') }}">
+    <div class="filter">
+        <label for="execution_id">Execution id</label>
+        <input id="execution_id" name="execution_id" type="number" min="1" value="{{ filters.execution_id }}">
+    </div>
+    <div class="filter">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+            <option value="">Any</option>
+            {% for opt in ["pending","queued","processing","success","failed","skipped","interrupted","retrying"] %}
+            <option value="{{ opt }}" {% if filters.status == opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter grow">
+        <label for="search">Search identifier</label>
+        <input id="search" name="search" type="text" value="{{ filters.search }}" placeholder="contains…">
+    </div>
+    <div class="filter">
+        <label for="page_size">Page size</label>
+        <select id="page_size" name="page_size">
+            {% for opt in [10,25,50,100] %}
+            <option value="{{ opt }}" {% if filters.page_size == opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter buttons">
+        <button class="btn primary" type="submit">Apply</button>
+        <a class="btn" href="{{ url_for('items_page') }}">Reset</a>
+    </div>
+</form>
+
+<div class="table-wrap">
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Execution</th>
+            <th>Identifier</th>
+            <th>Status</th>
+            <th class="right">Priority</th>
+            <th class="right">Retries</th>
+            <th>Started</th>
+            <th>Finished</th>
+            <th>Error</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in data.rows %}
+        <tr>
+            <td class="mono">{{ row.id }}</td>
+            <td class="mono">
+                <a href="{{ url_for('items_page') }}?execution_id={{ row.execution_id }}">{{ row.execution_id }}</a>
+            </td>
+            <td>{{ row.item_identifier or "—" }}</td>
+            <td><span class="badge status-{{ row.status }}">{{ row.status }}</span></td>
+            <td class="right mono">{{ row.priority or 0 }}</td>
+            <td class="right mono">{{ row.retry_count or 0 }}/{{ row.max_retries or 0 }}</td>
+            <td class="mono">{{ row.started_at or "—" }}</td>
+            <td class="mono">{{ row.finished_at or "—" }}</td>
+            <td class="muted small">{{ row.error_message or "" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="muted center">No items matched the current filters.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% include "_pagination.html" %}
+{% endblock %}
