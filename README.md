@@ -6,10 +6,10 @@
 
 **A comprehensive Python toolkit for Robotic Process Automation (RPA) development**
 
-[![PyPI Downloads](https://static.pepy.tech/badge/rpa-suite/month)](https://pepy.tech/projects/rpa_suite)
-[![PyPI version](https://img.shields.io/pypi/v/rpa-suite)](https://pypi.org/project/rpa-suite/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/rpa-suite)](https://pypi.org/project/rpa-suite/)
-[![License MIT](https://img.shields.io/pypi/l/rpa-suite)](https://opensource.org/licenses/MIT)
+[![PyPI Downloads](https://static.pepy.tech/badge/rpa-suite/month)](https://pepy.tech/projects/rpa-suite)
+[![PyPI version](https://img.shields.io/pypi/v/rpa-suite.svg)](https://pypi.org/project/rpa-suite/)
+[![Python versions](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue?logo=python&logoColor=white)](https://pypi.org/project/rpa-suite/)
+[![License: MIT](https://img.shields.io/pypi/l/rpa-suite.svg)](https://opensource.org/licenses/MIT)
 
 [Documentation](#documentation) • [Installation](#installation) • [Quick Start](#quick-start) • [Features](#features) • [Contributing](#contributing)
 
@@ -173,6 +173,7 @@ stats = db.get_statistics(execution_id=exec_id)
 Control execution timing and scheduling:
 
 - `exec_at_hour()` - Execute functions at specific times
+- `wait_until_hour()` - Block until a given `HH:MM` clock time
 - `wait_for_exec()` - Wait before executing functions
 - `exec_and_wait()` - Execute and wait pattern
 
@@ -200,7 +201,29 @@ File and screenshot management:
 
 - Screenshot capture with custom naming
 - Flag file creation/deletion for process tracking
+- Wait for a download to finish (`wait_for_file`)
+- Read/write CSV without pandas
+- Copy, move, zip/unzip, and HTTP download
 - File counting with extension filtering
+
+### Date (Date Module)
+
+- `get_dmy()` / `get_hms()` - current day/month/year and hour/minute/second
+- `stamp()` - filename-friendly timestamp (`dd_mm_YYYY-HH_MM_SS`)
+- `today_br()` - current date as `dd/mm/YYYY`
+- `shift_days()` - day/month/year shifted by N days
+
+### Directory (Directory Module)
+
+- `create_temp_dir()` / `delete_temp_dir()` - create and remove a temp folder (reuses if it exists)
+- `temp_dir()` - context manager: create, use, then delete
+- `ensure_dir()` - create a path if missing
+- `clear_dir()` - empty a folder without removing the folder itself
+
+### Utils
+
+- `set_importable_dir()` - add the project path to `sys.path`
+- `keep_awake()` - Windows context manager to prevent sleep/lock (`with rpa.utils.keep_awake():`)
 
 ### Database Tracking (Database Module)
 

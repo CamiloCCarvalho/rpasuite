@@ -31,6 +31,7 @@ class Clock:
 
     Methods:
         exec_at_hour: Executes a function at a specific time
+        wait_until_hour: Blocks until a given HH:MM clock time
         wait_for_exec: Waits N seconds, then executes a function
         exec_and_wait: Executes a function, then waits N seconds
 
@@ -43,6 +44,36 @@ class Clock:
         """
         Initialize the Clock utility.
         """
+
+    def _validate_hhmm(self, hour_to_exec: str) -> None:
+        if not isinstance(hour_to_exec, str) or not _HHMM_PATTERN.match(hour_to_exec):
+            raise ClockError(f"Invalid hour_to_exec format: {hour_to_exec!r}. Expected 'HH:MM' in 24h.")
+
+    def wait_until_hour(self, hour_to_wait: str, poll_seconds: int = 30) -> dict[str, bool]:
+        """
+        Block until the system clock reaches ``hour_to_wait`` (``HH:MM``, 24h).
+
+        Does not execute a callback — use ``exec_at_hour`` when you also want to
+        run a function at that time.
+
+        Parameters:
+            hour_to_wait: Time in ``HH:MM``.
+            poll_seconds: Sleep interval between checks (default 30, same as ``exec_at_hour``).
+        """
+        self._validate_hhmm(hour_to_wait)
+        if poll_seconds <= 0:
+            raise ClockError("`poll_seconds` must be > 0")
+        try:
+            while True:
+                now = dt.now()
+                moment_now = f"{now.hour:02d}:{now.minute:02d}"
+                if moment_now == hour_to_wait:
+                    return {"success": True}
+                time.sleep(poll_seconds)
+        except ClockError:
+            raise
+        except Exception as e:
+            raise ClockError(str(e)) from e
 
     def exec_at_hour(
         self,
@@ -78,8 +109,7 @@ class Clock:
         result: dict = {"tried": False, "success": False}
 
         if hour_to_exec is not None:
-            if not isinstance(hour_to_exec, str) or not _HHMM_PATTERN.match(hour_to_exec):
-                raise ClockError(f"Invalid hour_to_exec format: {hour_to_exec!r}. Expected 'HH:MM' in 24h.")
+            self._validate_hhmm(hour_to_exec)
 
         try:
             if hour_to_exec is None:
@@ -93,26 +123,19 @@ class Clock:
                     result["success"] = False
                 return result
 
-            run = True
-            while run:
-                now = dt.now()
-                moment_now = f"{now.hour:02d}:{now.minute:02d}"
-                if moment_now == hour_to_exec:
-                    try:
-                        fn_to_exec(*args, **kwargs)
-                        result["tried"] = True
-                        result["success"] = True
-                        success_print(f"{fn_to_exec.__name__}: Successfully executed!")
-                        run = False
-                    except Exception as e:
-                        result["tried"] = True
-                        result["success"] = False
-                        raise ClockError(
-                            f"An error occurred that prevented the function from executing: "
-                            f"{fn_to_exec.__name__} correctly. Error: {str(e)}"
-                        ) from e
-                else:
-                    time.sleep(30)
+            self.wait_until_hour(hour_to_exec)
+            try:
+                fn_to_exec(*args, **kwargs)
+                result["tried"] = True
+                result["success"] = True
+                success_print(f"{fn_to_exec.__name__}: Successfully executed!")
+            except Exception as e:
+                result["tried"] = True
+                result["success"] = False
+                raise ClockError(
+                    f"An error occurred that prevented the function from executing: "
+                    f"{fn_to_exec.__name__} correctly. Error: {str(e)}"
+                ) from e
 
             return result
 

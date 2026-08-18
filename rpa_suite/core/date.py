@@ -102,3 +102,38 @@ class Date:
             return day_got, month_got, year_got
         except Exception as e:
             raise DateError(f"Error function: {self.get_dmy.__name__}! {str(e)}.") from e
+
+    def stamp(self, with_time: bool = True) -> str:
+        """
+        Filename-friendly timestamp.
+
+        Default: ``dd_mm_YYYY-HH_MM_SS`` (same pattern used by screenshots).
+        With ``with_time=False``: ``dd_mm_YYYY``.
+        """
+        try:
+            now = dt.datetime.now()
+            if with_time:
+                return now.strftime("%d_%m_%Y-%H_%M_%S")
+            return now.strftime("%d_%m_%Y")
+        except Exception as e:
+            raise DateError(f"Error function: {self.stamp.__name__}! {str(e)}.") from e
+
+    def today_br(self) -> str:
+        """Current date as ``dd/mm/YYYY``."""
+        try:
+            now = dt.datetime.now()
+            return now.strftime("%d/%m/%Y")
+        except Exception as e:
+            raise DateError(f"Error function: {self.today_br.__name__}! {str(e)}.") from e
+
+    def shift_days(self, days: int) -> Tuple[Op[str], Op[str], Op[str]]:
+        """
+        Day, month and year shifted by ``days`` (negative = past).
+
+        Returns the same tuple shape as ``get_dmy``: ``('dd', 'mm', 'YYYY')``.
+        """
+        try:
+            target = dt.datetime.now() + dt.timedelta(days=days)
+            return f"{target.day:02d}", f"{target.month:02d}", f"{target.year:04d}"
+        except Exception as e:
+            raise DateError(f"Error function: {self.shift_days.__name__}! {str(e)}.") from e

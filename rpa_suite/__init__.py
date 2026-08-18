@@ -36,7 +36,7 @@ Available modules:
 
 """
 
-__version__ = "1.9.0"
+__version__ = "1.9.1"
 
 # allows importing the rpa_suite module without the package name
 from .suite import rpa

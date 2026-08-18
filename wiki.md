@@ -1,8 +1,8 @@
-# RPA Suite — Wiki (v1.9.0)
+# RPA Suite — Wiki (v1.9.1)
 
-Documentação dos módulos da biblioteca. A API pública recomendada é `from rpa_suite import rpa`.
+Module documentation for the library. The recommended public API is `from rpa_suite import rpa`.
 
-## Índice
+## Table of contents
 
 1. [Print](#print)
 2. [Date](#date)
@@ -23,7 +23,7 @@ Documentação dos módulos da biblioteca. A API pública recomendada é `from r
 17. [CLI](#cli)
 18. [Database](#database)
 
-Extras de instalação (além do `pip install rpa-suite`):
+Optional install extras (in addition to `pip install rpa-suite`):
 
 ```bash
 pip install rpa-suite[browser]      # Selenium
@@ -40,14 +40,14 @@ pip install rpa-suite[all]
 
 # Print
 
-**Print** é um submodulo do nosso conjunto.
-Este tem um caracteristica difernente dos demais.
+**Print** is a submodule of the suite.
+It has a different characteristic from the others.
 
-Sua implementação foi feita tanto no Objeto raiz como também no seu modulo dedicado, acesse seus métodos tanto pela variavel ``rpa`` como também pela classe **Print**.
+It is implemented both on the root object and in its dedicated module. You can access its methods through the ``rpa`` variable as well as through the **Print** class.
 
-Abaixo todos métodos e argumentos disponiveis de **Print**:
+Below are all methods and parameters available on **Print**:
 
-Metodos:
+Methods:
 
 - ``success_print``
 - ``alert_print``
@@ -58,28 +58,24 @@ Metodos:
 - ``print_call_fn``
 - ``print_retur_fn``
 
-Argumentos:
+Parameters:
 
 - ``string_text``: ``str``
 - ``color`` : ``Obj Colors``
 - ``ending`` : ``str``
 
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import Print`
+> To import the class on its own: `from rpa_suite.core import Print`
 
 <br>
 
-Exemplo de uso das funções de ``Print``:
+Example of the ``Print`` functions:
 
 ```python
-# Importação do objeto instanciado de Suite
+# Import the instantiated suite
 from rpa_suite import rpa
 
 """
-Cores disponiveis
+Available colors
   black   
   blue  
   green   
@@ -89,11 +85,11 @@ Cores disponiveis
   yellow  
   white   
   default 
-  call_fn (variação de blue) 
-  retur_fn (variação de magenta)
+  call_fn (blue variant) 
+  retur_fn (magenta variant)
 """
 
-# Como explicado anteriormente, já foi implementada diretamente todas funções do obj Print diretamente no modulo principal
+# As explained earlier, all Print object functions are already implemented directly on the main module
 
 rpa.success_print(f'It`s green here')
 rpa.alert_print(f'It`s yellow message')
@@ -103,32 +99,32 @@ rpa.info_print(f'It`s blue message')
 rpa.magenta_print(f'What color? Magenta')
 rpa.blue_print(f'Other blue')
 
-# variações (estas tem apenas objetivo de serem cores distintas para quem quer ser mais direto e sem muitas cores)
+# variants (these only exist to provide distinct colors for callers who want to be more direct and use fewer colors)
 rpa.print_call_fn(f'foo')
 rpa.print_retur_fn(f'foo2')
 ```
 
-Abaixo variações do uso e possibilidade de mudar as cores a sua vontade:
+Below are usage variants and how to change the colors as you like:
 
-> É possivel mudar a cor do seu print a sua vontade, importe o objeto de cores para isso.
+> You can change the print color as you like; import the colors object to do so.
 >
-> Defina também o "ending" assim como o print padrão do python.
+> You can also set "ending", just like Python's built-in print.
 
 <br>
 
-Exemplo manipulando as cores e o ending:
+Example manipulating colors and ending:
 
 ```python
-# Importação do objeto de Suite e Colors
+# Import the Suite object and Colors
 from rpa_suite import rpa
 from rpa_suite.core.print import Colors
 
-# Passagem de argumentos, mudança de comportamento e cores
+# Passing arguments, changing behavior and colors
 rpa.success_print(f'It`s red now!', color=Colors.red)
 rpa.alert_print(f"This don't breakline on ending", ending=' ')
 rpa.error_print(f'This message display on same line to alert.')
 
-# Exemplo com todos argumentos explicitos
+# Example with all arguments explicit
 rpa.info_print(string_text=f'All arguments explicts',
                color=Colors.blue,
                ending="\n\n"
@@ -139,52 +135,60 @@ rpa.info_print(string_text=f'All arguments explicts',
 
 # Date
 
-**Date** é um Objeto simples que tem por finalidade apenas acelerar a conversão de Data e Hora.
-Em muitos casos precisamos capturar Datas o que já é bem facil, no entando queremos pular a parte chata de ter que ficar formatando.
+**Date** is a simple object whose purpose is to speed up date and time conversion.
+In many cases we need to capture dates — which is already easy — but we want to skip the tedious formatting.
 
-Sua principal funcionalidade é devolver uma tupla ja com **Dia**, **Mes** e **Ano** formatada como **string** usando 2 digitos e o ano em 4 digitos. O mesmo valoe para **Horas**, **Minutos** e **Segundos** (este ultimo apenas com 2 digitos).
+Its main feature is returning a tuple already formatted as **strings** with **Day**, **Month**, and **Year**, using 2 digits for day and month and 4 digits for year. The same applies to **Hours**, **Minutes**, and **Seconds** (the latter also with 2 digits).
 
-Abaixo todos métodos e argumentos disponiveis de **Date**:
+Below are all methods and parameters available on **Date**:
 
-Metodos:
+Methods:
 
 - ``get_dmy``
 - ``get_hms``
+- ``stamp``
+- ``today_br``
+- ``shift_days``
 
-Argumentos:
+Parameters:
 
-- ``Na verão atual não há argumentos``
+- ``stamp(with_time=True)``
+- ``shift_days(days)`` — negative for the past
 
-Retorno:
+Returns:
 
 - ``get_dmy``  -> ``Tuple(str)``: ``'dd', 'mm', 'YYYY'``
 - ``get_hms``  -> ``Tuple(str)``: ``'hour', 'min', 'sec'``
-- Obs.: Apenas "Year" tem 4 digitos, os demais dados são sempre em 2 digitos **string**.
+- ``stamp`` -> ``str``: timestamp for file names (``dd_mm_YYYY-HH_MM_SS``)
+- ``today_br`` -> ``str``: current date as ``dd/mm/YYYY``
+- ``shift_days(n)`` -> ``Tuple(str)``: day/month/year shifted by ``n`` days (negative = past)
+- Note: Only "Year" uses 4 digits; all other values are always 2-digit **strings**.
 
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import Date`
+> To import the class on its own: `from rpa_suite.core import Date`
 
 <br>
 
-Exemplo de uso dos Metodos de ``Date``:
+Example of the ``Date`` methods:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# Usando a variavel date (objeto Date já instanciado) acessamos seu método que captura dia, mes e ano atual do seu sistema.
+# Using the date variable (already instantiated Date object), we call the method that captures the current day, month, and year from the system.
 dd, mm, yyyy = rpa.date.get_dmy()
 
-# Usando a variavel date (objeto Date já instanciado) acessamos seu método que captura hora, segundos e minutos atual do seu sistema.
+# Using the date variable (already instantiated Date object), we call the method that captures the current hour, minutes, and seconds from the system.
 hour, minute, sec = rpa.date.get_hms()
 
-# exibindo o retorno obtido para data
+# Timestamp for file names and date in BR format
+stamp = rpa.date.stamp()
+today = rpa.date.today_br()
+dd, mm, yyyy = rpa.date.shift_days(-1)
+
+# displaying the date return value
 rpa.info_print(f'date: {dd}/{mm}/{yyyy}')
 
-# exibindo o retorno obtido para horario
+# displaying the time return value
 rpa.info_print(f'hour: {hour}:{minute}:{sec}')
 
 >>> date: 18/04/2025
@@ -195,138 +199,144 @@ rpa.info_print(f'hour: {hour}:{minute}:{sec}')
 
 # Clock
 
-**Clock** é um Objeto dedicado a fazer controle de execução.
-Por vezes precisamos que um bloco de código ou uma função inteira aguarde, execute e espere, ou até mesmo podemos usar como Schedule para um robo inteiro.
+**Clock** is an object dedicated to execution control.
+Sometimes you need a code block or an entire function to wait, run, and wait again — or even to use it as a schedule for an entire bot.
 
-Abaixo todos métodos e argumentos disponiveis de **Clock**:
+Below are all methods and parameters available on **Clock**:
 
-Metodo ``exec_at_hour``:
+Method ``exec_at_hour``:
 
-- Função temporizada, executa a função no horário especificado, por ``default`` executa no momento da chamada em tempo de execução, opcionalmente pode escolher o horário para execução, sendo uma ``string`` contendo horas e minutos com dois digitos como demonstrado a seguir: ``'hh:mm'``.
-- Parametros:
+- Timed function: runs the function at the specified time. By ``default`` it runs at call time; optionally you can choose the time as a ``string`` of hours and minutes with two digits, as shown: ``'hh:mm'``.
+- Parameters:
 
-  - ``hour_to_exec`` : ``str`` - Horario no formato `'hh:mm'`.
-  - ``fn_to_exec``: ``Callable`` - Função que deseja executar.
-  - ``*args``: Argumentos posicionais da função.
-  - ``**kwargs``: Argumentos nomeados da função.
-
-<br>
-
-Metodo ``wait_for_exec``:
-
-- Função temporizada, aguarda uma quantidade de tempo em **segundos** para executa a função em seguida.
-Por ``default`` executa no momento da chamada em tempo de execução.
-- Parametros:
-
-  - ``wait_time`` : ``int`` - Tempo em segundos para aguardar.
-  - ``fn_to_exec`` : ``Callable`` - Função que deseja executar.
-  - ``*args``: Argumentos posicionais da sua função.
-  - ``**kwargs``: Argumentos nomeados da sua função.
+  - ``hour_to_exec`` : ``str`` - Time in `'hh:mm'` format.
+  - ``fn_to_exec``: ``Callable`` - Function you want to run.
+  - ``*args``: Positional arguments for the function.
+  - ``**kwargs``: Keyword arguments for the function.
 
 <br>
 
-Metodo ``exec_and_wait``:
+Method ``wait_until_hour``:
 
-- Função temporizada, executa a função do argumento e em seguinda aguarda o tempo desejado em segundos, por ``default`` executa no momento da chamada em tempo de execução.
-- Parametros:
+- Blocks execution until the system clock reaches ``HH:MM`` (24h). It does not run a callback — use ``exec_at_hour`` for that.
+- Parameters:
 
-  - ``wait_time``:``int`` - Tempo em segundos para aguardar após execução.
-  - ``fn_to_exec``: ``Callable`` - Função que deseja executar.
-  - ``*args``: Argumentos posicionais da sua função.
-  - ``**kwargs``: Argumentos nomeados da sua função.
+  - ``hour_to_wait`` : ``str`` - Time in `'hh:mm'` format.
+  - ``poll_seconds`` : ``int`` - Interval between checks (default ``30``, the same as ``exec_at_hour``).
 
 <br>
 
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import Clock`
+Method ``wait_for_exec``:
+
+- Timed function: waits a number of **seconds**, then runs the function.
+By ``default`` it runs at call time.
+- Parameters:
+
+  - ``wait_time`` : ``int`` - Time in seconds to wait.
+  - ``fn_to_exec`` : ``Callable`` - Function you want to run.
+  - ``*args``: Positional arguments for your function.
+  - ``**kwargs``: Keyword arguments for your function.
 
 <br>
 
-Exemplo de uso ``exec_at_hour``:
+Method ``exec_and_wait``:
+
+- Timed function: runs the function from the argument and then waits the desired number of seconds. By ``default`` it runs at call time.
+- Parameters:
+
+  - ``wait_time``:``int`` - Time in seconds to wait after execution.
+  - ``fn_to_exec``: ``Callable`` - Function you want to run.
+  - ``*args``: Positional arguments for your function.
+  - ``**kwargs``: Keyword arguments for your function.
+
+<br>
+
+> To import the class on its own: `from rpa_suite.core import Clock`
+
+<br>
+
+Example of ``exec_at_hour``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
 
-# Aqui sua função que deseja executar
+# The function you want to run
 def sum(a, b):
-  # realiza operações quais forem ...
+  # perform whatever operations you need ...
   print(a*b)
   return a * b
 
 
-# Este passo não é necessario, apenas par facilitar visualmente
+# This step is not required; it only makes the example easier to read
 a = 3
 b = 9
 
-# Executa a função no horario definido
+# Run the function at the defined time
 rpa.clock.exec_at_hour('12:52', sum, a, b)
 
-# result: A função soma deve ser executada no horario 12:52 do sistema onde esta rodando  o código.
+# result: The sum function should run at 12:52 on the system clock where this code is running.
 >>> 27
 >>> sum: Successfully executed!
 ```
 
 <br>
 
-Exemplo de uso ``wait_for_exec``:
+Example of ``wait_for_exec``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
 
-# Aqui sua função que deseja executar
+# The function you want to run
 def sum(a, b):
-  # realiza operações quais forem ...
+  # perform whatever operations you need ...
   print(a*b)
   return a * b
 
 
-# Este passo não é necessario, apenas par facilitar visualmente
+# This step is not required; it only makes the example easier to read
 a = 3
 b = 9
 
-# Executa a função após 10 segundos
+# Run the function after 10 seconds
 rpa.clock.wait_for_exec(10, sum, a, b)
 
-# result: A função soma deve ser executada após o tempo definido.
+# result: The sum function should run after the defined time.
 >>> 27
 >>> Function: wait_for_exec executed the function: sum.
 ```
 
 <br>
 
-Exemplo de uso ``exec_and_wait``:
+Example of ``exec_and_wait``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
 
-# Aqui sua função que deseja executar
+# The function you want to run
 def sum(a, b):
-  # realiza operações quais forem ...
+  # perform whatever operations you need ...
   print(a*b)
   return a * b
 
 
-# Este passo não é necessario, apenas par facilitar visualmente
+# This step is not required; it only makes the example easier to read
 a = 3
 b = 9
 time_await = 10
 
-# Executa a função, então aguarda 10 segundos para seguir com o proximo código
+# Run the function, then wait 10 seconds before continuing with the next code
 rpa.clock.exec_and_wait(time_await, sum, a, b)
 
-# Esta função abaixo, sera executada sómente 10 segundos após a execução da função acima
+# The function below will only run 10 seconds after the function above
 rpa.success_print(f'Run after: {time_await}')
 
-# result: A função soma deve ser executada após o tempo definido.
+# result: The sum function should run after the defined time.
 >>> 27
 >>> Function: wait_for_exec executed the function: sum.
 >>> Run after: 10
@@ -337,142 +347,177 @@ rpa.success_print(f'Run after: {time_await}')
 
 # Directory
 
-**Directory** é um Objeto dedicado a manipulação de diretórios, criação de pastas, exclusão de pastas, e exclusão de conteudos dentro de pastas.
+**Directory** is an object dedicated to directory handling: creating directories, deleting directories, and deleting contents inside directories.
 
-Abaixo todos métodos e argumentos disponiveis de **Directory**:
+Below are all methods and parameters available on **Directory**:
 
-Metodo ``create_temp_dir``:
+Method ``create_temp_dir``:
 
-- Função responsavel por criar diretório temporário, pode também criar diretório com nome desejado e salvar o path relativo para uso posterior. Por ``default`` o nome do diretório é "temp" e o caminho é onde esta sendo executada a função
-- Argumentos:
+- Function responsible for creating a temporary directory. You can also create a directory with a custom name and save the relative path for later use. By ``default`` the directory name is "temp" and the path is where the function is being executed.
+- Parameters:
 
-  - ``path_to_create``: ``str`` - Caminho para criar o diretório.
-  - ``name_temp_dir``: ``str`` - Nome desejado para o diretório.
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
-
-<br>
-
-Metodo ``delete_temp_dir``:
-
-- Função responsavel por deletar diretório temporário, pode também deletar diretório com nome desejado e opcionalmente excluir diretórios que estejam populados com conteudo. Por ``default`` o nome do diretório é "temp" e o caminho é onde esta sendo executada a função.
-- Argumentos:
-
-  - ``path_to_delete``: ``str`` - Caminho para deletar o diretório.
-  - ``name_temp_dir``: ``str`` - Nome do diretório a deletar.
-  - ``delete_files``: ``bool`` - Opção se deseja excluir diretório mesmo populado.
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+  - ``path_to_create``: ``str`` - Path where the directory should be created.
+  - ``name_temp_dir``: ``str`` - Desired name for the directory.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
+  - ``exist_ok``: ``bool`` - If ``True`` (default), reuses the directory when it already exists. Pass ``False`` to fail if it already exists.
 
 <br>
 
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import Directory`
+Method ``delete_temp_dir``:
+
+- Function responsible for deleting a temporary directory. You can also delete a directory with a custom name and optionally delete directories that still contain files. By ``default`` the directory name is "temp" and the path is where the function is being executed.
+- Parameters:
+
+  - ``path_to_delete``: ``str`` - Path of the directory to delete.
+  - ``name_temp_dir``: ``str`` - Name of the directory to delete.
+  - ``delete_files``: ``bool`` - Whether to delete the directory even if it is not empty.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
 
 <br>
 
-Exemplo de uso ``create_temp_dir``:
+Method ``ensure_dir``:
+
+- Ensures the path exists (creates parents if needed). Safe to call if the directory already exists.
+- Parameters:
+
+  - ``path``: ``str`` - Path to ensure.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
+
+<br>
+
+Method ``clear_dir``:
+
+- Empties a directory (files and subdirectories) without deleting the directory itself.
+- Parameters:
+
+  - ``path``: ``str`` - Directory to empty.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
+
+<br>
+
+Method ``temp_dir``:
+
+- Context manager: creates the temp directory, yields the path, and on exit deletes the directory (including its contents).
+- Parameters:
+
+  - ``path_to_create``: ``str`` - Base path (default ``'default'`` = cwd).
+  - ``name_temp_dir``: ``str`` - Directory name (default ``'temp'``).
+  - ``delete_on_exit``: ``bool`` - If ``True`` (default), deletes when leaving the ``with`` block.
+  - ``exist_ok``: ``bool`` - Reuses the directory if it already exists (default ``True``).
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
+
+Example:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
 from rpa_suite import rpa
 
-# Acessando a instancia de 'dir' directory acessamos seu método para criar uma pasta temporaria
+with rpa.directory.temp_dir() as path:
+    rpa.file.download("https://example.com/file.pdf", path)
+```
+
+<br>
+
+> To import the class on its own: `from rpa_suite.core import Directory`
+
+<br>
+
+Example of ``create_temp_dir``:
+
+```python
+# Import the instantiated suite with all features
+from rpa_suite import rpa
+
+# Accessing the 'dir' directory instance, we call its method to create a temporary directory
 result = rpa.directory.create_temp_dir()
 
-# Exibindo o dict de resultado obtido com o retorno da função
-# A função retorna um dict com o status de sucesso e o path da pasta criada
+# Displaying the result dict returned by the function
+# The function returns a dict with the success status and the path of the created directory
 rpa.success_print(result)
 
->>> A função deve criar uma pasta chamada 'temp' no diretório onde esta sendo executado este código.
+>>> The function should create a directory named 'temp' in the directory where this code is running.
 >>> result: {'success': True, 'path_created': 'C:\\User\\path\\to\\your_project\\temp'}
 
 
-# Usando argumentos
+# Using arguments
 result_example2 = rpa.directory.create_temp_dir(path_to_create=r'.\docs', name_temp_dir='mydir')
 
-# Exibindo o dict de resultado obtido com o retorno da função
-# A função retorna um dict com o status de sucesso e o path da pasta criada
+# Displaying the result dict returned by the function
+# The function returns a dict with the success status and the path of the created directory
 rpa.success_print(result_example2)
 
->>> A função deve criar uma pasta chamada 'docs' e interna a esta outra chamada 'mydir' considerando a raiz atual como ponto de partida.
+>>> The function should create a directory named 'docs' and, inside it, another named 'mydir', using the current root as the starting point.
 >>> result_example2: {'success': True, 'path_created': '.\\docs\\mydir'}
 ```
 
 <br>
 
-Exemplo de uso ``delete_temp_dir``:
+Example of ``delete_temp_dir``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# Acessando a instancia de 'dir' directory acessamos seu método para criar uma pasta temporaria
+# Accessing the 'dir' directory instance, we call its method to delete a temporary directory
 result = rpa.directory.delete_temp_dir()
 
-# Exibindo o dict de resultado obtido com o retorno da função
-# A função retorna um dict com o status de sucesso e o path da pasta deletada
+# Displaying the result dict returned by the function
+# The function returns a dict with the success status and the path of the deleted directory
 rpa.success_print(result)
 
->>> A função deve deleta uma pasta chamada 'temp' no diretório onde esta sendo executado este código.
+>>> The function should delete a directory named 'temp' in the directory where this code is running.
 >>> result: {'success': True, 'path_deleted': 'C:\\Intel\\PERSONAL\\_rpa_suite\\test_suite\\temp'}
 
-# Usando argumentos
+# Using arguments
 result_example2 = rpa.directory.delete_temp_dir(
     path_to_delete=r'.\docs', 
     name_temp_dir='mydir',
     delete_files=True)
 
-# Exibindo o dict de resultado obtido com o retorno da função
-# A função retorna um dict com o status de sucesso e o path da pasta deletada
+# Displaying the result dict returned by the function
+# The function returns a dict with the success status and the path of the deleted directory
 rpa.success_print(result_example2)
 
->>> A função deve deletar uma pasta chamada 'mydir' interna em relação a pasta 'docs' considerando a raiz atual como ponto de partida.
+>>> The function should delete a directory named 'mydir' inside the 'docs' directory, using the current root as the starting point.
 >>> result_example2: {'success': True, 'path_deleted': '.\\docs\\mydir'}
 ```
 
 # Email
 
-**Email** é um Objeto dedicado a emails, envio e manipulação, no entanto temos apenas formato SMPT implementado, *em breve vamos disponibilizar outros métodos*.
+**Email** is an object dedicated to emails — sending and handling. Only SMTP is implemented at this time; *additional methods will be available soon*.
 
-Abaixo todos métodos e argumentos disponiveis de **Email**:
+Below are all methods and parameters available on **Email**:
 
-Metodo ``send_smtp``:
+Method ``send_smtp``:
 
-- Função responsavel por fazer envio de emails usando SMTP, com possibilidade de incluir anexos, a finalidade é reduzir a quantidade de código usado para tal, pois emails precisam de muitos detalhes declarados.
-Por ``default`` o servidor, a porta e a autenticação são definidos seguindo o padrão da hostinger, e o body do email já é definido para aceitar conteudo em HTML.
+- Function responsible for sending emails via SMTP, with optional attachments. The goal is to reduce the amount of boilerplate, since email requires many declared details.
+By ``default`` the server, port, and authentication follow the Hostinger pattern, and the email body is already set to accept HTML content.
 
-- Argumentos:
+- Parameters:
 
-  - ``email_user`` : ``str`` - Email do remetente.
-  - ``email_password`` : ``str`` - Senha do remetente.
-  - ``email_to`` : ``str`` - Email do destinatario.
-  - ``subject_title`` : ``str`` - Titulo do email.
-  - ``body_message`` : ``str`` - Mensagem do Email, **aceita HTML**.
-  - ``attachments`` : ``list[str]`` - Lista com path de anexos.
-  - ``smtp_server`` : ``str`` - Servidor a utilizar.
-  - ``smtp_port`` : ``int`` - Porta a utilizar.
-  - ``auth_tls`` : ``bool`` - Tipo de autenticação, se **False usa SSL**.
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
-
-<br>
-
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import Email`
+  - ``email_user`` : ``str`` - Sender email.
+  - ``email_password`` : ``str`` - Sender password.
+  - ``email_to`` : ``str`` - Recipient email.
+  - ``subject_title`` : ``str`` - Email subject.
+  - ``body_message`` : ``str`` - Email message; **accepts HTML**.
+  - ``attachments`` : ``list[str]`` - List of attachment paths.
+  - ``smtp_server`` : ``str`` - Server to use.
+  - ``smtp_port`` : ``int`` - Port to use.
+  - ``auth_tls`` : ``bool`` - Authentication type; if **False, uses SSL**.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
 
 <br>
 
-Exemplo de uso ``send_smtp``:
+> To import the class on its own: `from rpa_suite.core import Email`
+
+<br>
+
+Example of ``send_smtp``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# Acessando a instancia de 'Email' acessamos seu método para enviar email por SMTP
+# Accessing the 'Email' instance, we call its method to send email via SMTP
 rpa.email.send_smtp(email_user='your@email.com',
                     email_password='your_password',
                     email_to='destiny@email.com',
@@ -490,78 +535,88 @@ rpa.email.send_smtp(email_user='your@email.com',
 
 ## File
 
-**File** é um Objeto dedicado a operações basicas com arquivos, como contagem, criação e exclusão. Porem com finalidades mais definidas para acelerar o desenvolvimento e facilitar tarefas simples.
+**File** is an object dedicated to basic file operations such as counting, creating, and deleting. It is aimed at more specific tasks to speed up development and simplify simple jobs.
 
-Abaixo todos métodos e argumentos disponiveis de **File**:
+Below are all methods and parameters available on **File**:
 
-Metodo ``flag_create``:
+Method ``flag_create``:
 
-- Função responsavel por criar um arquivo que serve como flag para indicar a execução do script, automação ou aplicação.
-  Por ``default`` o nome do arquivo é ``running.flag`` porem pode ser mudando via argumento, e o diretório onde é criado é a raiz onde esta sendo executado, podendo este também ser alterado via parametros.
-- Argumentos:
+- Function responsible for creating a file that serves as a flag to indicate that a script, automation, or application is running.
+  By ``default`` the file name is ``running.flag``, but it can be changed via argument. The directory where it is created is the root where the code is running, and that can also be changed via parameters.
+- Parameters:
 
-  - ``name_file`` : ``str`` - Nome do arquivo desejado incluindo a extensão.
-  - ``path_to_create`` : ``str`` - Caminho do diretório onde deve ser criado o arquivo.
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
-
-<br>
-
-Metodo ``flag_delete``:
-
-- Função responsavel por deletar um arquivo que serve como flag para indicar a execução do script, automação ou aplicação.
-  Por ``default`` o nome do arquivo é ``running.flag`` porem pode ser mudando via argumento, e o diretório onde ira excluir é a raiz onde esta sendo executado, podendo este também ser alterado via parametros.
-- Argumentos:
-
-  - ``name_file`` : ``str`` - Nome do arquivo desejado incluindo a extensão.
-  - ``path_to_delete`` : ``str`` - Caminho do diretório onde deve ser excluido o arquivo.
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+  - ``name_file`` : ``str`` - Desired file name, including the extension.
+  - ``path_to_create`` : ``str`` - Directory path where the file should be created.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
 
 <br>
 
-Metodo ``count_files``:
+Method ``flag_delete``:
 
-- Função responsavel por contar arquivos em um diretório, possivel especificar o diretório onde deseja contar e a extensão desejada, principal caracteristica é que ja percorreo as demais pastas internas se houver.
-  Por ``default`` o caminho onde busca pelo diretório é a raiz onde esta sendo executado ``'.'`` usando assim por padrão o caminho relativo, também é definido que busque por todas extensões. A contagem é retornada em um ``dict``.
-- Argumentos:
+- Function responsible for deleting a file that serves as a flag to indicate that a script, automation, or application is running.
+  By ``default`` the file name is ``running.flag``, but it can be changed via argument. The directory where it will be deleted is the root where the code is running, and that can also be changed via parameters.
+- Parameters:
 
-  - ``dir_to_count`` : ``str`` - Caminho para o diretório desejado para fazer a contagem
-  - ``type_extension`` : ``str`` - Extensão que deseja realizar a contagem.
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
-
-<br>
-
-Metodo ``screen_shot``:
-
-- Função responsavel por registrar uma imagem do monitor utilizado, podendo passar diversos argumentos para parametrizar da melhor maneira que deseja, principal caracteristica é que cria tanto a pasta como o arquivo de maneira automatica se nenhum argumento for passado, registrando cada imagem com uso de data e horario para poder registrar multiplas imagens se necessario.
-  Por ``default`` o caminho onde cria o diretório é a raiz onde esta sendo executado e o nome do diretório é ``screenshots``, e o nome do arquivo é ``'screenshot_dd_mm_aaaa-hh-mm-ss.png'``.
-- Argumentos:
-
-  - ``file_name`` : ``str`` - Nome do arquivo, ``default`` sendo ``'screenshot'``.
-  - ``path_dir`` : ``str`` - Caminho para criar o diretório.
-  - ``save_with_date`` : ``bool`` - Se deseja a data no nome do arquivo, ``default`` sendo ``'True'``.
-  - ``delay`` : ``int`` - Atraso para geração de imagem, ``default`` sendo ``1``.
-  - ``use_default_path_and_name`` : ``bool`` - Se deseja usar nome e caminho padrão, por padrão ``True``.
-  - ``name_ss_dir`` : ``str`` - Nome desejado para o diretório caso não escolha manter o padrão.
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
-
+  - ``name_file`` : ``str`` - Desired file name, including the extension.
+  - ``path_to_delete`` : ``str`` - Directory path where the file should be deleted.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
 
 <br>
 
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import File`
+Method ``count_files``:
+
+- Function responsible for counting files in a directory. You can specify the directory to count and the desired extension. Its main characteristic is that it already walks nested directories if they exist.
+  By ``default`` the search path is the root where the code is running ``'.'``, using a relative path, and it searches for all extensions. The count is returned in a ``dict``.
+- Parameters:
+
+  - ``dir_to_count`` : ``str`` - Path to the directory you want to count
+  - ``type_extension`` : ``str`` - Extension to count.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
 
 <br>
 
-Exemplo de uso ``flag_create``:
+Method ``screen_shot``:
+
+- Function responsible for capturing an image of the monitor in use. You can pass several arguments to parameterize it as you prefer. Its main characteristic is that it automatically creates both the directory and the file if no argument is passed, naming each image with date and time so you can capture multiple images if needed.
+  By ``default`` the directory is created at the root where the code is running, the directory name is ``screenshots``, and the file name is ``'screenshot_dd_mm_YYYY-hh-mm-ss.png'``.
+- Parameters:
+
+  - ``file_name`` : ``str`` - File name, ``default`` being ``'screenshot'``.
+  - ``path_dir`` : ``str`` - Path where the directory should be created.
+  - ``save_with_date`` : ``bool`` - Whether to include the date in the file name, ``default`` being ``'True'``.
+  - ``delay`` : ``int`` - Delay before generating the image, ``default`` being ``1``.
+  - ``use_default_path_and_name`` : ``bool`` - Whether to use the default name and path; ``True`` by default.
+  - ``name_ss_dir`` : ``str`` - Desired directory name if you do not want to keep the default.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
+
+<br>
+
+Method ``copy`` / ``move``:
+
+- Copies or moves a file/directory. If ``dst`` is an existing directory, the item is placed inside it.
+- Parameters: ``src``, ``dst``, ``overwrite`` (default ``True``), ``verbose``.
+
+Method ``zip_path`` / ``unzip_path``:
+
+- Compresses a file or directory into ``.zip`` and extracts a zip file. The default unzip destination is the directory of the zip itself.
+
+Method ``download``:
+
+- Downloads an HTTP URL with ``requests`` and saves it to disk. If ``dest`` is omitted or is a directory, the name comes from the URL.
+
+<br>
+
+> To import the class on its own: `from rpa_suite.core import File`
+
+<br>
+
+Example of ``flag_create``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# Acessando a instancia de 'File' acessamos seu método para criar um arquivo de flag no diretório onde esta sendo executado este arquivo
+# Accessing the 'File' instance, we call its method to create a flag file in the directory where this file is running
 rpa.file.flag_create(name_file='running_my_bot.flag',
                     display_message=True)
 
@@ -569,13 +624,13 @@ rpa.file.flag_create(name_file='running_my_bot.flag',
 >>> Flag file created.
 ```
 
-Exemplo de uso ``flag_delete``:
+Example of ``flag_delete``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# Acessando a instancia de 'File' acessamos seu método para deletar um arquivo de flag no diretório onde esta sendo executado este arquivo
+# Accessing the 'File' instance, we call its method to delete a flag file in the directory where this file is running
 rpa.file.flag_delete(name_file='running_my_bot.flag',
                     display_message=True)
 
@@ -583,15 +638,15 @@ rpa.file.flag_delete(name_file='running_my_bot.flag',
 >>> Flag file deleted.
 ```
 
-Exemplo de uso ``count_files``:
+Example of ``count_files``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# Considere que existe a pasta 'docs' no mesmo nivel deste arquivo, com 3 arquivos dentro dela
+# Assume there is a 'docs' directory at the same level as this file, with 3 files inside it
 
-# Acessando a instancia de 'File' acessamos seu método para contar arquivos, caminho relativo passado em forma de lista caso queira contar varios diretórios
+# Accessing the 'File' instance, we call its method to count files; the relative path is passed as a list if you want to count multiple directories
 result = rpa.file.count_files(['docs'], display_message=True)
 rpa.success_print(result)
 
@@ -600,18 +655,18 @@ rpa.success_print(result)
 >>> {'success': True, 'qt': 3}
 ```
 
-Exemplo de uso ``screen_shot``:
+Example of ``screen_shot``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# !Important: Esta funcionalidade precisa das libs: pyautogui e pillow! (rpa_suite já as instala, porem verifique em caso de problemas)
+# !Important: This feature requires the pyautogui and pillow libraries! (rpa_suite already installs them, but check if you run into problems)
 
-# Acessando a instancia de 'File' acessamos seu método para realizar screenshots com apenas uma linha.
+# Accessing the 'File' instance, we call its method to take screenshots in a single line.
 rpa.file.screen_shot()
 
->>> Diretório:'C:\Users\You\your_project\here\screenshots' foi criado com sucesso.
+>>> Directory:'C:\Users\You\your_project\here\screenshots' was created successfully.
 ```
 
 
@@ -619,148 +674,140 @@ rpa.file.screen_shot()
 
 ## Log
 
-**Log** é um Objeto dedicado criação, registro e acompanhamento de logs. Sua estrutura é bastante simples conta com apenas 2 tipos de método, o primeiro para fazer a configuração, criando um diretório e arquivo para registro.
+**Log** is an object dedicated to creating, recording, and following logs. Its structure is quite simple and has only 2 kinds of method: the first configures the logger, creating a directory and a file for recording.
 
-O segundo tipo gerando os logs desejados. 
+The second kind generates the desired logs.
 
-Principais destaques: 
-  - Facilidade de realizar tudo com apenas 2 linhas de código, e quando o registro já existe não é substituido, facilitando a manutenção e continuidade de logs caso deseje usar como histórico.
-  - Conta com um método considerado "start" para registrar uma linha em branco no arquivo facilitando a divisão do arquivo por execuções.
-  - Registro com dados que facilitam a navegação por estruturas grandes de código apontando a ultima subpasta e o arquivo onde foi disparado o log.
+Main highlights:
+  - Easy to do everything with just 2 lines of code, and when the record already exists it is not replaced, which makes maintenance and continuity easier if you want to use it as a history.
+  - Includes a method considered "start" that writes a blank line to the file, making it easier to split the file by executions.
+  - Records data that make it easier to navigate large codebases by pointing to the last subdirectory and the file where the log was triggered.
 
-Abaixo todos métodos e argumentos disponiveis de **Log**:
+Below are all methods and parameters available on **Log**:
 
-Metodo ``config_logger``:
+Method ``config_logger``:
 
-- Função por configurar um logger e apontar para o caminho do arquivo desejado, gerando assim os logs no arquivo e também registrando as mensagems no console, todas mensagens já são personalizadas para diferencia-las. Também conta com um filtro de palavras para excluir dados sensiveis se necessario. (Neste módulo estamos realizando ajustes constantemente para oferecer uma esperiencia mais completa)
-  Por ``default`` o caminho onde cria o diretório e arquivo é a raiz onde esta sendo executado ``'.'`` usando assim por padrão o caminho relativo, esta mesmo caminho é utilizado pelas funções de log para registra as mensagens no arquivo e também no console.
+- Function that configures a logger and points it to the desired file path, writing logs to the file and also printing messages to the console. All messages are already customized so they can be distinguished. It also includes a word filter to exclude sensitive data if needed. (In this module we are constantly making adjustments to offer a more complete experience)
+  By ``default`` the directory and file are created at the root where the code is running ``'.'``, using a relative path. That same path is used by the log functions to record messages in the file and also on the console.
 
-> **⚠️ Importante:**
-> Garanta que seja executado o método config_logger antes de chamar os métodos de log para garantir que não haverá erros.
+> **⚠️ Important:**
+> Make sure ``config_logger`` is executed before calling the log methods to avoid errors.
 
-- Argumentos:
+- Parameters:
 
-  - ``path_dir`` : ``str`` - Caminho para criar o diretório, por ``default`` o caminho do arquivo em execução.
-  - ``name_log_dir`` : ``str`` - Nome do diretório de logs, por ``default`` chama-se ``'Logs'``.
-  - ``name_file_log`` : ``str`` - NOme do arquivo de log, por ``default`` chama-se ``'log'`` com extensão fixa: ``.log``
-  - ``filter_words`` : ``list[str]`` - Lista de palavras que deseja filtrar para não aparecer no registro, use para dados sensiveis.
-
-<br>
-
-Metodos ``log_start_run_debug``, ``log_debug``, ``log_info``, ``log_warning``, ``log_error``, ``log_critical``:
-
-- Métodos responsaveis por gera um registro de log no arquivo e no console. Em especial o prieiro método ``log_start_run_debug`` adiciona uma linha vazia antes de registrar o conteudo, facilitando dividir o arquivo para encontrar pontos de inicio de execução. Todos os métodos são pré personalizados por seus leveis e também com cores para facilitar que sejam diferenciados entre si.
-
-> **⚠️ Importante:**
-> Garanta que seja executado o método config_logger antes de chamar os métodos de log para garantir que não haverá erros.
-
-- Argumentos:
-
-  - ``msg`` : ``str`` - Mensagem desejada no registro de log.
+  - ``path_dir`` : ``str`` - Path where the directory should be created; by ``default`` the path of the running file.
+  - ``name_log_dir`` : ``str`` - Log directory name; by ``default`` it is ``'Logs'``.
+  - ``name_file_log`` : ``str`` - Log file name; by ``default`` it is ``'log'`` with a fixed extension: ``.log``
+  - ``filter_words`` : ``list[str]`` - List of words you want to filter out of the record; use this for sensitive data.
 
 <br>
 
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import Log`
+Methods ``log_start_run_debug``, ``log_debug``, ``log_info``, ``log_warning``, ``log_error``, ``log_critical``:
+
+- Methods responsible for generating a log record in the file and on the console. In particular, the first method ``log_start_run_debug`` adds an empty line before recording the content, making it easier to split the file and find execution start points. All methods are pre-customized by their levels and also with colors so they can be distinguished from each other.
+
+> **⚠️ Important:**
+> Make sure ``config_logger`` is executed before calling the log methods to avoid errors.
+
+- Parameters:
+
+  - ``msg`` : ``str`` - Desired message in the log record.
 
 <br>
 
-Exemplo de uso ``config_logger``:
+> To import the class on its own: `from rpa_suite.core import Log`
+
+<br>
+
+Example of ``config_logger``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# Acessando a instancia de 'Log' acessamos seu método que configura o logger, cria a pasta e também o arquivo de log
+# Accessing the 'Log' instance, we call its method that configures the logger and also creates the directory and the log file
 rpa.log.config_logger()
 
-# Este método deve criar uma pasta no local atual da execução chamada Logs com arquivo 'log.log' disponibilizando assim que use as funções de log para registrar neste arquivo.
+# This method should create a directory named Logs in the current execution location, with a 'log.log' file, so you can use the log functions to record in that file.
 
-# !IMPORTANT: garanta que instancie primeiramente no seu código config_logger para usar livremente as funções de log em qualquer etapa do seu projeto e qualquer arquivo, se os métodos de log forem chamados sem a configuração primeiro, apresentarão erro.
+# !IMPORTANT: make sure you first instantiate config_logger in your code so you can freely use the log functions at any stage of your project and in any file. If the log methods are called without configuration first, they will raise an error.
 
->>> Diretório:'C:\Users\You\your_project\here\Logs' foi criado com sucesso.
+>>> Directory:'C:\Users\You\your_project\here\Logs' was created successfully.
 ```
 
 
 <br>
 
-Exemplo de uso ``log_start_run_debug``, ``log_info``, ``log_warning``, ``log_error`` ,``log_critical``, ``log_debug``:
+Example of ``log_start_run_debug``, ``log_info``, ``log_warning``, ``log_error`` ,``log_critical``, ``log_debug``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
 
-# !IMPORTANT: Garanta que ja tenha sido executado o método config_logger deste módulo anteriormente no seu projeto para poder capturar e apontar para o arquivo correto e gerar os logs.
+# !IMPORTANT: Make sure the config_logger method of this module has already been executed earlier in your project so it can capture and point to the correct file and generate the logs.
 
 
-# Métodos de log disponíveis para uso, registra tanto no arquivo como também no console ja personalizado, além de gerar um espaço no arquivo para determinar o inicio da execução com log de start
-rpa.log.log_start_run_debug(f'Iniciando execução do script {__file__}')
+# Available log methods; they record both in the file and on the console, already customized, and also create space in the file to mark the start of execution with the start log
+rpa.log.log_start_run_debug(f'Starting script execution {__file__}')
 
-rpa.log.log_info(f'Executando tarefa exemplo 1')
+rpa.log.log_info(f'Running example task 1')
 
-rpa.log.log_warning(f'Executando tarefa exemplo 2 com warning')
+rpa.log.log_warning(f'Running example task 2 with warning')
 
-rpa.log.log_error(f'Executando tarefa exemplo 3 com erro')
+rpa.log.log_error(f'Running example task 3 with error')
 
-rpa.log.log_critical(f'Executando tarefa exemplo 4 com erro crítico')
+rpa.log.log_critical(f'Running example task 4 with critical error')
 
-rpa.log.log_debug(f'Executando tarefa exemplo 5 com debug')
+rpa.log.log_debug(f'Running example task 5 with debug')
 
->>> 21.04.25.00:33 DEBUG    Iniciando execução do script c:\You\your_project\here\this_file.py
->>> 21.04.25.00:33 INFO     Executando tarefa exemplo 1
->>> 21.04.25.00:33 WARNING  Executando tarefa exemplo 2 com warning
->>> 21.04.25.00:33 ERROR    Executando tarefa exemplo 3 com erro
->>> 21.04.25.00:33 CRITICAL Executando tarefa exemplo 4 com erro crítico
->>> 21.04.25.00:33 DEBUG    Executando tarefa exemplo 5 com debug
+>>> 21.04.25.00:33 DEBUG    Starting script execution c:\You\your_project\here\this_file.py
+>>> 21.04.25.00:33 INFO     Running example task 1
+>>> 21.04.25.00:33 WARNING  Running example task 2 with warning
+>>> 21.04.25.00:33 ERROR    Running example task 3 with error
+>>> 21.04.25.00:33 CRITICAL Running example task 4 with critical error
+>>> 21.04.25.00:33 DEBUG    Running example task 5 with debug
 ```
 
 <br>
 
 ## Regex
 
-**Regex** é um Objeto dedicado para uso de regex, contamos com um método convencional para buscar uma substring em uma string. Posteriormente vamos adicionar funcionalidades para tornar este módulo mais interessante e utilizavel em mais casos.
+**Regex** is an object dedicated to regex usage. We provide a conventional method to search for a substring in a string. Later we will add features to make this module more interesting and usable in more cases.
 
-Principais destaques: 
-  - Facilidade de realizar busca de uma string dentro de outra string de maneira mais rapida que o convencional com uso de re.
-  - Tem uso mais amplo que o padrão do python com ``__contains__`` pois já devolve um valor boleano com a possibilidade de mudar o estado de busca com uso de case sensitive como False. 
+Main highlights:
+  - Easier to search for a string inside another string, faster than the conventional use of re.
+  - Broader than Python's default ``__contains__`` because it already returns a boolean and lets you change the search with case sensitive set to False.
 
-Abaixo todos métodos e argumentos disponiveis de **Regex**:
+Below are all methods and parameters available on **Regex**:
 
-Metodo ``check_pattern_in_text``:
+Method ``check_pattern_in_text``:
 
-- Função responsavel por realizar a busca de uma string em outra string, capacidade de ser ou não case sensitive sem uso de blocos ``if`` e sem a necessidade de fazer Upper ou Lower no conteudo original.
-
-
-- Argumentos:
-
-  - ``origin_text`` : ``str`` - Conteudo de texto para a busca, deve ser uma string.
-  - ``pattern_to_search`` : ``str`` - Padrão desejado para a busca.
-  - ``case_sensitive`` : ``bool`` - Opção que indica se deve ser uma busca case sensitive.
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+- Function responsible for searching for a string inside another string, with optional case sensitivity, without ``if`` blocks and without needing to Upper or Lower the original content.
 
 
-<br>
+- Parameters:
 
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import Regex`
+  - ``origin_text`` : ``str`` - Text content for the search; must be a string.
+  - ``pattern_to_search`` : ``str`` - Desired pattern to search for.
+  - ``case_sensitive`` : ``bool`` - Whether the search should be case sensitive.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
 
 
 <br>
 
-Exemplo de uso ``check_pattern_in_text``:
+> To import the class on its own: `from rpa_suite.core import Regex`
+
+
+<br>
+
+Example of ``check_pattern_in_text``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# Acessando a instancia de 'Regex' acessamos seu método que busca padrões em um texto, com opção de ser case sensitive e exibir mensagem retornando um valor booleano
+# Accessing the 'Regex' instance, we call its method that searches for patterns in a text, with optional case sensitivity and message display, returning a boolean
 result: bool = rpa.regex.check_pattern_in_text(origin_text= 'This is a simple text with a pattern to search: Hello, World!',
                                 pattern_to_search= 'hello, world',
                                 case_sensitive= False,
@@ -778,47 +825,43 @@ if result:
 
 ## Validate
 
-**Validate** é um Objeto dedicado para validação de dados, podendo ser palavras, strings e emails.
+**Validate** is an object dedicated to data validation, including words, strings, and emails.
 
-Principais destaques: 
-  - Método word procura por palavras porem já faz a validação de espaços e pode separar um texto inteiro por lista de palavras para evitar falsos positivos.
-  - Método emails pode validar listas de emails o que facilita filtrar apenas emails validos para o envio com apenas uma chamada, retornando um dicionario com completo com todas informações como quantidade, e listas separadas de emails validos e invalidos. 
+Main highlights:
+  - The word method looks for words but already validates spaces and can split an entire text into a list of words to avoid false positives.
+  - The emails method can validate lists of emails, which makes it easier to filter only valid emails for sending with a single call, returning a complete dictionary with all information such as counts and separate lists of valid and invalid emails.
 
-Abaixo todos métodos e argumentos disponiveis de **Validate**:
+Below are all methods and parameters available on **Validate**:
 
-Metodo ``word``:
+Method ``word``:
 
-- Função responsavel por realizar a busca de uma string ou palavra em uma string, com possibilidade de ser case sensitive e mudar a forma de validação da busca com _search_by_.
+- Function responsible for searching for a string or word in a string, with optional case sensitivity and the ability to change the search mode with _search_by_.
 
-  Por ``default`` o tipo de busca é ``'string'`` podendo ser alterado para ``'word'``.
+  By ``default`` the search type is ``'string'``, and it can be changed to ``'word'``.
 
-- Argumentos:
+- Parameters:
 
-  - ``origin_text`` : ``str`` - Conteudo de texto para a busca, deve ser uma string.
-  - ``searched_word`` : ``str`` - Padrão desejado para a busca.
-  - ``case_sensitivy`` : ``bool`` - Opção que indica se deve ser uma busca case sensitive.
-  - ``search_by`` : ``str`` - Opção que indica a forma de busca, pode ser ``string`` ou ``word``, a busca por _word_ divide a string original possibilitando encontrar apenas ocorrencias validas.
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
-
-
-<br>
-
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import Validate`
+  - ``origin_text`` : ``str`` - Text content for the search; must be a string.
+  - ``searched_word`` : ``str`` - Desired pattern to search for.
+  - ``case_sensitivy`` : ``bool`` - Whether the search should be case sensitive.
+  - ``search_by`` : ``str`` - Search mode; can be ``string`` or ``word``. A _word_ search splits the original string so only valid occurrences are found.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
 
 
 <br>
 
-Exemplo de uso ``word``:
+> To import the class on its own: `from rpa_suite.core import Validate`
+
+
+<br>
+
+Example of ``word``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# Acessando a instancia de 'Validate' acessamos seu método que busca strings com foco em palavras. Implementaremos um retorno com numero de ocorrencias e as posições de inicio e fim de cada ocorrencia.
+# Accessing the 'Validate' instance, we call its method that searches strings with a focus on words. We will implement a return with the number of occurrences and the start and end positions of each occurrence.
 result: dict = rpa.validate.word(origin_text='Texto de origem', searched_word='Origem', case_sensitivy=True, search_by='string', display_message=True)
 
 rpa.success_print(result)
@@ -829,42 +872,38 @@ rpa.success_print(result)
 
 <br>
 
-Metodo ``emails``:
+Method ``emails``:
 
-- Função responsavel por realizar validação de emails, que deve ser passado como uma lista de strings, sua implementação utiliza a biblioteca __mail_validator__.
+- Function responsible for validating emails, which must be passed as a list of strings. Its implementation uses the __mail_validator__ library.
 
-- Argumentos:
+- Parameters:
 
-  - ``email_list`` : ``list[str]`` - Lista de emails que deseja validar.
-  - ``display_message``: ``bool`` - Opção se deseja que exiba mensagens no terminal.
+  - ``email_list`` : ``list[str]`` - List of emails you want to validate.
+  - ``display_message``: ``bool`` - Whether to print messages to the terminal.
 
-- Retorno:
-  - ``dict``: Dicionario que indica os resultados.
-      - ``success``: ``bool`` - Chave que indica verdadeiro apenas se **todos** emails forem validos.
-      - ``valid_emails``: ``list[str]`` - Lista de emails que são validos.
-      - ``invalid_emails``: ``lis[str]`` - Lista de emails que não são validos.
-      - ``qt_valids``: ``int`` - Numero de emails validos.
-      - ``qt_invalids``: ``int`` - Numero de emails invalidos.
-      - ``map_validation``: ``list[ Obj(ValidatedEmail) ]`` - Lista com os Objetos de _mail_validator_ que foi retornada. 
+- Returns:
+  - ``dict``: Dictionary with the results.
+      - ``success``: ``bool`` - Key that is true only if **all** emails are valid.
+      - ``valid_emails``: ``list[str]`` - List of emails that are valid.
+      - ``invalid_emails``: ``lis[str]`` - List of emails that are not valid.
+      - ``qt_valids``: ``int`` - Number of valid emails.
+      - ``qt_invalids``: ``int`` - Number of invalid emails.
+      - ``map_validation``: ``list[ Obj(ValidatedEmail) ]`` - List of the _mail_validator_ objects that were returned.
 
 <br>
 
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import Validate`
+> To import the class on its own: `from rpa_suite.core import Validate`
 
 
 <br>
 
-Exemplo de uso ``emails``:
+Example of ``emails``:
 
 ```python
-# Importando a suite instanciada com todas funcionalidades
+# Import the instantiated suite with all features
 from rpa_suite import rpa
 
-# Acessando a instancia de 'Validate' acessamos seu método 'emails' que valida uma lista conferindo se os emails são validos, utiliza a lib email_validator que pode ser um pouco lenta.
+# Accessing the 'Validate' instance, we call its 'emails' method, which validates a list checking whether the emails are valid. It uses the email_validator lib, which can be a bit slow.
 result: dict = rpa.validate.emails(email_list=['email@teste.com', 'test@test.br', 'invnalid_email@test'], display_message=True)
 
 rpa.success_print(result)
@@ -877,125 +916,120 @@ rpa.success_print(result)
 
 ## Asyn
 
-**Asyn**: Um módulo projetado para simplificar a execução e gerenciamento de funções **assíncronas** em scripts de automação, utilizando o objeto **AsyncRunner**.
+**Asyn**: A module designed to simplify running and managing **asynchronous** functions in automation scripts, using the **AsyncRunner** object.
 
-Principais características:
+Main characteristics:
 
-- Implementação simplificada de chamadas assíncronas, permitindo código mais limpo e direto
-- Eliminação da necessidade de criar manualmente funções assíncronas para chamadas de métodos existentes
-- Gerenciamento eficiente de tarefas assíncronas, otimizando o desenvolvimento de scripts e automações
-
-<br>
-
-Saiba mais sobre programação assíncrona em: *[Programação Assíncrona em Python](https://pythonacademy.com.br/blog/programacao-assincrona-no-python)*
-
-
-> **⚠️ Importante:**
-> *A execução de funções de forma assíncrona requer atenção cuidadosa para evitar problemas no código. É fundamental compreender as nuances entre Concorrência, Paralelismo e Assincronicidade.*
-> *Sugestões de estudo aprofundado:*
-> *[&gt; Introdução a concorrência e paralelismo](https://medium.com/nerd-for-tech/concurrency-and-parallelism-in-python-a-brief-introduction-9fd19b8c6433)*
-> *[&gt; Aprenda sobre concorrência e paralelismo em Python](https://medium.com/nerd-for-tech/concurrency-and-parallelism-in-python-a-brief-introduction-9fd19b8c6433)*
+- Simplified asynchronous calls, allowing cleaner and more direct code
+- No need to manually create asynchronous functions just to call existing methods
+- Efficient management of asynchronous tasks, speeding up script and automation development
 
 <br>
 
-Abaixo todos métodos e argumentos disponíveis de **Asyn**:
+Learn more about asynchronous programming at: *[Asynchronous Programming in Python](https://pythonacademy.com.br/blog/programacao-assincrona-no-python)*
 
-Método ``run``:
 
-- Função responsavel por iniciar a execução de uma função em assincronicidade.
-- Argumentos:
-
-  - ``function`` : ``Callable[..., T]`` - O primeiro argumento deve ser sua função ou ``chamavel``.
-  - ``*args``: ``Any`` - Argumentos posicionais da sua função ou chamavel.
-  - ``*kwargs``: ``Any`` - Argumentos nomeados da sua função ou chamavel.
-
-Método ``is_running``:
-
-- Função responsavel por consultar a função que esta rodando de forma Assincrona para saber se já finalizou sua execução.
-- Argumentos:
-
-  - Nenhum argumento é passado pelo usuario para este método.
-  - ``return`` : ``bool`` - Retorna ``False`` quando a função executada em assincronicidade já foi finalizada, ``True`` caso contrario.
-
-Método ``get_result``:
-
-- Função responsavel por recuperar o resultado (retorno) da função que foi executada de forma assincrona. Observe que get_result devolver um dicionario dentro de outro dicionario, o externo com as informações de assincronicidade que foi criada, e sua chave result com outro dicionario contendo o resultado (retorno) da execução da função.
-- Argumentos:
-
-  - ``timeout`` : ``Optional[float]`` - Opcionalmente pode ser passado o tempo limite para consultar e aguardar o resultado.
-  - ``return`` : ``Dict[str, Any]`` - Retorna um dicionario contendo informações da assincronicidade, e uma de suas chaves devolve um dicionario com resultado da execução.
-
-Método ``cancel``:
-
-- Função responsavel por cancelar a execução em andamento da função que esta rodando de forma assincrona, este método valida primeiramente se realmente esta em execução para finalizar.
-- Argumentos:
-
-  - Nenhum argumento é passado pelo usuario para este método.
+> **⚠️ Important:**
+> *Running functions asynchronously requires careful attention to avoid problems in the code. It is essential to understand the nuances among Concurrency, Parallelism, and Asynchronicity.*
+> *Suggestions for deeper study:*
+> *[&gt; Introduction to concurrency and parallelism](https://medium.com/nerd-for-tech/concurrency-and-parallelism-in-python-a-brief-introduction-9fd19b8c6433)*
+> *[&gt; Learn about concurrency and parallelism in Python](https://medium.com/nerd-for-tech/concurrency-and-parallelism-in-python-a-brief-introduction-9fd19b8c6433)*
 
 <br>
 
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import AsyncRunner`
+Below are all methods and parameters available on **Asyn**:
+
+Method ``run``:
+
+- Function responsible for starting execution of a function asynchronously.
+- Parameters:
+
+  - ``function`` : ``Callable[..., T]`` - The first argument must be your function or ``callable``.
+  - ``*args``: ``Any`` - Positional arguments for your function or callable.
+  - ``*kwargs``: ``Any`` - Keyword arguments for your function or callable.
+
+Method ``is_running``:
+
+- Function responsible for checking the function that is running asynchronously to see whether it has already finished.
+- Parameters:
+
+  - No arguments are passed by the user to this method.
+  - ``return`` : ``bool`` - Returns ``False`` when the function executed asynchronously has already finished, ``True`` otherwise.
+
+Method ``get_result``:
+
+- Function responsible for retrieving the result (return value) of the function that was executed asynchronously. Note that get_result returns a dictionary inside another dictionary: the outer one with information about the asynchronicity that was created, and its result key with another dictionary containing the result (return value) of the function execution.
+- Parameters:
+
+  - ``timeout`` : ``Optional[float]`` - Optionally, a timeout can be passed to query and wait for the result.
+  - ``return`` : ``Dict[str, Any]`` - Returns a dictionary containing asynchronicity information, and one of its keys returns a dictionary with the execution result.
+
+Method ``cancel``:
+
+- Function responsible for canceling the in-progress execution of the function that is running asynchronously. This method first validates whether it is really running before stopping it.
+- Parameters:
+
+  - No arguments are passed by the user to this method.
 
 <br>
 
-Exemplo de uso ``Asyn``:
+> To import the class on its own: `from rpa_suite.core import AsyncRunner`
+
+<br>
+
+Example of ``Asyn``:
 
 ```python
-# Importando a suite instanciada, e também a classe para Tipar nosso objeto e facilitar a chamada dos métodos
+# Import the instantiated suite, and also the class to type our object and make method calls easier
 from rpa_suite import rpa
 from rpa_suite.core import AsyncRunner
 from time import sleep
 
 
-# Função que deve ser executada de forma assíncrona simulando uma tarefa demorada
+# Function that should run asynchronously, simulating a long-running task
 def somar(a, b):
   
-    print(f'Iniciando função de calculo')
+    print(f'Starting calculation function')
     sleep(4)
-    print(f'finalizando função de calculo')
+    print(f'finishing calculation function')
     return a + b
 
 
 
-
-# Função principal do seu script ou automação
+# Main function of your script or automation
 def main():
   
-    """Fluxo principal da automação"""
+    """Main automation flow"""
   
 
-    print(f'Simulando 1 tarefa qualquer')
+    print(f'Simulating some task')
     sleep(3)
 
-    # Opcionalmente você pode instanciar o objeto a partir da classe
+    # Optionally you can instantiate the object from the class
     #runner: AsyncRunner = AsyncRunner()
 
-    # Instanciando o objeto de execução assíncrona
+    # Instantiating the asynchronous execution object
     runner: AsyncRunner = rpa.asyn()
   
-    # Executando a função somar de forma assíncrona
+    # Running the somar function asynchronously
     runner.run(somar, 10, 30)
 
-    # Simulando outra tarefa enquanto a função somar ainda está em execução
-    print(f'executando tarefa 2 enquanto somar ainda esta rodando em paralelo')
+    # Simulating another task while the somar function is still running
+    print(f'running task 2 while somar is still running in parallel')
   
-    # Aguardar 6 segundos para simular outra tarefa, caso esta seja rapida, é importante chamar sempre o método is_running() para verificar se a função em assincronissidade ainda está em execução.
+    # Wait 6 seconds to simulate another task. If this one is fast, it is important to always call the is_running() method to check whether the asynchronous function is still running.
     sleep(6)
   
-    # Iniciamos a variável que irá armazenar o resultado da função somar
+    # We start the variable that will store the result of the somar function
     result_soma = None
   
-    # Verificamos se a função ainda está em execução, caso não esteja, chamamos o método get_result() para obter o resultado da função somar.
+    # We check whether the function is still running; if it is not, we call get_result() to obtain the result of the somar function.
     if not runner.is_running():
         respons = runner.get_result(30)
         if respons['success']:
             result_soma = respons['result']
   
-    print(f'Resultado obtido: {result_soma}')  
+    print(f'Result obtained: {result_soma}')  
 
 
 
@@ -1008,126 +1042,122 @@ if __name__ == '__main__':
 
 ## Parallel
 
-**Parallel**: Um módulo projetado para simplificar a execução e gerenciamento de funções em **paralelo** em scripts de automação,utilizando o objeto **ParallelRunner**.
+**Parallel**: A module designed to simplify running and managing functions **in parallel** in automation scripts, using the **ParallelRunner** object.
 
-Principais características:
+Main characteristics:
 
-- Implementação simplificada de execução paralela, eliminando a complexidade de gerenciamento manual de processos
-- Métodos intuitivos para criação, execução e monitoramento de tarefas paralelas
-- Código limpo e direto, reduzindo a verbosidade típica de implementações de paralelismo
-- Abstração eficiente dos mecanismos de execução paralela, facilitando o desenvolvimento de aplicações concorrentes
-
-<br>
-
-Saiba mais sobre programação com paralelismo em: *[Paralelismo em Python (threads vs processos)](https://community.revelo.com.br/o-paralelismo-no-python-threads-vs-processos-parte-1/)*
-
-
-
-> **⚠️ Importante:**
-> *A execução de funções de forma assíncrona requer atenção cuidadosa para evitar problemas no código. É fundamental compreender as nuances entre Concorrência, Paralelismo e Assincronicidade.*
-> *Sugestões de estudo aprofundado:*
-> *[&gt; Introdução a concorrência e paralelismo](https://medium.com/nerd-for-tech/concurrency-and-parallelism-in-python-a-brief-introduction-9fd19b8c6433)*
-> *[&gt; Aprenda sobre concorrência e paralelismo em Python](https://medium.com/nerd-for-tech/concurrency-and-parallelism-in-python-a-brief-introduction-9fd19b8c6433)*
+- Simplified parallel execution, eliminating the complexity of manually managing processes
+- Intuitive methods for creating, running, and monitoring parallel tasks
+- Clean, direct code, reducing the typical verbosity of parallelism implementations
+- Efficient abstraction of parallel execution mechanisms, making concurrent application development easier
 
 <br>
 
-Abaixo todos métodos e argumentos disponíveis de **ParallelRunner**:
+Learn more about programming with parallelism at: *[Parallelism in Python (threads vs processes)](https://community.revelo.com.br/o-paralelismo-no-python-threads-vs-processos-parte-1/)*
 
-Método ``run``:
 
-- Função responsavel por iniciar a execução de uma função em **Paralelo**.
-- Argumentos:
 
-  - ``function`` : ``Callable[..., T]`` - O primeiro argumento deve ser sua função ou ``chamavel``.
-  - ``*args``: ``Any`` - Argumentos posicionais da sua função ou chamavel.
-  - ``*kwargs``: ``Any`` - Argumentos nomeados da sua função ou chamavel.
-
-Método ``is_running``:
-
-- Função responsavel por consultar a função que esta rodando de forma paralela para saber se já finalizou sua execução.
-- Argumentos:
-
-  - Nenhum argumento é passado pelo usuario para este método.
-  - ``return`` : ``bool`` - Retorna ``False`` quando a função executada em paralelismo já foi finalizada, ``True`` caso contrario.
-
-Método ``get_result``:
-
-- Função responsavel por recuperar o resultado (retorno) da função que foi executada de forma paralela. Observe que get_result devolver um dicionario dentro de outro dicionario, o externo com as informações de paralelismo que foi criada, e sua chave result com outro dicionario contendo o resultado (retorno) da execução da função.
-- Argumentos:
-
-  - ``timeout`` : ``Optional[float]`` - Opcionalmente pode ser passado o tempo limite para consultar e aguardar o resultado.
-  - ``return`` : ``Dict[str, Any]`` - Retorna um dicionario contendo informações da paralelismo, e uma de suas chaves devolve um dicionario com resultado da execução.
-
-Método ``cancel``:
-
-- Função responsavel por cancelar a execução em andamento da função que esta rodando de forma paralela, este método valida primeiramente se realmente esta em execução para finalizar.
-- Argumentos:
-
-  - Nenhum argumento é passado pelo usuario para este método.
+> **⚠️ Important:**
+> *Running functions asynchronously requires careful attention to avoid problems in the code. It is essential to understand the nuances among Concurrency, Parallelism, and Asynchronicity.*
+> *Suggestions for deeper study:*
+> *[&gt; Introduction to concurrency and parallelism](https://medium.com/nerd-for-tech/concurrency-and-parallelism-in-python-a-brief-introduction-9fd19b8c6433)*
+> *[&gt; Learn about concurrency and parallelism in Python](https://medium.com/nerd-for-tech/concurrency-and-parallelism-in-python-a-brief-introduction-9fd19b8c6433)*
 
 <br>
 
-> Se desejar importar ou instanciar de outra forma veja o guia na parte de "Componentes" ou "Formas de Uso".
->
-> Também é possivel fazer o import da seguinte forma, para usar o Objeto isolado:
->
-> `from rpa_suite.core import ParallelRunner`
+Below are all methods and parameters available on **ParallelRunner**:
+
+Method ``run``:
+
+- Function responsible for starting execution of a function **in Parallel**.
+- Parameters:
+
+  - ``function`` : ``Callable[..., T]`` - The first argument must be your function or ``callable``.
+  - ``*args``: ``Any`` - Positional arguments for your function or callable.
+  - ``*kwargs``: ``Any`` - Keyword arguments for your function or callable.
+
+Method ``is_running``:
+
+- Function responsible for checking the function that is running in parallel to see whether it has already finished.
+- Parameters:
+
+  - No arguments are passed by the user to this method.
+  - ``return`` : ``bool`` - Returns ``False`` when the function executed in parallel has already finished, ``True`` otherwise.
+
+Method ``get_result``:
+
+- Function responsible for retrieving the result (return value) of the function that was executed in parallel. Note that get_result returns a dictionary inside another dictionary: the outer one with information about the parallelism that was created, and its result key with another dictionary containing the result (return value) of the function execution.
+- Parameters:
+
+  - ``timeout`` : ``Optional[float]`` - Optionally, a timeout can be passed to query and wait for the result.
+  - ``return`` : ``Dict[str, Any]`` - Returns a dictionary containing parallelism information, and one of its keys returns a dictionary with the execution result.
+
+Method ``cancel``:
+
+- Function responsible for canceling the in-progress execution of the function that is running in parallel. This method first validates whether it is really running before stopping it.
+- Parameters:
+
+  - No arguments are passed by the user to this method.
 
 <br>
 
-Exemplo de uso ``Parallel``:
+> To import the class on its own: `from rpa_suite.core import ParallelRunner`
+
+<br>
+
+Example of ``Parallel``:
 
 ```python
-# Importando a suite instanciada, e também a classe para demonstrar que pode ser feito de duas formas diferentes
+# Import the instantiated suite, and also the class to show that it can be done in two different ways
 from rpa_suite import rpa
 from rpa_suite.core import ParallelRunner
 import time
 
-# Função que deve ser executada de forma assíncrona simulando uma tarefa demorada
+# Function that should run asynchronously, simulating a long-running task
 def somar(a, b):
   
-    print(f'Iniciando função soma')
+    print(f'Starting sum function')
     time.sleep(4)
-    print(f'finalizando função soma')
+    print(f'finishing sum function')
     return a + b
 
 
 
 
-# Função principal do seu script ou automação
+# Main function of your script or automation
 def main():
   
-    """Fluxo principal da automação"""
+    """Main automation flow"""
   
-    print(f'realizando tarefa 1')
+    print(f'running task 1')
     time.sleep(3)
   
-    # Opcionalmente você pode instanciar o objeto a partir da classe
+    # Optionally you can instantiate the object from the class
     #runner: ParallelRunner = ParallelRunner()
 
-    # Instanciando o runner para execução em paralelo a partir do objeto da suite
+    # Instantiating the runner for parallel execution from the suite object
     runner: ParallelRunner = rpa.parallel()
   
-    # Chamada da função principal 'run' que ira disparar a sua função de forma paralela
+    # Call to the main 'run' function, which will dispatch your function in parallel
     runner.run(somar, 10, 30)
 
-    # apenas um exemplo para emular uma tarefa em sequencia
-    print(f'executando tarefa 2 enquanto somar ainda esta rodando em paralelo')
+    # just an example to emulate a sequential task
+    print(f'running task 2 while somar is still running in parallel')
   
-    # Aguardar 6 segundos para simular outra tarefa, caso esta seja rapida, é importante chamar sempre o método is_running() para verificar se a função em paralelo ainda está em execução.
+    # Wait 6 seconds to simulate another task. If this one is fast, it is important to always call the is_running() method to check whether the parallel function is still running.
     time.sleep(6)
   
-    # Iniciamos a variável que irá armazenar o resultado da função somar
+    # We start the variable that will store the result of the somar function
     result_soma = None
 
-    # Verificamos se a função ainda está em execução, caso não esteja, chamamos o método get_result() para obter o resultado da função somar.
+    # We check whether the function is still running; if it is not, we call get_result() to obtain the result of the somar function.
     if not runner.is_running():
         respons = runner.get_result(30)
         if respons['success']:
             result_soma = respons['result']
   
 
-    print(f'Resultado obtido: {result_soma}')  
+    print(f'Result obtained: {result_soma}')  
 
 
 
@@ -1140,69 +1170,69 @@ if __name__ == '__main__':
 
 # Retry
 
-**Retry** é um decorator para repetir uma função em caso de falha, com backoff exponencial. Exposto em `rpa.retry` e também como `from rpa_suite.core import retry, RetryError`.
+**Retry** is a decorator that repeats a function on failure, with exponential backoff. Exposed on `rpa.retry` and also as `from rpa_suite.core import retry, RetryError`.
 
-Parametros de ``retry``:
+Parameters of ``retry``:
 
-- ``attempts`` : ``int`` - Número total de tentativas (>= 1). Default: ``3``.
-- ``delay`` : ``float`` - Espera em segundos antes da primeira nova tentativa. Default: ``0.5``.
-- ``backoff`` : ``float`` - Multiplicador do delay entre tentativas. Default: ``2.0``.
-- ``exceptions`` : tipo ou iterável de exceções que disparam retry. Default: ``Exception``.
-- ``max_delay`` : ``float | None`` - Teto do intervalo entre tentativas.
-- ``jitter`` : ``float`` - Jitter aleatório em segundos (``0`` desliga).
-- ``on_retry`` : callback opcional ``fn(attempt_index, exception, sleep_seconds)``.
+- ``attempts`` : ``int`` - Total number of attempts (>= 1). Default: ``3``.
+- ``delay`` : ``float`` - Wait in seconds before the first retry. Default: ``0.5``.
+- ``backoff`` : ``float`` - Multiplier of the delay between attempts. Default: ``2.0``.
+- ``exceptions`` : type or iterable of exceptions that trigger retry. Default: ``Exception``.
+- ``max_delay`` : ``float | None`` - Cap on the interval between attempts.
+- ``jitter`` : ``float`` - Random jitter in seconds (``0`` disables it).
+- ``on_retry`` : optional callback ``fn(attempt_index, exception, sleep_seconds)``.
 
-Se todas as tentativas falharem, é levantado ``RetryError`` (a última exceção fica em ``__cause__`` e em ``last_exception``).
+If all attempts fail, ``RetryError`` is raised (the last exception is in ``__cause__`` and in ``last_exception``).
 
 ```python
 from rpa_suite import rpa
 
 @rpa.retry(attempts=4, delay=0.2, backoff=2.0, exceptions=TimeoutError)
-def baixar_arquivo():
+def download_file():
     ...
 
 try:
-    baixar_arquivo()
+    download_file()
 except rpa.RetryError as exc:
     rpa.error_print(str(exc))
 ```
 
-> Import isolado: `from rpa_suite.core import retry, RetryError`
+> To import the class on its own: `from rpa_suite.core import retry, RetryError`
 
 <br>
 
 # Notifier
 
-**Notifier** envia webhooks HTTP (JSON) para Slack, Microsoft Teams e Telegram. Já vem instanciado em ``rpa.notifier``. Usa ``requests`` (dependência do núcleo).
+**Notifier** sends HTTP webhooks (JSON) to Slack, Microsoft Teams, and Telegram. It is already instantiated on ``rpa.notifier``. It uses ``requests`` (a core dependency).
 
-Métodos:
+Methods:
 
 - ``send_webhook(url, payload, method='POST', headers=None, timeout=None)``
 - ``slack(webhook_url, text, blocks=None, timeout=None)``
 - ``teams(webhook_url, title, text, theme_color='0076D7', timeout=None)``
 - ``telegram(bot_token, chat_id, text, parse_mode=None, disable_web_page_preview=True, timeout=None)``
 
-Retorno: ``dict`` com ``status_code``, ``ok`` e ``body``.
+Returns: ``dict`` with ``status_code``, ``ok``, and ``body``.
 
 ```python
 from rpa_suite import rpa
 
-rpa.notifier.slack("https://hooks.slack.com/services/...", "Robô finalizou com 42 itens")
-rpa.notifier.teams("https://outlook.office.com/webhook/...", "RPA", "Execução concluída")
-rpa.notifier.telegram(bot_token="123:ABC", chat_id="@canal", text="Bot ok")
+rpa.notifier.slack("https://hooks.slack.com/services/...", "Bot finished with 42 items")
+rpa.notifier.teams("https://outlook.office.com/webhook/...", "RPA", "Run completed")
+rpa.notifier.telegram(bot_token="123:ABC", chat_id="@channel", text="Bot ok")
 ```
 
-> Import isolado: `from rpa_suite.core import Notifier, NotifierError`
+> To import the class on its own: `from rpa_suite.core import Notifier, NotifierError`
 
 <br>
 
 # Browser
 
-**Browser** automatiza o Chrome via Selenium + debugging port. É extra opcional: ``pip install rpa-suite[browser]``. Em seguida use ``rpa.browser`` (a classe; instancie com ``rpa.browser()``).
+**Browser** automates Chrome via Selenium + debugging port. It is an optional extra: ``pip install rpa-suite[browser]``. Then use ``rpa.browser`` (the class; instantiate with ``rpa.browser()``).
 
-> Implementação atual é voltada a Windows (`chrome.exe` via `cmd.exe`).
+> The current implementation targets Windows (`chrome.exe` via `cmd.exe`).
 
-Métodos públicos:
+Public methods:
 
 - ``start_browser(close_chrome_on_this_port=True, timeout=10, verbose=False)``
 - ``configure_browser()``
@@ -1221,72 +1251,72 @@ el = browser.find_ele("//h1", by=By.XPATH)
 browser.close_browser()
 ```
 
-Se ``rpa.browser`` for ``None``, o extra ``[browser]`` não está instalado.
+If ``rpa.browser`` is ``None``, the ``[browser]`` extra is not installed.
 
-> Import isolado (requer selenium): `from rpa_suite.core import Browser`
+> To import the class on its own (requires selenium): `from rpa_suite.core import Browser`
 
 <br>
 
 # Artemis
 
-**Artemis** faz automação de desktop por visão (PyAutoGUI): localizar imagem na tela e clicar. Já entra no install básico (`pyautogui`). O parâmetro ``confidence`` só funciona com OpenCV: ``pip install rpa-suite[opencv]``. Sem o extra, a busca usa correspondência exata de pixels.
+**Artemis** does desktop automation by vision (PyAutoGUI): locate an image on the screen and click it. It is included in the basic install (`pyautogui`). The ``confidence`` parameter only works with OpenCV: ``pip install rpa-suite[opencv]``. Without the extra, the search uses exact pixel matching.
 
-Use ``rpa.artemis`` (classe): ``bot = rpa.artemis()``. Imagens padrão na pasta ``resource``.
+Use ``rpa.artemis`` (class): ``bot = rpa.artemis()``. Default images are in the ``resource`` directory.
 
-Métodos públicos:
+Public methods:
 
 - ``click_image(image_label, images_folder='resource', confidence=0.78, timeout=10.0, ...)``
 - ``find_image_position(image_label, images_folder='resource', confidence=0.8, timeout=5.0, ...)``
 - ``wait_and_click(image_label, images_folder='resource', confidence=0.8, timeout=30.0)``
 - ``quick_click(image_label, images_folder='resource')``
 
-Retorno: ``(x, y)`` se encontrou, ou ``False``.
+Returns: ``(x, y)`` if found, or ``False``.
 
 ```python
 from rpa_suite import rpa
 
 desktop = rpa.artemis()
-pos = desktop.click_image("botao_salvar.png", timeout=8.0)
+pos = desktop.click_image("save_button.png", timeout=8.0)
 if not pos:
-    rpa.alert_print("Imagem não encontrada")
+    rpa.alert_print("Image not found")
 
 desktop.wait_and_click("ok_button", timeout=30.0)
-desktop.quick_click("icone_menu")
+desktop.quick_click("menu_icon")
 ```
 
-> Import isolado: `from rpa_suite.core import Artemis`
+> To import the class on its own: `from rpa_suite.core import Artemis`
 
 <br>
 
 # Iris
 
-**Iris** converte documentos (PDF, imagens, texto) com OCR/IA via **docling**. Extra: ``pip install rpa-suite[ocr]``. Use ``rpa.iris`` (classe).
+**Iris** converts documents (PDF, images, text) with OCR/AI via **docling**. Extra: ``pip install rpa-suite[ocr]``. Use ``rpa.iris`` (class).
 
-Métodos:
+Methods:
 
 - ``read_document(file_path, result_format=ExportFormats.MARKDOWN, verbose=False)``
 - ``read_documents(list_file_path, result_format=ExportFormats.MARKDOWN, verbose=False)``
 
-Formatos: ``MARKDOWN``, ``DICT``, ``DOCTAGS``, ``HTML``, ``TEXT``, ``INDENTEDTEXT``.
+Formats: ``MARKDOWN``, ``DICT``, ``DOCTAGS``, ``HTML``, ``TEXT``, ``INDENTEDTEXT``.
 
 ```python
 from rpa_suite import rpa
 from rpa_suite.core.iris import ExportFormats
 
 iris = rpa.iris()
-markdown = iris.read_document("nota.pdf", ExportFormats.MARKDOWN)
-lotes = iris.read_documents(["a.pdf", "b.pdf"], ExportFormats.TEXT)
+markdown = iris.read_document("invoice.pdf", ExportFormats.MARKDOWN)
+batches = iris.read_documents(["a.pdf", "b.pdf"], ExportFormats.TEXT)
 ```
 
-Se ``rpa.iris`` for ``None``, o extra ``[ocr]`` não está instalado.
+If ``rpa.iris`` is ``None``, the ``[ocr]`` extra is not installed.
 
-> Import isolado (requer docling): `from rpa_suite.core.iris import Iris, ExportFormats`
+> To import the class on its own (requires docling): `from rpa_suite.core.iris import Iris, ExportFormats`
 
 <br>
 
 # CLI
 
-A lib expõe um CLI via ``python -m rpa_suite``. O dashboard exige ``pip install rpa-suite[dashboard]``.
+The library exposes a CLI via ``python -m rpa_suite``. The dashboard requires ``pip install rpa-suite[dashboard]``.
 
 ```bash
 python -m rpa_suite version
@@ -1296,7 +1326,7 @@ python -m rpa_suite dashboard path/to/file.db --port 5001
 python -m rpa_suite dashboard path/to/file.db --host 127.0.0.1 --port 5001 --debug
 ```
 
-O comando ``dashboard`` abre a UI HTML (execuções, itens, logs) contra um arquivo SQLite gerado pelo módulo Database.
+The ``dashboard`` command opens the HTML UI (executions, items, logs) against a SQLite file generated by the Database module.
 
 <br>
 
@@ -1592,7 +1622,7 @@ db = Database(
     logs_table="logs_rpa_test",
     allow_reprocess_interrupted_items=True,
     prevent_duplicate_items=True,
-    unique_item_field="item_data.valor",
+    unique_item_field="item_data.amount",
     auto_detect_interruptions=False,
 )
 
@@ -1607,13 +1637,13 @@ item_ids = db.add_items(
     items=[
         {
             "item_identifier": "ORD-001",
-            "item_data": {"order_id": "ORD-001", "valor": 150.0},
+            "item_data": {"order_id": "ORD-001", "amount": 150.0},
             "priority": 10,
             "max_retries": 3,
         },
         {
             "item_identifier": "ORD-002",
-            "item_data": {"order_id": "ORD-002", "valor": 80.0},
+            "item_data": {"order_id": "ORD-002", "amount": 80.0},
             "priority": 5,
         },
     ]
@@ -1677,7 +1707,7 @@ Updates counters (`total_items`, `successful_items`, `failed_items`, `interrupte
 item_id = db.add_item(
     execution_id=None,              # uses active execution if omitted
     item_identifier="PED-1001",
-    item_data={"pedido_id": "PED-1001", "valor": 250.0},
+    item_data={"order_id": "PED-1001", "value": 250.0},
     processing_schema={"steps": ["validate", "submit"]},
     priority=10,                    # higher = claimed first
     max_retries=3,                  # 0 = unlimited

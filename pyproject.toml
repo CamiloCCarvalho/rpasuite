@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rpa_suite"
-version = "1.9.0"
-description = "Comprehensive Python toolkit for RPA automation: email, logging, database tracking, browser automation, OCR, desktop automation, and more. Essential utilities for building robust automation workflows with Selenium, Botcity, and custom solutions."
+version = "1.9.1"
+description = "Python toolkit for RPA: email, files, logging, desktop and browser automation, OCR, and execution tracking."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -16,28 +16,30 @@ requires-python = ">=3.11"
 keywords = [
     "rpa",
     "automation",
+    "robotic-process-automation",
+    "bot",
+    "gui",
+    "testing",
     "selenium",
-    "logging",
-    "database",
-    "sqlite",
-    "postgresql",
-    "mysql",
-    "sqlserver",
-    "ocr",
     "pyautogui",
-    "email",
-    "browser-automation",
+    "ocr",
+    "desktop",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: System Administrators",
+    "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Testing",
     "Topic :: Utilities",
     "Topic :: Communications :: Email",
     "Topic :: Database",
     "Topic :: Internet :: WWW/HTTP :: Browsers",
     "Topic :: Multimedia :: Graphics :: Capture :: Screen Capture",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -45,7 +47,6 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Environment :: Console",
     "Natural Language :: English",
-    "Natural Language :: Portuguese (Brazilian)",
 ]
 dependencies = [
     "colorama",

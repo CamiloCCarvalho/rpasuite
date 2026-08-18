@@ -3,7 +3,8 @@
 # imports standard
 import os
 import shutil
-from typing import Union
+from contextlib import contextmanager
+from typing import Iterator, Union
 
 # imports internal
 from rpa_suite.functions._printer import alert_print, success_print
@@ -49,11 +50,32 @@ class Directory:
         except Exception as e:
             raise DirectoryError(f"Error trying execute: {self.__init__.__name__}! {str(e)}.") from e
 
+    def _resolve_base_path(self, path: str | None) -> str:
+        if path is None or path in ("default", ""):
+            return os.getcwd()
+        return path
+
+    def ensure_dir(self, path: str, display_message: bool = False) -> str:
+        """
+        Create ``path`` (and parents) if it does not exist. Safe to call when it already exists.
+
+        Returns the absolute path created/ensured.
+        """
+        try:
+            full_path = os.path.abspath(path)
+            os.makedirs(full_path, exist_ok=True)
+            if display_message:
+                success_print(f"Directory:'{full_path}' is ready.")
+            return full_path
+        except Exception as e:
+            raise DirectoryError(f"Error trying execute: {self.ensure_dir.__name__}! {str(e)}.") from e
+
     def create_temp_dir(
         self,
         path_to_create: str = "default",
         name_temp_dir: str = "temp",
         display_message: bool = False,
+        exist_ok: bool = True,
     ) -> dict[str, Union[bool, str, None]]:
         """
         Function responsible for creating a temporary directory to work with files and etc.
@@ -65,6 +87,9 @@ class Directory:
         ``name_temp_dir: str`` - should be a string representing the name of the temporary directory to be created. If it is empty, the ``temp`` value will be used as the default directory name.
 
         ``display_message: bool`` - should be a bool to display messages on terminal, by default False.
+
+        ``exist_ok: bool`` - if True (default), reuse the directory when it already exists.
+            Pass False to restore the previous fail-if-exists behaviour.
 
         Return:
         ----------
@@ -79,16 +104,11 @@ class Directory:
         }
 
         try:
-            if path_to_create == "default":  # pylint: disable=duplicate-code
-                path_to_create: str = os.getcwd()
-
-            # Build path to new dir
+            path_to_create = self._resolve_base_path(path_to_create)
             full_path: str = os.path.join(path_to_create, name_temp_dir)
 
-            # Create dir in this block
             try:
-                # Successefully created
-                os.makedirs(full_path, exist_ok=False)
+                os.makedirs(full_path, exist_ok=exist_ok)
 
                 result["success"] = True
                 result["path_created"] = rf"{full_path}"
@@ -108,6 +128,8 @@ class Directory:
                 if display_message:
                     raise DirectoryError(f"Permission denied: Not possible to create Directory '{full_path}'.") from e
 
+        except DirectoryError:
+            raise
         except Exception as e:
             result["success"] = False
             result["path_created"] = None
@@ -146,9 +168,7 @@ class Directory:
         }
 
         try:
-            # by 'default', defines path to local script execution path
-            if path_to_delete == "default":  # pylint: disable=duplicate-code
-                path_to_delete: str = os.getcwd()
+            path_to_delete = self._resolve_base_path(path_to_delete)
 
             # Build path to new dir
             full_path: str = os.path.join(path_to_delete, name_temp_dir)
@@ -196,3 +216,74 @@ class Directory:
             raise DirectoryError(f"Error trying execute: {self.delete_temp_dir.__name__}! {str(e)}.") from e
 
         return result
+
+    def clear_dir(self, path: str, display_message: bool = False) -> dict[str, Union[bool, str, int]]:
+        """
+        Remove files and subfolders inside ``path`` but keep the directory itself.
+
+        Returns:
+            dict with ``success``, ``path`` and ``removed`` (number of entries deleted).
+        """
+        result: dict[str, Union[bool, str, int]] = {"success": False, "path": path, "removed": 0}
+        try:
+            full_path = os.path.abspath(path)
+            if not os.path.isdir(full_path):
+                raise DirectoryError(f"Directory does not exist: '{full_path}'.")
+
+            removed = 0
+            for name in os.listdir(full_path):
+                entry = os.path.join(full_path, name)
+                if os.path.isdir(entry) and not os.path.islink(entry):
+                    shutil.rmtree(entry)
+                else:
+                    os.remove(entry)
+                removed += 1
+
+            result["success"] = True
+            result["path"] = full_path
+            result["removed"] = removed
+            if display_message:
+                success_print(f"Directory:'{full_path}' cleared ({removed} entries).")
+            return result
+        except DirectoryError:
+            raise
+        except Exception as e:
+            raise DirectoryError(f"Error trying execute: {self.clear_dir.__name__}! {str(e)}.") from e
+
+    @contextmanager
+    def temp_dir(
+        self,
+        path_to_create: str = "default",
+        name_temp_dir: str = "temp",
+        delete_on_exit: bool = True,
+        exist_ok: bool = True,
+        display_message: bool = False,
+    ) -> Iterator[str]:
+        """
+        Context manager: create a temp folder, yield its path, then optionally delete it.
+
+        Example:
+            >>> from rpa_suite import rpa
+            >>> with rpa.directory.temp_dir() as path:
+            ...     # download PDFs into `path`
+            ...     pass
+        """
+        created = self.create_temp_dir(
+            path_to_create=path_to_create,
+            name_temp_dir=name_temp_dir,
+            display_message=display_message,
+            exist_ok=exist_ok,
+        )
+        path = created.get("path_created")
+        if not path:
+            raise DirectoryError("Failed to create temporary directory.")
+        try:
+            yield str(path)
+        finally:
+            if delete_on_exit:
+                self.delete_temp_dir(
+                    path_to_delete=path_to_create,
+                    name_temp_dir=name_temp_dir,
+                    delete_files=True,
+                    display_message=display_message,
+                )

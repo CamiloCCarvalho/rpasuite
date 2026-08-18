@@ -66,6 +66,19 @@ class Utils:
         except Exception as e:
             raise UtilsError(f"Error configuring importable directory: {str(e)}.") from e
 
+    def keep_awake(self) -> "KeepSessionActive":
+        """
+        Context manager that prevents Windows sleep/lock during a long bot run.
+
+        On non-Windows systems it is a no-op so the same snippet remains portable.
+
+        Example:
+            >>> from rpa_suite import rpa
+            >>> with rpa.utils.keep_awake():
+            ...     run_long_job()
+        """
+        return KeepSessionActive()
+
 
 class KeepSessionActive:
     """
@@ -121,6 +134,8 @@ class KeepSessionActive:
         Captures and logs any errors during state configuration.
         """
         try:
+            if sys.platform != "win32":
+                return self
             ctypes.windll.kernel32.SetThreadExecutionState(
                 self.ES_CONTINUOUS | self.ES_SYSTEM_REQUIRED | self.ES_DISPLAY_REQUIRED
             )
@@ -149,9 +164,15 @@ class KeepSessionActive:
         Captures and logs any errors during state restoration.
         """
         try:
+            if sys.platform != "win32":
+                return
             ctypes.windll.kernel32.SetThreadExecutionState(self.ES_CONTINUOUS)
         except Exception as e:
             raise UtilsError(f"Error restoring execution state: {str(e)}.") from e
+
+
+# Exposed on Utils so `rpa.utils` can use the same API as Tools.
+Utils.keep_session_active = KeepSessionActive
 
 
 class Tools(Utils):

@@ -3,11 +3,15 @@
 # imports standard
 import csv
 import os
+import shutil
 import time
+import zipfile
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Union
+from urllib.parse import unquote, urlparse
 
 # imports third party
+import requests
 from colorama import Fore
 
 from rpa_suite.functions.__create_ss_dir import __create_ss_dir as create_ss_dir
@@ -353,6 +357,222 @@ class File:
             return os.path.abspath(file_path)
         except Exception as e:
             raise FileError(f"Error writing CSV '{file_path}': {str(e)}") from e
+
+    def copy(
+        self,
+        src: str,
+        dst: str,
+        overwrite: bool = True,
+        verbose: bool = False,
+    ) -> str:
+        """
+        Copy a file or directory to ``dst``. Directories are copied recursively.
+
+        Returns the absolute destination path.
+        """
+        try:
+            src_abs = os.path.abspath(src)
+            dst_abs = os.path.abspath(dst)
+            if not os.path.exists(src_abs):
+                raise FileError(f"Source does not exist: '{src_abs}'.")
+
+            if os.path.isdir(dst_abs):
+                dst_abs = os.path.join(dst_abs, os.path.basename(src_abs))
+
+            if os.path.exists(dst_abs) and not overwrite:
+                raise FileError(f"Destination already exists: '{dst_abs}'.")
+
+            parent = os.path.dirname(dst_abs)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
+
+            if os.path.isdir(src_abs):
+                if os.path.exists(dst_abs):
+                    shutil.rmtree(dst_abs)
+                shutil.copytree(src_abs, dst_abs)
+            else:
+                shutil.copy2(src_abs, dst_abs)
+
+            if verbose:
+                success_print(f"Copied '{src_abs}' -> '{dst_abs}'.")
+            return dst_abs
+        except FileError:
+            raise
+        except Exception as e:
+            raise FileError(f"Error copying '{src}' to '{dst}': {str(e)}") from e
+
+    def move(
+        self,
+        src: str,
+        dst: str,
+        overwrite: bool = True,
+        verbose: bool = False,
+    ) -> str:
+        """
+        Move a file or directory to ``dst``.
+
+        Returns the absolute destination path.
+        """
+        try:
+            src_abs = os.path.abspath(src)
+            dst_abs = os.path.abspath(dst)
+            if not os.path.exists(src_abs):
+                raise FileError(f"Source does not exist: '{src_abs}'.")
+
+            if os.path.isdir(dst_abs):
+                dst_abs = os.path.join(dst_abs, os.path.basename(src_abs))
+
+            if os.path.exists(dst_abs):
+                if not overwrite:
+                    raise FileError(f"Destination already exists: '{dst_abs}'.")
+                if os.path.isdir(dst_abs) and not os.path.islink(dst_abs):
+                    shutil.rmtree(dst_abs)
+                else:
+                    os.remove(dst_abs)
+
+            parent = os.path.dirname(dst_abs)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
+
+            shutil.move(src_abs, dst_abs)
+            if verbose:
+                success_print(f"Moved '{src_abs}' -> '{dst_abs}'.")
+            return dst_abs
+        except FileError:
+            raise
+        except Exception as e:
+            raise FileError(f"Error moving '{src}' to '{dst}': {str(e)}") from e
+
+    def zip_path(
+        self,
+        source: str,
+        archive_path: str | None = None,
+        verbose: bool = False,
+    ) -> str:
+        """
+        Zip a file or folder. If ``archive_path`` is omitted, uses ``<source>.zip``.
+
+        Returns the absolute path of the created archive.
+        """
+        try:
+            source_abs = os.path.abspath(source)
+            if not os.path.exists(source_abs):
+                raise FileError(f"Source does not exist: '{source_abs}'.")
+
+            if archive_path is None:
+                archive_path = source_abs.rstrip("\\/") + ".zip"
+            archive_abs = os.path.abspath(archive_path)
+            parent = os.path.dirname(archive_abs)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
+
+            if os.path.isdir(source_abs):
+                base, ext = os.path.splitext(archive_abs)
+                if ext.lower() != ".zip":
+                    base = archive_abs
+                created = shutil.make_archive(
+                    base,
+                    "zip",
+                    root_dir=os.path.dirname(source_abs),
+                    base_dir=os.path.basename(source_abs),
+                )
+                created_abs = os.path.abspath(created)
+                if created_abs != archive_abs:
+                    if os.path.exists(archive_abs):
+                        os.remove(archive_abs)
+                    shutil.move(created_abs, archive_abs)
+                    created_abs = archive_abs
+            else:
+                with zipfile.ZipFile(archive_abs, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+                    zf.write(source_abs, arcname=os.path.basename(source_abs))
+                created_abs = archive_abs
+
+            if verbose:
+                success_print(f"Archive created: '{created_abs}'.")
+            return created_abs
+        except FileError:
+            raise
+        except Exception as e:
+            raise FileError(f"Error zipping '{source}': {str(e)}") from e
+
+    def unzip_path(
+        self,
+        archive_path: str,
+        dest_dir: str | None = None,
+        verbose: bool = False,
+    ) -> str:
+        """
+        Extract a zip archive. Default destination is the folder of the zip file.
+
+        Returns the absolute extraction directory.
+        """
+        try:
+            archive_abs = os.path.abspath(archive_path)
+            if not os.path.isfile(archive_abs):
+                raise FileError(f"Archive does not exist: '{archive_abs}'.")
+
+            dest_abs = os.path.abspath(dest_dir) if dest_dir else os.path.dirname(archive_abs)
+            os.makedirs(dest_abs, exist_ok=True)
+
+            with zipfile.ZipFile(archive_abs, "r") as zf:
+                for member in zf.infolist():
+                    target = os.path.abspath(os.path.join(dest_abs, member.filename))
+                    if target != dest_abs and not target.startswith(dest_abs + os.sep):
+                        raise FileError(f"Unsafe zip entry blocked: '{member.filename}'.")
+                zf.extractall(dest_abs)
+
+            if verbose:
+                success_print(f"Extracted '{archive_abs}' -> '{dest_abs}'.")
+            return dest_abs
+        except FileError:
+            raise
+        except Exception as e:
+            raise FileError(f"Error unzipping '{archive_path}': {str(e)}") from e
+
+    def download(
+        self,
+        url: str,
+        dest: str | None = None,
+        timeout: float = 60.0,
+        chunk_size: int = 8192,
+        verbose: bool = False,
+    ) -> str:
+        """
+        Download ``url`` to disk with ``requests``.
+
+        If ``dest`` is omitted or is a directory, the filename is taken from the URL path.
+
+        Returns the absolute path of the saved file.
+        """
+        try:
+            parsed = urlparse(url)
+            url_name = unquote(os.path.basename(parsed.path)) or "download.bin"
+
+            if dest is None:
+                dest_abs = os.path.abspath(url_name)
+            else:
+                dest_abs = os.path.abspath(dest)
+                if os.path.isdir(dest_abs) or dest.endswith(("/", "\\")):
+                    dest_abs = os.path.join(dest_abs, url_name)
+
+            parent = os.path.dirname(dest_abs)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
+
+            with requests.get(url, stream=True, timeout=timeout) as response:
+                response.raise_for_status()
+                with open(dest_abs, "wb") as out:
+                    for chunk in response.iter_content(chunk_size=chunk_size):
+                        if chunk:
+                            out.write(chunk)
+
+            if verbose:
+                success_print(f"Downloaded '{url}' -> '{dest_abs}'.")
+            return dest_abs
+        except FileError:
+            raise
+        except Exception as e:
+            raise FileError(f"Error downloading '{url}': {str(e)}") from e
 
     def count_files(
         self,
