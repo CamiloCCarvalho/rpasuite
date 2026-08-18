@@ -10,7 +10,6 @@ openpyxl>=3.1.2
 pandas>=2.1.4
 pyautogui>=0.9.54
 selenium>=4.16.0
-typing>=3.7.4.3
 webdriver_manager>=4.0.1
 docling
 
@@ -28,4 +27,5 @@ isort
 bandit
 
 # to package
+build
 twine

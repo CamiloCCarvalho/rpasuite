@@ -208,7 +208,6 @@ class Suite:
             "pandas",
             "pyautogui",
             "selenium",
-            "typing",
             "webdriver_manager",
             "docling",
         ]

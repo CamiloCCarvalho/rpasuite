@@ -4,6 +4,14 @@ setup(
     name="rpa_suite",
     version="1.9.0",
     packages=find_packages(),
+    include_package_data=True,
+    package_data={
+        "rpa_suite.core.dashboard": [
+            "templates/*.html",
+            "static/*.css",
+            "static/*.js",
+        ],
+    },
     description="Comprehensive Python toolkit for RPA automation: email, logging, database tracking, browser automation, OCR, desktop automation, and more. Essential utilities for building robust automation workflows with Selenium, Botcity, and custom solutions.",
     long_description_content_type="text/markdown",
     long_description=open("README.md", encoding="utf-8").read(),  # pylint: disable=consider-using-with
@@ -63,7 +71,6 @@ setup(
         "colorlog",
         "email_validator",
         "loguru",
-        "typing",
         "pillow",
         "pyautogui",
         "requests",
