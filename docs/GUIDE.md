@@ -1238,3 +1238,753 @@ if __name__ == '__main__':
     main()
 
 ```
+
+<br>
+
+# Database
+
+**Database** is the RPA Suite module for execution tracking, item queues, structured logs, retention, reprocessing, and observability. It is designed for production RPA workflows: idempotent queues, checkpoints, retries, interruption handling, deduplication, and a built-in HTML dashboard.
+
+You can import it in several ways:
+
+```python
+from rpa_suite.core import Database, DatabaseType, RetentionPolicy
+from rpa_suite import rpa
+
+db = rpa.database(...)          # via Suite (if exposed)
+db = Database(...)              # direct import (recommended)
+```
+
+> **Optional dependency:** the HTML dashboard requires Flask (`pip install flask`).
+
+---
+
+## Table of contents
+
+1. [Concepts](#concepts)
+2. [Supported backends](#supported-backends)
+3. [Constructor](#constructor)
+4. [Quick start](#quick-start)
+5. [Executions](#executions)
+6. [Items & queue](#items--queue)
+7. [Logs](#logs)
+8. [Reprocessing](#reprocessing)
+9. [Interruptions](#interruptions)
+10. [Retention & storage](#retention--storage)
+11. [Cleanup](#cleanup)
+12. [Statistics & dashboard queries](#statistics--dashboard-queries)
+13. [HTML dashboard](#html-dashboard)
+14. [CLI](#cli)
+15. [Best practices](#best-practices)
+
+---
+
+## Concepts
+
+The module organizes RPA work into three layers:
+
+| Layer | Purpose |
+|-------|---------|
+| **Executions** | One bot run (start → finish). Holds counters, metadata, and status. |
+| **Items** | Individual work units inside a queue (orders, files, records, etc.). |
+| **Logs** | Structured messages tied to an execution (and optionally forwarded to `Log`). |
+
+### Item status model
+
+The library **writes** these statuses:
+
+```
+pending → processing → success | failed | skipped | interrupted
+```
+
+- `queued` and `retrying` are **read aliases** for legacy rows; new inserts use `pending`.
+- **`execution_id`** on an item = the execution that **created** it (`create_execution` in the dashboard).
+- **`last_execution_id`** = the last execution that **touched** the item (claim, checkpoint, finish, reprocess, etc.).
+
+#### Item status flow diagram
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    [*] --> pending: add_item / add_items
+
+    pending --> processing: claim_next_item_from_queue\nstart_processing_item
+    queued --> processing: claim (legacy read alias)
+    interrupted --> processing: claim (if allow_reprocess)
+
+    processing --> success: finish_item(status='success')
+    processing --> failed: finish_item(status='failed')
+    processing --> skipped: finish_item(status='skipped')
+    processing --> interrupted: detect_and_mark_interrupted_items\nOS signal shutdown
+
+    failed --> pending: reprocess_interrupted_item\n(if allowed & retries OK)
+    interrupted --> pending: reprocess_interrupted_item\n(if allowed & retries OK)
+
+    success --> [*]
+    failed --> [*]: terminal (unless reprocessed)
+    skipped --> [*]
+```
+
+| Transition | Typical API |
+|------------|-------------|
+| → `pending` | `add_item`, `add_items`, `reprocess_interrupted_item` |
+| → `processing` | `claim_next_item_from_queue`, `start_processing_item` |
+| → `success` / `failed` / `skipped` | `finish_item` |
+| → `interrupted` | `detect_and_mark_interrupted_items`, signal handler on shutdown |
+| `interrupted` / `failed` → `pending` | `reprocess_interrupted_item`, `reprocess_items_from_execution` |
+
+> **`retrying`** is not written by current code; treat it as a legacy read alias grouped with backlog filters.
+
+#### Execution status flow diagram
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    [*] --> running: start_execution
+
+    running --> completed: finish_execution(status='completed')
+    running --> failed: finish_execution(status='failed')
+    running --> cancelled: finish_execution(status='cancelled')
+    running --> interrupted: detect_and_mark_interrupted_executions\nOS signal shutdown
+
+    interrupted --> running: reprocess_interrupted_execution\n(new execution row)
+
+    completed --> [*]
+    failed --> [*]
+    cancelled --> [*]
+    interrupted --> [*]: or reprocess into new run
+```
+
+| Transition | Typical API |
+|------------|-------------|
+| → `running` | `start_execution` |
+| → `completed` / `failed` / `cancelled` | `finish_execution` |
+| → `interrupted` | `detect_and_mark_interrupted_executions`, signal handler |
+| `interrupted` → new `running` | `reprocess_interrupted_execution` (creates a child execution) |
+
+#### End-to-end flow (execution + items)
+
+```mermaid
+flowchart TD
+    A[start_execution] --> B[add_item / add_items]
+    B --> C{claim_next_item_from_queue}
+    C -->|item found| D[processing]
+    C -->|queue empty| E[finish_execution]
+    D --> F[update_checkpoint optional]
+    F --> G{handler result}
+    G -->|OK| H[finish_item success]
+    G -->|error| I[finish_item failed]
+    G -->|skip| J[finish_item skipped]
+    H --> C
+    I --> C
+    J --> C
+    D -->|crash / kill| K[interrupted]
+    K -->|reprocess allowed| B
+    E --> L([done])
+```
+
+### Active execution
+
+After `start_execution()`, the instance stores `_current_execution_id`. Many methods accept an optional `execution_id`; when omitted, they use the active execution.
+
+Always call `start_execution()` before adding items/logs, or pass `execution_id` explicitly.
+
+---
+
+## Supported backends
+
+```python
+from rpa_suite.core import DatabaseType
+
+DatabaseType.SQLITE       # default — local file, best for dev/single-bot
+DatabaseType.POSTGRESQL   # production server
+DatabaseType.MYSQL        # production server
+DatabaseType.SQLSERVER    # production server (requires pyodbc + ODBC driver)
+```
+
+### SQLite (default)
+
+```python
+db = Database(
+    db_path="my_bot.db",
+    db_dir="database",           # folder for the file; "default" = cwd
+    executions_table="exec_bot",
+    items_table="items_bot",
+    logs_table="logs_bot",
+)
+```
+
+### PostgreSQL / MySQL
+
+```python
+db = Database(
+    db_type=DatabaseType.POSTGRESQL,
+    host="localhost",
+    port=5432,
+    database="rpa_db",
+    user="rpa_user",
+    password="secret",
+    use_pool=True,
+    pool_size=5,
+)
+```
+
+### SQL Server
+
+```python
+db = Database(
+    db_type=DatabaseType.SQLSERVER,
+    host="localhost",
+    port=1433,
+    database="rpa_db",
+    user="sa",
+    password="secret",
+    driver="ODBC Driver 17 for SQL Server",  # optional
+    trust_server_certificate=True,
+    encrypt=True,
+)
+```
+
+Requires: `pip install pyodbc` and a system ODBC driver.
+
+---
+
+## Constructor
+
+```python
+Database(
+    db_type=DatabaseType.SQLITE,
+    db_path="athena_executions.db",
+    db_dir="default",
+    host=None,
+    port=None,
+    database=None,
+    user=None,
+    password=None,
+    driver=None,
+    trust_server_certificate=True,
+    encrypt=True,
+    use_pool=True,
+    pool_size=5,
+    executions_table="athena_executions",
+    items_table="athena_items",
+    logs_table="athena_logs",
+    allow_reprocess_interrupted_items=False,
+    allow_reprocess_interrupted_executions=False,
+    auto_detect_interruptions=True,
+    mark_stale_on_init=False,
+    auto_generate_execution_id=True,
+    prevent_duplicate_items=False,
+    unique_item_field="item_identifier",
+    duplicate_item_behavior="skip",
+    log_instance=None,
+    verbose=False,
+    retention_policy=None,
+)
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `db_type` | `DatabaseType` | Backend. Default: `SQLITE`. |
+| `db_path` | `str` | SQLite file name (combined with `db_dir`). |
+| `db_dir` | `str` | Directory for SQLite file. `"default"` = current working directory. Created if missing. |
+| `host`, `port`, `database`, `user`, `password` | — | Server backends (PostgreSQL, MySQL, SQL Server). |
+| `driver` | `str` | SQL Server ODBC driver name. |
+| `trust_server_certificate`, `encrypt` | `bool` | SQL Server connection options. |
+| `use_pool`, `pool_size` | — | Connection pooling (PostgreSQL/MySQL). |
+| `executions_table`, `items_table`, `logs_table` | `str` | Custom table names (validated). |
+| `allow_reprocess_interrupted_items` | `bool` | Allow reprocessing interrupted/failed items. |
+| `allow_reprocess_interrupted_executions` | `bool` | Allow cloning an interrupted execution into a new run. |
+| `auto_detect_interruptions` | `bool` | Register OS signal handlers to mark running work as interrupted on shutdown. |
+| `mark_stale_on_init` | `bool` | On init, mark stale `running`/`processing` rows as interrupted. |
+| `auto_generate_execution_id` | `bool` | Generate UUID for external `execution_id` when not provided. |
+| `prevent_duplicate_items` | `bool` | Global deduplication across the items table. |
+| `unique_item_field` | `str` | `"item_identifier"` or `"item_data.<key>"` (e.g. `"item_data.order_id"`). |
+| `duplicate_item_behavior` | `str` | `"skip"` (return existing id) or `"error"`. |
+| `log_instance` | `Log` | Optional `rpa_suite.core.Log` — DB logs also go to the file logger. |
+| `verbose` | `bool` | Print init messages. |
+| `retention_policy` | `RetentionPolicy` \| `dict` \| `None` | Automatic TTL/row-cap cleanup (see [Retention](#retention--storage)). |
+
+### Context manager
+
+```python
+with Database(db_path="bot.db", auto_detect_interruptions=False) as db:
+    exec_id = db.start_execution(automation_name="my-bot")
+    ...
+# connection closed automatically
+```
+
+---
+
+## Quick start
+
+Full minimal flow: execution → batch items → process → logs → finish → dashboard.
+
+```python
+from rpa_suite.core import Database
+
+db = Database(
+    db_path="rpa_test.db",
+    db_dir="database",
+    executions_table="execution_rpa_test",
+    items_table="items_rpa_test",
+    logs_table="logs_rpa_test",
+    allow_reprocess_interrupted_items=True,
+    prevent_duplicate_items=True,
+    unique_item_field="item_data.valor",
+    auto_detect_interruptions=False,
+)
+
+exec_id = db.start_execution(
+    automation_name="order_processor",
+    metadata={"version": "1.0.0", "env": "prod"},
+)
+
+db.add_log_info("Bot started", step_name="Init")
+
+item_ids = db.add_items(
+    items=[
+        {
+            "item_identifier": "ORD-001",
+            "item_data": {"order_id": "ORD-001", "valor": 150.0},
+            "priority": 10,
+            "max_retries": 3,
+        },
+        {
+            "item_identifier": "ORD-002",
+            "item_data": {"order_id": "ORD-002", "valor": 80.0},
+            "priority": 5,
+        },
+    ]
+)
+
+def handle_item(item: dict) -> str:
+    # your business logic here
+    return "Processed OK"
+
+stats = db.process_queue(exec_id, handler=handle_item)
+db.add_log_success(f"Queue done: {stats}", step_name="Finish")
+db.finish_execution(exec_id)
+db.close()
+```
+
+---
+
+## Executions
+
+### Methods
+
+| Method | Description |
+|--------|-------------|
+| `start_execution(...)` | Start a new run; sets active execution. Returns internal `id` (int). |
+| `finish_execution(execution_id, status='completed', error_message=None)` | Close a run. Status: `completed`, `failed`, `cancelled`. |
+| `get_execution(execution_id)` | Fetch one execution row as dict. |
+| `get_executions(status=None, automation_name=None, limit=None)` | List executions with optional filters. |
+| `detect_and_mark_interrupted_executions(scope='current')` | Mark unfinished runs as `interrupted`. |
+| `check_interrupted()` | Deprecated; returns whether current execution was interrupted. |
+
+### `start_execution`
+
+```python
+exec_id = db.start_execution(
+    automation_name="invoice_bot",
+    execution_id="optional-external-uuid",   # optional; auto-generated if omitted
+    metadata={"client": "ACME", "batch": 42},
+)
+```
+
+**Returns:** `int` — internal primary key (`id`). Use this for items, logs, and finish calls.
+
+### `finish_execution`
+
+```python
+db.finish_execution(exec_id, status="completed")
+db.finish_execution(exec_id, status="failed", error_message="SMTP timeout")
+```
+
+Updates counters (`total_items`, `successful_items`, `failed_items`, `interrupted_items`) from items linked to that execution.
+
+---
+
+## Items & queue
+
+### Adding items
+
+#### `add_item`
+
+```python
+item_id = db.add_item(
+    execution_id=None,              # uses active execution if omitted
+    item_identifier="PED-1001",
+    item_data={"pedido_id": "PED-1001", "valor": 250.0},
+    processing_schema={"steps": ["validate", "submit"]},
+    priority=10,                    # higher = claimed first
+    max_retries=3,                  # 0 = unlimited
+)
+```
+
+**Returns:** `int` — item id. With dedup enabled, may return an existing id (`duplicate_item_behavior="skip"`).
+
+#### `add_items` (batch)
+
+```python
+ids = db.add_items(
+    execution_id=exec_id,
+    items=[
+        {"item_identifier": "A", "item_data": {"id": "A"}, "priority": 1},
+        {"item_identifier": "B", "item_data": {"id": "B"}, "priority": 2},
+    ],
+    default_priority=0,
+    default_max_retries=0,
+)
+```
+
+**Returns:** `list[int]` — created item ids.
+
+### Deduplication
+
+When `prevent_duplicate_items=True`:
+
+```python
+db = Database(
+    prevent_duplicate_items=True,
+    unique_item_field="item_identifier",       # or "item_data.order_id"
+    duplicate_item_behavior="skip",            # or "error"
+)
+```
+
+- **`skip`:** second insert with the same unique value returns the existing item id.
+- **`error`:** raises `DatabaseError`.
+
+### Processing items (manual)
+
+Recommended pattern: **claim atomically**, then finish.
+
+```python
+item = db.claim_next_item_from_queue(exec_id)
+if item:
+    try:
+        db.update_checkpoint(item["id"], "Downloading file")
+        result = process(item["item_data"])
+        db.update_checkpoint(item["id"], "Upload complete")
+        db.finish_item(item["id"], status="success", notes=str(result))
+    except Exception as exc:
+        db.finish_item(item["id"], status="failed", error_message=str(exc))
+```
+
+| Method | Description |
+|--------|-------------|
+| `claim_next_item_from_queue(execution_id, include_interrupted=None)` | Atomically claim next item (`pending`/`queued`/`interrupted`). **Prefer this** over manual get+start. |
+| `get_next_item_from_queue(execution_id, include_interrupted=None)` | Read-only peek; does not change status. |
+| `start_processing_item(item_id)` | Mark item as `processing` (non-atomic alternative). |
+| `update_checkpoint(item_id, checkpoint)` | Save last checkpoint string; updates `last_execution_id`. |
+| `finish_item(item_id, status='success', error_message=None, notes=None)` | Finalize item. Status: `success`, `failed`, `skipped`. |
+| `get_item(item_id)` | Fetch one item; normalizes JSON fields. |
+| `get_item_by_unique_key(unique_value)` | Lookup by dedup field when enabled. |
+
+### `process_queue` (high-level loop)
+
+Runs the claim → handler → finish loop for you:
+
+```python
+def my_handler(item: dict) -> str:
+    return f"Done {item['item_identifier']}"
+
+stats = db.process_queue(
+    execution_id=exec_id,
+    handler=my_handler,
+    max_items=None,              # limit items this call
+    stop_on_error=False,         # stop loop on first exception
+    include_interrupted=None,    # None = use Database default
+    on_success=None,             # optional callback(item, result)
+    on_error=None,               # optional callback(item, exception)
+)
+# stats: {"processed": 10, "success": 9, "failed": 1}
+```
+
+### Listing items — `get_items`
+
+```python
+# Pending items in the current execution (default)
+pending = db.get_items()
+
+# All unfinished work across every execution
+backlog = db.get_items(scope="all", status="backlog")
+
+# Failed items in a specific execution
+failed = db.get_items(execution_id=exec_id, status="failed")
+```
+
+| Parameter | Description |
+|-----------|-------------|
+| `execution_id` | Filter by execution. Overrides `scope` when set. |
+| `status` | Filter group or exact status (default: `pending`). |
+| `scope` | `"current"` (default) or `"all"`. |
+
+**Status groups:**
+
+| Value | Includes |
+|-------|----------|
+| `pending` | `pending`, `queued` |
+| `executed` | `success`, `failed`, `skipped` |
+| `interrupted` | `interrupted` |
+| `backlog` / `reprocessavel` | unfinished work (pending, queued, interrupted, retrying, failed, processing) |
+| `all` | no status filter |
+
+> Do not pass `backlog` as `scope`. Use `get_items(scope="all", status="backlog")`.
+
+---
+
+## Logs
+
+### Log levels (class constants)
+
+`LOG_LEVEL_DEBUG`, `LOG_LEVEL_INFO`, `LOG_LEVEL_WARNING`, `LOG_LEVEL_ERROR`, `LOG_LEVEL_CRITICAL`, `LOG_LEVEL_SUCCESS`
+
+### Methods
+
+| Method | Description |
+|--------|-------------|
+| `add_log(message, execution_id=None, log_level=INFO, step_name=None)` | Generic log insert. |
+| `add_log_debug`, `add_log_info`, `add_log_warning`, `add_log_warn`, `add_log_error`, `add_log_critical`, `add_log_success` | Shortcuts for each level. |
+| `get_logs(execution_id=None, log_level=None, step_name=None, limit=None, order_desc=True)` | Query logs. |
+| `clear_logs(execution_id=None, log_level=None, older_than_days=None, confirm=False)` | Delete logs (`confirm=True` required). |
+
+### Examples
+
+```python
+db.add_log_info("Reading input file", step_name="Step 1 - Extract")
+db.add_log_warning("Retry attempt 2", step_name="Step 2 - Submit")
+db.add_log_error("Validation failed", step_name="Step 2 - Submit")
+db.add_log_success("Batch completed", step_name="Step 3 - Finish")
+
+entries = db.get_logs(execution_id=exec_id, order_desc=False)
+for entry in entries:
+    print(entry["log_level"], entry["step_name"], entry["message"])
+```
+
+When `log_instance` is set on `Database`, each DB log is also forwarded to the file `Log` object.
+
+---
+
+## Reprocessing
+
+Enable flags at construction:
+
+```python
+db = Database(
+    allow_reprocess_interrupted_items=True,
+    allow_reprocess_interrupted_executions=True,
+)
+```
+
+| Method | Description |
+|--------|-------------|
+| `can_reprocess_item(item_id)` | Check if item is eligible. |
+| `reprocess_interrupted_item(item_id)` | Reset item to `pending`, bump `retry_count`. |
+| `reprocess_items_from_execution(execution_id, statuses=None)` | Reprocess multiple items from one execution. |
+| `can_reprocess_execution(execution_id)` | Check if execution can be cloned. |
+| `reprocess_interrupted_execution(execution_id)` | Create new execution with copies of unfinished items. Returns new `exec_id`. |
+| `is_reprocessable(item_row)` | Low-level eligibility check on a row dict. |
+
+```python
+new_exec_id = db.reprocess_interrupted_execution(old_exec_id)
+db.process_queue(new_exec_id, handler=my_handler)
+```
+
+---
+
+## Interruptions
+
+On process kill (Ctrl+C, task kill, etc.), when `auto_detect_interruptions=True`:
+
+1. Current execution → `interrupted`
+2. Items in `processing` → `interrupted`
+
+Manual detection:
+
+```python
+marked_exec_ids = db.detect_and_mark_interrupted_executions(scope="all")
+marked_item_ids = db.detect_and_mark_interrupted_items(scope="current")
+```
+
+Use `mark_stale_on_init=True` to clean up leftover `running`/`processing` rows from a previous crash when the bot starts again.
+
+---
+
+## Retention & storage
+
+Automatic cleanup by age and row caps.
+
+```python
+from rpa_suite.core import Database, RetentionPolicy
+
+db = Database(
+    db_path="bot.db",
+    retention_policy={
+        "enabled": True,
+        "auto_on_init": False,
+        "auto_on_finish_execution": True,
+        "logs": {
+            "max_age_days": 30,
+            "max_age_days_by_level": {"error": 90, "critical": 180},
+            "max_rows": 1_000_000,
+        },
+        "items": {
+            "max_age_days_by_status": {"success": 60, "failed": 120},
+            "max_rows_by_status": {"success": 500_000},
+        },
+        "executions": {
+            "max_age_days_by_status": {"completed": 90, "failed": 120},
+        },
+    },
+)
+
+# Manual run
+summary = db.apply_retention_policy(dry_run=True)   # preview counts
+summary = db.apply_retention_policy(dry_run=False)  # delete
+
+stats = db.get_storage_stats()  # row counts + SQLite file size
+```
+
+Protected statuses (not deleted by default): pending, processing, interrupted, running, etc.
+
+---
+
+## Cleanup
+
+Destructive operations require `confirm=True`.
+
+| Method | Description |
+|--------|-------------|
+| `clear_pending_items(confirm=True)` | Remove pending/queued items. |
+| `clear_interrupted_items(confirm=True)` | Remove interrupted items. |
+| `clear_successful_items(confirm=True)` | Remove successful items. |
+| `clear_failed_items(confirm=True)` | Remove failed items. |
+| `clear_interrupted_executions(confirm=True)` | Remove interrupted executions. |
+| `clear_successful_executions(confirm=True)` | Remove completed executions. |
+| `clear_failed_executions(confirm=True)` | Remove failed executions. |
+| `clear_items_table(confirm=True)` | Wipe all items. |
+| `clear_executions_table(confirm=True)` | Wipe all executions. |
+| `clear_logs_table(confirm=True)` | Wipe all logs. |
+| `clear_database(confirm=True)` | Wipe everything. |
+
+---
+
+## Statistics & dashboard queries
+
+Programmatic queries used by the dashboard (also callable from your code):
+
+| Method | Description |
+|--------|-------------|
+| `get_statistics(execution_id=None)` | Aggregated execution/item/log stats. |
+| `list_executions(...)` | Paginated executions with filters. |
+| `list_items(...)` | Paginated items; exposes `create_execution` / `last_execution`. |
+| `list_logs(...)` | Paginated logs. |
+| `dashboard_summary()` | Overview KPIs for the dashboard home page. |
+| `executions_over_time(days=14)` | Daily execution counts for charts. |
+| `item_status_distribution(execution_id=None)` | Item counts by status. |
+| `log_level_distribution(execution_id=None)` | Log counts by level. |
+| `top_automations(limit=5)` | Most frequent automation names. |
+
+```python
+summary = db.dashboard_summary()
+print(summary["executions"]["total"], summary["items"]["pending"])
+```
+
+---
+
+## HTML dashboard
+
+Local Flask UI to inspect executions, items, and logs.
+
+### Programmatic
+
+```python
+from rpa_suite.core import Database
+from rpa_suite.core.dashboard import run_dashboard
+
+db = Database(db_path="rpa_test.db", db_dir="database", ...)
+run_dashboard(db, host="127.0.0.1", port=5001)
+```
+
+### CLI (SQLite file)
+
+```bash
+pip install flask
+python -m rpa_suite dashboard database/rpa_test.db --port 5001
+python -m rpa_suite dashboard database/rpa_test.db --host 127.0.0.1 --port 5001 --debug
+```
+
+### Pages
+
+| URL | Content |
+|-----|---------|
+| `/` | Overview — KPIs, charts (executions over time, item status, log levels, top automations). |
+| `/executions` | Paginated executions; filter by status, automation name, date range. |
+| `/items` | Paginated items; filter by execution id, status, identifier search. Columns: **Create exec**, **Last exec**, expandable **Data** JSON preview. |
+| `/logs` | Paginated logs; filter by execution id, level, message search. |
+
+### JSON API (for charts / integrations)
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/summary` | Same as `dashboard_summary()`. |
+| `GET /api/executions/timeseries?days=14` | Executions per day. |
+| `GET /api/items/status?execution_id=` | Item status distribution. |
+| `GET /api/logs/levels?execution_id=` | Log level distribution. |
+| `GET /api/executions/top?limit=5` | Top automations. |
+
+---
+
+## CLI
+
+```bash
+# Dashboard
+python -m rpa_suite dashboard path/to/file.db --port 5001
+
+# Storage stats (JSON or plain text)
+python -m rpa_suite db-stats path/to/file.db
+python -m rpa_suite db-stats path/to/file.db --json
+
+# Version
+python -m rpa_suite version
+```
+
+---
+
+## Best practices
+
+1. **Always** call `start_execution()` before adding items/logs (or pass `execution_id` every time).
+2. **Prefer** `claim_next_item_from_queue()` over `get_next_item_from_queue()` + `start_processing_item()` — it is atomic under concurrency.
+3. **Prefer** `process_queue()` when every item follows the same handler pattern.
+4. Use **`update_checkpoint()`** at meaningful steps for observability and recovery.
+5. Use **`scope="all"`** only when you intentionally want cross-execution backlog (e.g. shared SQLite queue across runs).
+6. Enable **`prevent_duplicate_items`** when the same business key must not enter the queue twice.
+7. Set **`auto_detect_interruptions=True`** in production; combine with `finish_execution()` in a `finally` block when possible.
+8. Use **`dict`** for `item_data` — the library normalizes JSON on read; the dashboard shows a readable preview.
+9. Call **`db.close()`** or use `with Database(...) as db:` when done; especially important with connection pools.
+10. For long-running bots, configure **`retention_policy`** to avoid unbounded table growth.
+
+### Recommended shutdown pattern
+
+```python
+exec_id = db.start_execution(automation_name="my-bot")
+try:
+    db.process_queue(exec_id, handler=my_handler)
+    db.finish_execution(exec_id, status="completed")
+except Exception as exc:
+    db.finish_execution(exec_id, status="failed", error_message=str(exc))
+    raise
+finally:
+    db.close()
+```
+
+---
+
+## Related
+
+- Wiki (other modules): [rpasuite Modules](https://github.com/CamiloCCarvalho/rpasuite/wiki/Modules)
+- This harness validates the installed package under `.venv/Lib/site-packages/rpa_suite/`
