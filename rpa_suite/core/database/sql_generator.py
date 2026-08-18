@@ -7,6 +7,7 @@ from .constants import (
     VALID_LOG_LEVELS_SQL,
     DatabaseType,
 )
+from .dialect_sql import create_index_sql
 
 
 class SQLGenerator:
@@ -31,24 +32,34 @@ class SQLGenerator:
             return "SERIAL PRIMARY KEY"
         if self.db_type == DatabaseType.MYSQL:
             return "INT AUTO_INCREMENT PRIMARY KEY"
+        if self.db_type == DatabaseType.SQLSERVER:
+            return "INT IDENTITY(1,1) PRIMARY KEY"
         return "INTEGER PRIMARY KEY AUTOINCREMENT"
 
     def _get_text_type(self) -> str:
+        if self.db_type == DatabaseType.SQLSERVER:
+            return "NVARCHAR(255)"
         if self.db_type in (DatabaseType.POSTGRESQL, DatabaseType.MYSQL):
             return "VARCHAR(255)"
         return "TEXT"
 
     def _get_long_text_type(self) -> str:
+        if self.db_type == DatabaseType.SQLSERVER:
+            return "NVARCHAR(MAX)"
         return "TEXT"
 
     def _get_boolean_type(self) -> str:
         if self.db_type == DatabaseType.SQLITE:
             return "INTEGER"
+        if self.db_type == DatabaseType.SQLSERVER:
+            return "BIT"
         return "BOOLEAN"
 
     def _get_datetime_type(self) -> str:
         if self.db_type == DatabaseType.POSTGRESQL:
             return "TIMESTAMP"
+        if self.db_type == DatabaseType.SQLSERVER:
+            return "DATETIME2"
         return "DATETIME"
 
     def _get_real_type(self) -> str:
@@ -56,7 +67,14 @@ class SQLGenerator:
             return "DOUBLE PRECISION"
         if self.db_type == DatabaseType.MYSQL:
             return "DOUBLE"
+        if self.db_type == DatabaseType.SQLSERVER:
+            return "FLOAT"
         return "REAL"
+
+    def _bool_default_false(self) -> str:
+        if self.db_type in (DatabaseType.SQLITE, DatabaseType.SQLSERVER):
+            return "DEFAULT 0"
+        return "DEFAULT FALSE"
 
     def create_executions_table(self) -> str:
         pk_type = self._get_pk_type()
@@ -65,7 +83,7 @@ class SQLGenerator:
         bool_type = self._get_boolean_type()
         datetime_type = self._get_datetime_type()
         real_type = self._get_real_type()
-        bool_default_false = "DEFAULT 0" if self.db_type == DatabaseType.SQLITE else "DEFAULT FALSE"
+        bool_default_false = self._bool_default_false()
         default_timestamp = "DEFAULT CURRENT_TIMESTAMP"
 
         sql = f"""
@@ -109,6 +127,7 @@ class SQLGenerator:
             CREATE TABLE IF NOT EXISTS {self.items_table} (
                 id {pk_type},
                 execution_id INTEGER NOT NULL,
+                last_execution_id INTEGER,
                 item_identifier {text_type},
                 status {text_type} NOT NULL DEFAULT 'pending',
                 priority INTEGER DEFAULT 0,
@@ -127,6 +146,7 @@ class SQLGenerator:
                 created_at {datetime_type} NOT NULL {default_timestamp},
                 updated_at {datetime_type} NOT NULL {default_timestamp},
                 FOREIGN KEY (execution_id) REFERENCES {self.executions_table}(id) ON DELETE CASCADE,
+                FOREIGN KEY (last_execution_id) REFERENCES {self.executions_table}(id) ON DELETE SET NULL,
                 CHECK (status IN ('pending', 'queued', 'processing', 'success', 'failed', 'skipped', 'interrupted', 'retrying'))
             )
         """
@@ -159,18 +179,20 @@ class SQLGenerator:
         return sql
 
     def create_indexes(self) -> List[str]:
-        return [
-            f"CREATE INDEX IF NOT EXISTS idx_{self.executions_table}_execution_id ON {self.executions_table}(execution_id)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.executions_table}_status ON {self.executions_table}(status)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.executions_table}_finished_properly ON {self.executions_table}(finished_properly)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.executions_table}_started_at ON {self.executions_table}(started_at)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.items_table}_execution_id ON {self.items_table}(execution_id)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.items_table}_status ON {self.items_table}(status)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.items_table}_queue ON {self.items_table}(execution_id, queue_position, status)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.items_table}_priority ON {self.items_table}(priority DESC, status)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.items_table}_updated_at ON {self.items_table}(updated_at)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_execution_id ON {self.logs_table}(execution_id)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_timestamp ON {self.logs_table}(timestamp)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_log_level ON {self.logs_table}(log_level)",
-            f"CREATE INDEX IF NOT EXISTS idx_{self.logs_table}_execution_timestamp ON {self.logs_table}(execution_id, timestamp)",
+        specs = [
+            (f"idx_{self.executions_table}_execution_id", self.executions_table, "execution_id"),
+            (f"idx_{self.executions_table}_status", self.executions_table, "status"),
+            (f"idx_{self.executions_table}_finished_properly", self.executions_table, "finished_properly"),
+            (f"idx_{self.executions_table}_started_at", self.executions_table, "started_at"),
+            (f"idx_{self.items_table}_execution_id", self.items_table, "execution_id"),
+            (f"idx_{self.items_table}_last_execution_id", self.items_table, "last_execution_id"),
+            (f"idx_{self.items_table}_status", self.items_table, "status"),
+            (f"idx_{self.items_table}_queue", self.items_table, "execution_id, queue_position, status"),
+            (f"idx_{self.items_table}_priority", self.items_table, "priority DESC, status"),
+            (f"idx_{self.items_table}_updated_at", self.items_table, "updated_at"),
+            (f"idx_{self.logs_table}_execution_id", self.logs_table, "execution_id"),
+            (f"idx_{self.logs_table}_timestamp", self.logs_table, "timestamp"),
+            (f"idx_{self.logs_table}_log_level", self.logs_table, "log_level"),
+            (f"idx_{self.logs_table}_execution_timestamp", self.logs_table, "execution_id, timestamp"),
         ]
+        return [create_index_sql(self.db_type, name, table, columns) for name, table, columns in specs]

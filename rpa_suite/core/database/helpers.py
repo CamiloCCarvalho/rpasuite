@@ -1,5 +1,8 @@
 # rpa_suite/core/database/helpers.py
 
+from __future__ import annotations
+
+import json
 from typing import Any
 
 from .constants import DatabaseType
@@ -9,6 +12,8 @@ def row_to_dict(row: Any, db_type: DatabaseType) -> dict[str, Any]:
     """Convert a cursor row to a dict regardless of database backend."""
     if row is None:
         return {}
+    if isinstance(row, dict):
+        return dict(row)
     if db_type == DatabaseType.SQLITE:
         return dict(row)
     if hasattr(row, "keys"):
@@ -21,6 +26,35 @@ def row_to_dict(row: Any, db_type: DatabaseType) -> dict[str, Any]:
 def rows_to_dicts(rows: list[Any], db_type: DatabaseType) -> list[dict[str, Any]]:
     """Convert multiple cursor rows to dicts."""
     return [row_to_dict(row, db_type) for row in rows]
+
+
+def _parse_json_field(value: Any) -> Any:
+    """Parse a JSON string field; leave non-strings and invalid JSON unchanged."""
+    if not isinstance(value, str):
+        return value
+    text = value.strip()
+    if not text:
+        return value
+    try:
+        return json.loads(text)
+    except (json.JSONDecodeError, TypeError):
+        return value
+
+
+def normalize_item_row(row: dict[str, Any] | None) -> dict[str, Any] | None:
+    """
+    Normalize item row fields for callers.
+
+    Ensures ``item_data`` and ``processing_schema`` are dicts when stored as JSON text.
+    """
+    if row is None:
+        return None
+    out = dict(row)
+    if "item_data" in out:
+        out["item_data"] = _parse_json_field(out["item_data"])
+    if "processing_schema" in out:
+        out["processing_schema"] = _parse_json_field(out["processing_schema"])
+    return out
 
 
 def resolve_execution_id(

@@ -11,7 +11,7 @@ usage examples.
 from __future__ import annotations
 
 import os
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from urllib.parse import urlencode
 
 if TYPE_CHECKING:  # pragma: no cover - typing-only
@@ -31,9 +31,7 @@ def _require_flask():
     try:
         import flask  # type: ignore[import-not-found]  # noqa: F401
     except ImportError as e:  # pragma: no cover - depends on env
-        raise DashboardError(
-            "Flask is required to run the dashboard. Install with: pip install flask"
-        ) from e
+        raise DashboardError("Flask is required to run the dashboard. Install with: pip install flask") from e
     return flask
 
 
@@ -45,7 +43,7 @@ def _int_arg(value: Any, default: int) -> int:
         return default
 
 
-def _optional_int(value: Any) -> Optional[int]:
+def _optional_int(value: Any) -> int | None:
     if value in (None, ""):
         return None
     try:
@@ -54,13 +52,42 @@ def _optional_int(value: Any) -> Optional[int]:
         return None
 
 
-def _optional_str(value: Any) -> Optional[str]:
+def _optional_str(value: Any) -> str | None:
     if value in (None, ""):
         return None
     return str(value)
 
 
-def create_app(database, title: str = "RPA Suite Dashboard") -> "Flask":
+def _dashboard_paths() -> dict[str, str]:
+    """
+    Resolve and validate dashboard template/static directories.
+
+    Returns:
+        dict with keys ``here``, ``templates`` and ``static``.
+
+    Raises:
+        DashboardError: when required HTML/CSS/JS assets are missing from the
+            installed package (typical when package-data was not included).
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    templates = os.path.join(here, "templates")
+    static = os.path.join(here, "static")
+    required = (
+        os.path.join(templates, "overview.html"),
+        os.path.join(templates, "error.html"),
+        os.path.join(static, "dashboard.css"),
+        os.path.join(static, "dashboard.js"),
+    )
+    missing = [path for path in required if not os.path.isfile(path)]
+    if missing:
+        raise DashboardError(
+            "Dashboard assets missing. Reinstall rpa-suite with templates included "
+            f"(missing: {', '.join(os.path.basename(p) for p in missing)})."
+        )
+    return {"here": here, "templates": templates, "static": static}
+
+
+def create_app(database, title: str = "RPA Suite Dashboard") -> Flask:
     """
     Build a Flask app that serves the dashboard against `database`.
 
@@ -71,28 +98,28 @@ def create_app(database, title: str = "RPA Suite Dashboard") -> "Flask":
     Returns:
         A ready-to-run Flask application.
     """
-    flask = _require_flask()
-    from flask import Flask, jsonify, render_template, request  # type: ignore[import-not-found]
+    _require_flask()
+    from flask import Flask, Response, jsonify, render_template, request  # type: ignore[import-not-found]
 
-    here = os.path.dirname(os.path.abspath(__file__))
+    paths = _dashboard_paths()
     app = Flask(
         __name__,
-        template_folder=os.path.join(here, "templates"),
-        static_folder=os.path.join(here, "static"),
+        template_folder=paths["templates"],
+        static_folder=paths["static"],
         static_url_path="/static",
     )
     app.config["TITLE"] = title
     app.config["DATABASE"] = database
 
     @app.context_processor
-    def _inject_title() -> Dict[str, Any]:
+    def _inject_title() -> dict[str, Any]:
         return {"title": app.config["TITLE"]}
 
     def _base_qs_without_page() -> str:
         pairs = [(k, v) for k, v in request.args.items() if k != "page"]
         return urlencode(pairs)
 
-    def _view_data(raw: Dict[str, Any]) -> Dict[str, Any]:
+    def _view_data(raw: dict[str, Any]) -> dict[str, Any]:
         """Wrap paginated query results using `rows` (Jinja-safe key)."""
         return {
             "rows": raw.get("items", []),
@@ -228,11 +255,20 @@ def create_app(database, title: str = "RPA Suite Dashboard") -> "Flask":
 
     @app.errorhandler(Exception)
     def _handle_error(exc: Exception) -> Any:  # noqa: ARG001
-        # We keep this generic so we do not leak internal SQL details to callers.
+        # Keep this generic so we do not leak internal SQL details to callers.
+        # Never raise from here — if error.html is missing, fall back to plain HTML.
         message = str(exc) or exc.__class__.__name__
         if request.path.startswith("/api/"):
             return jsonify({"error": message}), 500
-        return render_template("error.html", message=message, active=""), 500
+        try:
+            return render_template("error.html", message=message, active=""), 500
+        except Exception:
+            safe = (
+                "<!doctype html><html><head><meta charset='utf-8'>"
+                "<title>Dashboard error</title></head><body>"
+                f"<h1>Dashboard error</h1><pre>{message}</pre></body></html>"
+            )
+            return Response(safe, status=500, mimetype="text/html")
 
     return app
 

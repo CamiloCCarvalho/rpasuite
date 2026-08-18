@@ -16,7 +16,12 @@ class ExecutionsMixin:
     """Domain operations — use via the Database class."""
 
     def _on_interrupt_signal(self) -> None:
-        """Flag the current execution as interrupted (thread-safe, no I/O in signal handler)."""
+        """
+        Legacy hook: set in-memory interruption flag.
+
+        Prefer automatic persistence via ``signals`` handlers (SIGINT/SIGTERM/atexit).
+        Kept so ``check_interrupted()`` still works for older polling loops.
+        """
         if self._current_execution_id:
             self._interrupted_flag = True
 
@@ -35,22 +40,24 @@ class ExecutionsMixin:
 
     def check_interrupted(self) -> bool:
         """
-        Check whether an interruption was signaled and persist it in the database.
+        Deprecated: interruptions are persisted automatically on SIGINT/SIGTERM/atexit.
 
-        Call this periodically in the main application loop to process
-        interruptions signaled by the registered handlers.
+        Kept for backward compatibility. When ``_interrupted_flag`` is set, marks the
+        current execution and its ``processing`` items as interrupted.
 
         Returns:
         --------
         bool: True if an interruption was processed, False otherwise
         """
-        if self._interrupted_flag and self._current_execution_id:
-            try:
-                self._mark_execution_interrupted(self._current_execution_id)
-                return True
-            except Exception:
-                pass
-        return False
+        if not self._interrupted_flag or not self._current_execution_id:
+            return False
+        try:
+            items = self.detect_and_mark_interrupted_items(scope="current")
+            execs = self.detect_and_mark_interrupted_executions(scope="current")
+            self._interrupted_flag = False
+            return bool(items or execs)
+        except Exception:
+            return False
 
     def start_execution(
         self, automation_name: str, execution_id: str | None = None, metadata: dict[str, Any] | None = None
@@ -272,7 +279,10 @@ class ExecutionsMixin:
 
             safe_limit = validate_limit(limit)
             if safe_limit is not None:
-                query += f" LIMIT {safe_limit}"
+                if self.db_type == DatabaseType.SQLSERVER:
+                    query = query.replace("SELECT ", f"SELECT TOP ({safe_limit}) ", 1)
+                else:
+                    query += f" LIMIT {safe_limit}"
 
             cursor = self._adapter.execute_query(query, tuple(params) if params else None)
             rows = cursor.fetchall()
@@ -293,6 +303,8 @@ class ExecutionsMixin:
         """
         Detect and mark executions that were not finished properly.
 
+        Returns only the ids that were ``running`` and marked in this call.
+
         Parameters:
         -----------
         execution_id: Optional[int]
@@ -308,17 +320,29 @@ class ExecutionsMixin:
                 return []
 
             if target_id is not None:
+                select_ids = f"""
+                    SELECT id FROM {self.executions_table}
+                    WHERE id = ? AND status = 'running' AND finished_properly = 0
+                """
+                cursor = self._adapter.execute_query(select_ids, (target_id,))
+            else:
+                select_ids = f"""
+                    SELECT id FROM {self.executions_table}
+                    WHERE status = 'running' AND finished_properly = 0
+                """
+                cursor = self._adapter.execute_query(select_ids)
+
+            interrupted_ids = [extract_row_id(row) for row in (cursor.fetchall() or [])]
+            if not interrupted_ids:
+                return []
+
+            if target_id is not None:
                 query = f"""
                     UPDATE {self.executions_table}
                     SET status = 'interrupted', finished_properly = 0
                     WHERE id = ? AND status = 'running' AND finished_properly = 0
                 """
                 self._adapter.execute_query(query, (target_id,))
-                query_ids = f"""
-                    SELECT id FROM {self.executions_table}
-                    WHERE id = ? AND status = 'interrupted'
-                """
-                cursor = self._adapter.execute_query(query_ids, (target_id,))
             else:
                 query = f"""
                     UPDATE {self.executions_table}
@@ -326,14 +350,7 @@ class ExecutionsMixin:
                     WHERE status = 'running' AND finished_properly = 0
                 """
                 self._adapter.execute_query(query)
-                query_ids = f"""
-                    SELECT id FROM {self.executions_table}
-                    WHERE status = 'interrupted' AND finished_properly = 0
-                """
-                cursor = self._adapter.execute_query(query_ids)
 
-            rows = cursor.fetchall()
-            interrupted_ids = [extract_row_id(row) for row in rows]
             self._adapter.commit()
             return interrupted_ids
 

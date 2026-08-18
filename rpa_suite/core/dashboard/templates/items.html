@@ -39,8 +39,11 @@
     <thead>
         <tr>
             <th>ID</th>
-            <th>Execution</th>
+            <th>Create exec</th>
+            <th>Last exec</th>
             <th>Identifier</th>
+            <th>Data</th>
+            <th>Schema</th>
             <th>Status</th>
             <th class="right">Priority</th>
             <th class="right">Retries</th>
@@ -54,22 +57,79 @@
         <tr>
             <td class="mono">{{ row.id }}</td>
             <td class="mono">
-                <a href="{{ url_for('items_page') }}?execution_id={{ row.execution_id }}">{{ row.execution_id }}</a>
+                {% if row.create_execution %}
+                <a href="{{ url_for('items_page') }}?execution_id={{ row.create_execution }}">{{ row.create_execution }}</a>
+                {% else %}
+                —
+                {% endif %}
+            </td>
+            <td class="mono">
+                {% if row.last_execution %}
+                <a href="{{ url_for('items_page') }}?execution_id={{ row.last_execution }}">{{ row.last_execution }}</a>
+                {% else %}
+                —
+                {% endif %}
             </td>
             <td>{{ row.item_identifier or "—" }}</td>
+            <td class="cell-data-td">
+                {% if row.item_data_full %}
+                <div class="cell-data">
+                    <pre class="cell-data-body mono small">{{ row.item_data_preview }}</pre>
+                    <pre class="cell-data-full-source" hidden>{{ row.item_data_full }}</pre>
+                    <pre class="cell-data-preview-source" hidden>{{ row.item_data_preview }}</pre>
+                    <button type="button"
+                            class="cell-data-toggle"
+                            aria-expanded="false"
+                            aria-label="Expand data"
+                            title="Expand">▾</button>
+                </div>
+                {% else %}
+                <span class="muted">—</span>
+                {% endif %}
+            </td>
+            <td class="cell-data-td">
+                {% if row.processing_schema_full %}
+                <div class="cell-data">
+                    <pre class="cell-data-body mono small">{{ row.processing_schema_preview }}</pre>
+                    <pre class="cell-data-full-source" hidden>{{ row.processing_schema_full }}</pre>
+                    <pre class="cell-data-preview-source" hidden>{{ row.processing_schema_preview }}</pre>
+                    <button type="button"
+                            class="cell-data-toggle"
+                            aria-expanded="false"
+                            aria-label="Expand schema"
+                            title="Expand">▾</button>
+                </div>
+                {% else %}
+                <span class="muted">—</span>
+                {% endif %}
+            </td>
             <td><span class="badge status-{{ row.status }}">{{ row.status }}</span></td>
             <td class="right mono">{{ row.priority or 0 }}</td>
-            <td class="right mono">{{ row.retry_count or 0 }}/{{ row.max_retries or 0 }}</td>
+            <td class="right mono">
+                {%- set retries_used = row.retry_count if row.retry_count is not none else 0 -%}
+                {%- set retries_max = row.max_retries if row.max_retries is not none else 0 -%}
+                {%- if retries_max <= 0 -%}
+                {{ retries_used }}/∞
+                {%- else -%}
+                {{ retries_used }}/{{ retries_max }}
+                {%- endif -%}
+            </td>
             <td class="mono">{{ row.started_at or "—" }}</td>
             <td class="mono">{{ row.finished_at or "—" }}</td>
             <td class="muted small">{{ row.error_message or "" }}</td>
         </tr>
         {% else %}
-        <tr><td colspan="9" class="muted center">No items matched the current filters.</td></tr>
+        <tr><td colspan="12" class="muted center">No items matched the current filters.</td></tr>
         {% endfor %}
     </tbody>
 </table>
 </div>
 
 {% include "_pagination.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.__DASHBOARD_INIT__ = "items";
+</script>
 {% endblock %}

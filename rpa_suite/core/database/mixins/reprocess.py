@@ -124,49 +124,94 @@ class ReprocessMixin:
             if not exec_data:
                 return None
 
+            metadata = exec_data.get("metadata")
+            if isinstance(metadata, str):
+                metadata = json.loads(metadata) if metadata else None
+
             # Cria nova execução
             new_exec_id = self.start_execution(
                 automation_name=exec_data["automation_name"],
-                execution_id=None,  # Novo execution_id
-                metadata=json.loads(exec_data["metadata"]) if exec_data.get("metadata") else None,
+                execution_id=None,
+                metadata=metadata,
             )
 
-            # Atualiza parent_execution_id e reprocess_count
-            update_query = f"""
+            # Increment reprocess_count on the parent; link child via parent_execution_id
+            self._adapter.execute_query(
+                f"""
                 UPDATE {self.executions_table}
-                SET parent_execution_id = ?, reprocess_count = reprocess_count + 1
+                SET reprocess_count = reprocess_count + 1
                 WHERE id = ?
-            """
-            self._adapter.execute_query(update_query, (execution_id, new_exec_id))
+                """,
+                (execution_id,),
+            )
+            self._adapter.execute_query(
+                f"""
+                UPDATE {self.executions_table}
+                SET parent_execution_id = ?
+                WHERE id = ?
+                """,
+                (execution_id, new_exec_id),
+            )
 
             # Se manter itens, copia itens elegíveis para nova execução
             if keep_items:
                 items = self.get_items(execution_id, status="all")
                 for item in items:
                     should_copy = reset_items_status or self.is_reprocessable(
-                        item, allow_failed=True, allow_interrupted=True, allow_pending_queued=True
+                        item,
+                        allow_failed=True,
+                        allow_interrupted=True,
+                        allow_pending_queued=True,
                     )
                     if not should_copy:
                         continue
 
-                    new_status = "pending"
+                    item_data = item.get("item_data")
+                    if isinstance(item_data, str):
+                        item_data = json.loads(item_data) if item_data else None
+                    processing_schema = item.get("processing_schema")
+                    if isinstance(processing_schema, str):
+                        processing_schema = json.loads(processing_schema) if processing_schema else None
+
+                    if self.prevent_duplicate_items:
+                        self.add_item(
+                            execution_id=new_exec_id,
+                            item_identifier=item.get("item_identifier"),
+                            item_data=item_data if isinstance(item_data, dict) else None,
+                            processing_schema=(processing_schema if isinstance(processing_schema, dict) else None),
+                            priority=int(item.get("priority", 0) or 0),
+                            max_retries=int(item.get("max_retries", 0) or 0),
+                        )
+                        continue
+
+                    item_data_str = json.dumps(item_data) if isinstance(item_data, dict) else item.get("item_data")
+                    schema_str = (
+                        json.dumps(processing_schema)
+                        if isinstance(processing_schema, dict)
+                        else item.get("processing_schema")
+                    )
                     item_id_query = f"""
                         INSERT INTO {self.items_table}
-                        (execution_id, item_identifier, status, priority, queue_position,
-                         processing_schema, item_data, allow_reprocess)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        (execution_id, last_execution_id, item_identifier, status, priority,
+                         queue_position, processing_schema, item_data, max_retries,
+                         allow_reprocess, retry_count, created_at, updated_at)
+                        VALUES (?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, 0, ?, ?)
                     """
+                    now = datetime.now()
                     self._adapter.execute_query(
                         item_id_query,
                         (
                             new_exec_id,
+                            new_exec_id,
                             item.get("item_identifier"),
-                            new_status,
                             item.get("priority", 0),
                             item.get("queue_position"),
-                            item.get("processing_schema"),
-                            item.get("item_data"),
+                            schema_str,
+                            item_data_str,
+                            item.get("max_retries", 0),
                             item.get("allow_reprocess", 1),
+                            now,
+                            now,
                         ),
                     )
 
@@ -221,6 +266,7 @@ class ReprocessMixin:
                 raise DatabaseError(f"Item {item_id} cannot be reprocessed")
 
             now = datetime.now()
+            touch_id = getattr(self, "_current_execution_id", None)
             query = f"""
                 UPDATE {self.items_table}
                 SET status = 'pending',
@@ -230,11 +276,12 @@ class ReprocessMixin:
                     error_message = NULL,
                     last_checkpoint = NULL,
                     retry_count = retry_count + 1,
-                    updated_at = ?
+                    updated_at = ?,
+                    last_execution_id = COALESCE(?, last_execution_id)
                 WHERE id = ?
             """
 
-            self._adapter.execute_query(query, (now, item_id))
+            self._adapter.execute_query(query, (now, touch_id, item_id))
             self._adapter.commit()
             return True
 

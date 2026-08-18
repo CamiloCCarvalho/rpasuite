@@ -48,9 +48,7 @@ class ItemsRetentionConfig:
             "skipped": 60,
         }
     )
-    max_rows_by_status: dict[str, int] = field(
-        default_factory=lambda: {"success": 500_000}
-    )
+    max_rows_by_status: dict[str, int] = field(default_factory=lambda: {"success": 500_000})
     protect_statuses: tuple[str, ...] = DEFAULT_ITEM_PROTECT_STATUSES
     batch_size: int = DEFAULT_RETENTION_BATCH_SIZE
 
@@ -102,9 +100,7 @@ class RetentionPolicy:
                 default=policy.logs.max_age_days_by_level,
             ),
             max_rows=_validate_positive_int(logs_data.get("max_rows", 1_000_000), "logs.max_rows"),
-            protect_running_executions=bool(
-                logs_data.get("protect_running_executions", True)
-            ),
+            protect_running_executions=bool(logs_data.get("protect_running_executions", True)),
             batch_size=_validate_positive_int(
                 logs_data.get("batch_size", DEFAULT_RETENTION_BATCH_SIZE),
                 "logs.batch_size",
@@ -141,9 +137,7 @@ class RetentionPolicy:
                 executions_data.get("protect_statuses"),
                 default=DEFAULT_EXECUTION_PROTECT_STATUSES,
             ),
-            cascade_delete_children=bool(
-                executions_data.get("cascade_delete_children", True)
-            ),
+            cascade_delete_children=bool(executions_data.get("cascade_delete_children", True)),
             batch_size=_validate_positive_int(
                 executions_data.get("batch_size", DEFAULT_RETENTION_BATCH_SIZE),
                 "executions.batch_size",

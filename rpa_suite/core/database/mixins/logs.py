@@ -257,7 +257,10 @@ class LogsMixin:
 
             safe_limit = validate_limit(limit)
             if safe_limit is not None:
-                query += f" LIMIT {safe_limit}"
+                if self.db_type == DatabaseType.SQLSERVER:
+                    query = query.replace("SELECT ", f"SELECT TOP ({safe_limit}) ", 1)
+                else:
+                    query += f" LIMIT {safe_limit}"
 
             cursor = self._adapter.execute_query(query, tuple(params))
             rows = cursor.fetchall()
@@ -324,6 +327,9 @@ class LogsMixin:
                     query += f" AND timestamp < NOW() - INTERVAL '{safe_days} days'"
                 elif self.db_type == DatabaseType.MYSQL:
                     query += f" AND timestamp < DATE_SUB(NOW(), INTERVAL {safe_days} DAY)"
+                elif self.db_type == DatabaseType.SQLSERVER:
+                    query += " AND timestamp < DATEADD(day, -?, GETDATE())"
+                    params.append(safe_days)
 
             cursor = self._adapter.execute_query(query, tuple(params) if params else None)
 

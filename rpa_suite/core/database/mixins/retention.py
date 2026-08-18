@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
-from ..constants import DatabaseType, VALID_LOG_LEVELS
+from ..constants import VALID_LOG_LEVELS, DatabaseType
+from ..dialect_sql import limit_suffix, select_top_prefix
 from ..exceptions import DatabaseError
 from ..retention import RetentionPolicy
 
@@ -20,7 +21,7 @@ class RetentionMixin:
         self,
         execution_id: int,
         status: str = "completed",
-        error_message: Optional[str] = None,
+        error_message: str | None = None,
     ) -> bool:
         """Finish an execution and optionally run automatic retention."""
         result = super().finish_execution(execution_id, status, error_message)  # type: ignore[misc]
@@ -36,7 +37,7 @@ class RetentionMixin:
         except Exception:
             pass
 
-    def get_storage_stats(self) -> Dict[str, Any]:
+    def get_storage_stats(self) -> dict[str, Any]:
         """
         Return row counts and approximate storage usage.
 
@@ -46,15 +47,13 @@ class RetentionMixin:
         """
         self._ensure_open()
         try:
-            stats: Dict[str, Any] = {}
+            stats: dict[str, Any] = {}
             for table_key, table_name in (
                 ("executions", self.executions_table),
                 ("items", self.items_table),
                 ("logs", self.logs_table),
             ):
-                cursor = self._adapter.execute_query(
-                    f"SELECT COUNT(*) FROM {table_name}"
-                )
+                cursor = self._adapter.execute_query(f"SELECT COUNT(*) FROM {table_name}")
                 row = cursor.fetchone()
                 stats[table_key] = {"rows": int(row[0]) if row else 0}
 
@@ -68,7 +67,7 @@ class RetentionMixin:
         except Exception as e:
             raise DatabaseError(f"Failed to fetch storage stats: {str(e)}.") from e
 
-    def apply_retention_policy(self, dry_run: bool = False) -> Dict[str, Any]:
+    def apply_retention_policy(self, dry_run: bool = False) -> dict[str, Any]:
         """
         Apply configured retention rules (TTL + row caps).
 
@@ -85,13 +84,12 @@ class RetentionMixin:
         policy = getattr(self, "retention_policy", None)
         if not policy or not policy.enabled:
             raise DatabaseError(
-                "Retention policy is disabled. "
-                "Pass retention_policy={'enabled': True, ...} to Database()."
+                "Retention policy is disabled. " "Pass retention_policy={'enabled': True, ...} to Database()."
             )
 
         started = time.perf_counter()
         summary_key = "would_delete" if dry_run else "deleted"
-        summary: Dict[str, int] = {"logs": 0, "items": 0, "executions": 0}
+        summary: dict[str, int] = {"logs": 0, "items": 0, "executions": 0}
 
         try:
             summary["logs"] = self._apply_logs_retention(policy, dry_run=dry_run)
@@ -118,7 +116,7 @@ class RetentionMixin:
                 self._adapter.rollback()
             raise DatabaseError(f"Failed to apply retention policy: {str(e)}.") from e
 
-    def _maybe_vacuum_sqlite(self, summary: Dict[str, int]) -> None:
+    def _maybe_vacuum_sqlite(self, summary: dict[str, int]) -> None:
         deleted_total = summary["logs"] + summary["items"] + summary["executions"]
         if deleted_total >= 10_000:
             try:
@@ -128,21 +126,20 @@ class RetentionMixin:
 
     def _running_execution_filter(self, alias: str = "") -> str:
         prefix = f"{alias}." if alias else ""
-        return (
-            f"{prefix}execution_id NOT IN "
-            f"(SELECT id FROM {self.executions_table} WHERE status = 'running')"
-        )
+        return f"{prefix}execution_id NOT IN " f"(SELECT id FROM {self.executions_table} WHERE status = 'running')"
 
-    def _older_than_clause(self, column: str, days: int) -> Tuple[str, Tuple[Any, ...]]:
+    def _older_than_clause(self, column: str, days: int) -> tuple[str, tuple[Any, ...]]:
         if self.db_type == DatabaseType.SQLITE:
             return f"{column} < datetime('now', '-' || ? || ' days')", (days,)
         if self.db_type == DatabaseType.POSTGRESQL:
             return f"{column} < NOW() - INTERVAL '{days} days'", ()
         if self.db_type == DatabaseType.MYSQL:
             return f"{column} < DATE_SUB(NOW(), INTERVAL {days} DAY)", ()
+        if self.db_type == DatabaseType.SQLSERVER:
+            return f"{column} < DATEADD(day, -?, GETDATE())", (days,)
         return f"{column} < datetime('now', '-' || ? || ' days')", (days,)
 
-    def _fetch_scalar(self, query: str, params: Optional[Tuple[Any, ...]] = None) -> int:
+    def _fetch_scalar(self, query: str, params: tuple[Any, ...] | None = None) -> int:
         cursor = self._adapter.execute_query(query, params)
         row = cursor.fetchone()
         return int(row[0]) if row and row[0] is not None else 0
@@ -151,7 +148,7 @@ class RetentionMixin:
         self,
         *,
         select_ids_query: str,
-        select_params: Tuple[Any, ...],
+        select_params: tuple[Any, ...],
         table_name: str,
         batch_size: int,
         dry_run: bool,
@@ -163,8 +160,8 @@ class RetentionMixin:
 
         total_deleted = 0
         while True:
-            id_query = f"{select_ids_query} LIMIT ?"
-            id_params: Tuple[Any, ...] = (*select_params, batch_size)
+            id_query = f"{select_ids_query} {limit_suffix(self.db_type, '?')}"
+            id_params: tuple[Any, ...] = (*select_params, batch_size)
             cursor = self._adapter.execute_query(id_query, id_params)
             ids = [row[0] for row in cursor.fetchall()]
             if not ids:
@@ -270,19 +267,29 @@ class RetentionMixin:
             ORDER BY timestamp ASC
         """
         if dry_run:
-            count_query = f"""
-                SELECT COUNT(*) FROM (
-                    {select_ids}
-                    LIMIT ?
-                )
-            """
+            if self.db_type == DatabaseType.SQLSERVER:
+                count_query = f"""
+                    SELECT COUNT(*) FROM (
+                        SELECT {select_top_prefix(self.db_type, '?')} id
+                        FROM {self.logs_table}
+                        WHERE {where_sql}
+                        ORDER BY timestamp ASC
+                    ) AS capped
+                """
+            else:
+                count_query = f"""
+                    SELECT COUNT(*) FROM (
+                        {select_ids}
+                        LIMIT ?
+                    ) AS capped
+                """
             return self._fetch_scalar(count_query, (overflow,))
 
         deleted = 0
         remaining = overflow
         while remaining > 0:
             batch = min(batch_size, remaining)
-            id_query = f"{select_ids} LIMIT ?"
+            id_query = f"{select_ids} {limit_suffix(self.db_type, '?')}"
             cursor = self._adapter.execute_query(id_query, (batch,))
             ids = [row[0] for row in cursor.fetchall()]
             if not ids:
@@ -339,7 +346,7 @@ class RetentionMixin:
             days,
         )
         where_sql = f"status = ? AND {age_clause}"
-        params: Tuple[Any, ...] = (status, *age_params)
+        params: tuple[Any, ...] = (status, *age_params)
         select_ids = f"""
             SELECT id FROM {self.items_table}
             WHERE {where_sql}
@@ -375,19 +382,32 @@ class RetentionMixin:
             ORDER BY COALESCE(updated_at, finished_at, created_at) ASC
         """
         if dry_run:
-            count_query = f"""
-                SELECT COUNT(*) FROM (
-                    {select_ids}
-                    LIMIT ?
-                )
-            """
+            if self.db_type == DatabaseType.SQLSERVER:
+                count_query = f"""
+                    SELECT COUNT(*) FROM (
+                        SELECT {select_top_prefix(self.db_type, '?')} id
+                        FROM {self.items_table}
+                        WHERE status = ?
+                        ORDER BY COALESCE(updated_at, finished_at, created_at) ASC
+                    ) AS capped
+                """
+            else:
+                count_query = f"""
+                    SELECT COUNT(*) FROM (
+                        {select_ids}
+                        LIMIT ?
+                    ) AS capped
+                """
             return self._fetch_scalar(count_query, (status, overflow))
 
         deleted = 0
         remaining = overflow
         while remaining > 0:
             batch = min(batch_size, remaining)
-            cursor = self._adapter.execute_query(f"{select_ids} LIMIT ?", (status, batch))
+            cursor = self._adapter.execute_query(
+                f"{select_ids} {limit_suffix(self.db_type, '?')}",
+                (status, batch),
+            )
             ids = [row[0] for row in cursor.fetchall()]
             if not ids:
                 break
@@ -433,7 +453,7 @@ class RetentionMixin:
             days,
         )
         where_sql = f"status = ? AND {age_clause}"
-        params: Tuple[Any, ...] = (status, *age_params)
+        params: tuple[Any, ...] = (status, *age_params)
         select_ids = f"""
             SELECT id FROM {self.executions_table}
             WHERE {where_sql}

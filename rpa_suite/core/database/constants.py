@@ -9,6 +9,7 @@ class DatabaseType(Enum):
     SQLITE = "sqlite"
     POSTGRESQL = "postgresql"
     MYSQL = "mysql"
+    SQLSERVER = "sqlserver"
 
 
 CONFIRMATION_CODES = {
@@ -64,6 +65,8 @@ TRANSIENT_ERROR_KEYWORDS = (
 DEFAULT_SQLITE_BUSY_TIMEOUT_MS = 30_000
 
 # Filtros agrupados para get_items()
+# Written statuses: pending → processing → success|failed|skipped|interrupted.
+# queued/retrying appear only as read aliases for legacy rows.
 ITEM_STATUS_FILTER_PENDING = "pending"
 ITEM_STATUS_FILTER_EXECUTED = "executed"
 ITEM_STATUS_FILTER_ALL = "all"

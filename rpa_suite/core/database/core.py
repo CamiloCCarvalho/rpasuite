@@ -6,7 +6,7 @@ import os
 
 from rpa_suite.functions._printer import alert_print, success_print
 
-from .adapters import DatabaseAdapter, MySQLAdapter, PostgreSQLAdapter, SQLiteAdapter
+from .adapters import DatabaseAdapter, MySQLAdapter, PostgreSQLAdapter, SQLiteAdapter, SQLServerAdapter
 from .constants import (
     CONFIRMATION_CODES,
     DEFAULT_DB_NAME,
@@ -23,6 +23,7 @@ from .constants import (
     VALID_LOG_LEVELS,
     DatabaseType,
 )
+from .dialect_sql import create_index_sql, drop_index_sql
 from .exceptions import DatabaseError
 from .helpers import extract_row_id, row_to_dict, rows_to_dicts
 from .item_dedup import (
@@ -76,7 +77,7 @@ class Database(
     """
     Main class for RPA execution management with multi-database support.
 
-    Supports SQLite (default), PostgreSQL, and MySQL.
+    Supports SQLite (default), PostgreSQL, MySQL, and SQL Server.
     """
 
     LOG_LEVEL_DEBUG = LOG_LEVEL_DEBUG
@@ -97,6 +98,9 @@ class Database(
         database: str | None = None,
         user: str | None = None,
         password: str | None = None,
+        driver: str | None = None,
+        trust_server_certificate: bool = True,
+        encrypt: bool = True,
         use_pool: bool = True,
         pool_size: int = 5,
         executions_table: str = DEFAULT_EXECUTIONS_TABLE,
@@ -120,7 +124,7 @@ class Database(
         Parameters:
         -----------
         db_type : DatabaseType
-            Database backend: SQLITE, POSTGRESQL, or MYSQL.
+            Database backend: SQLITE, POSTGRESQL, MYSQL, or SQLSERVER.
             Default: DatabaseType.SQLITE
 
         db_path : str
@@ -135,19 +139,31 @@ class Database(
             Default: "default"
 
         host : Optional[str]
-            Server host (PostgreSQL/MySQL).
+            Server host (PostgreSQL/MySQL/SQL Server).
 
         port : Optional[int]
-            Server port (PostgreSQL: 5432, MySQL: 3306).
+            Server port (PostgreSQL: 5432, MySQL: 3306, SQL Server: 1433).
 
         database : Optional[str]
-            Database name (PostgreSQL/MySQL).
+            Database name (PostgreSQL/MySQL/SQL Server).
 
         user : Optional[str]
-            Database user (PostgreSQL/MySQL).
+            Database user (PostgreSQL/MySQL/SQL Server).
 
         password : Optional[str]
-            Database password (PostgreSQL/MySQL).
+            Database password (PostgreSQL/MySQL/SQL Server).
+
+        driver : Optional[str]
+            ODBC driver name for SQL Server.
+            Default: "ODBC Driver 17 for SQL Server"
+
+        trust_server_certificate : bool
+            Trust server certificate for SQL Server ODBC connections.
+            Default: True
+
+        encrypt : bool
+            Enable encryption for SQL Server ODBC connections.
+            Default: True
 
         use_pool : bool
             Enable connection pooling (PostgreSQL/MySQL).
@@ -285,6 +301,9 @@ class Database(
                 database=database,
                 user=user,
                 password=password,
+                driver=driver,
+                trust_server_certificate=trust_server_certificate,
+                encrypt=encrypt,
                 use_pool=use_pool,
                 pool_size=pool_size,
             )
@@ -361,6 +380,18 @@ class Database(
                 pool_size=kwargs["pool_size"],
             )
 
+        elif db_type == DatabaseType.SQLSERVER:
+            return SQLServerAdapter(
+                host=kwargs["host"],
+                port=kwargs.get("port", 1433),
+                database=kwargs["database"],
+                user=kwargs["user"],
+                password=kwargs["password"],
+                driver=kwargs.get("driver") or "ODBC Driver 17 for SQL Server",
+                trust_server_certificate=kwargs.get("trust_server_certificate", True),
+                encrypt=kwargs.get("encrypt", True),
+            )
+
         else:
             raise DatabaseError(f"Unsupported database type: {db_type}")
 
@@ -414,7 +445,7 @@ class Database(
         """
         index_name = f"idx_{self.items_table}_unique_item_identifier"
         try:
-            self._adapter.execute_query(f"DROP INDEX IF EXISTS {index_name}")
+            self._adapter.execute_query(drop_index_sql(self.db_type, index_name, self.items_table))
         except Exception:
             pass
 
@@ -423,10 +454,17 @@ class Database(
         if self.unique_item_field != "item_identifier":
             return
 
-        index_sql = (
-            f"CREATE UNIQUE INDEX IF NOT EXISTS {index_name} "
-            f"ON {self.items_table}(item_identifier) "
-            f"WHERE item_identifier IS NOT NULL AND item_identifier != ''"
+        where_clause = "item_identifier IS NOT NULL AND item_identifier != ''"
+        if self.db_type == DatabaseType.SQLSERVER:
+            where_clause = "item_identifier IS NOT NULL AND item_identifier <> ''"
+
+        index_sql = create_index_sql(
+            self.db_type,
+            index_name,
+            self.items_table,
+            "item_identifier",
+            unique=True,
+            where=where_clause,
         )
         try:
             self._adapter.execute_query(index_sql)

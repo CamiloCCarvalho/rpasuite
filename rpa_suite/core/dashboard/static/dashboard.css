@@ -172,10 +172,70 @@ input:focus, select:focus { border-color: var(--primary); }
 .table .right { text-align: right; }
 .table .center { text-align: center; }
 .table.compact th, .table.compact td { padding: 8px 12px; }
+.table a {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.table a:visited { color: var(--text); }
+.table a:hover { color: #ffffff; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
 .muted { color: var(--muted); }
 .small { font-size: 12px; }
 .wrap { max-width: 520px; white-space: pre-wrap; word-break: break-word; }
+.cell-data-td {
+    width: 280px;
+    max-width: 280px;
+    min-width: 180px;
+}
+.cell-data {
+    position: relative;
+    width: 100%;
+    max-width: 280px;
+    padding-bottom: 22px;
+}
+.cell-data-body {
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+.cell-data.is-expanded .cell-data-body {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    overflow: visible;
+    text-overflow: clip;
+}
+.cell-data-toggle {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 22px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--panel-2);
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.cell-data-toggle:hover {
+    color: var(--text);
+    border-color: var(--primary);
+}
+.cell-data.is-expanded .cell-data-toggle {
+    transform: rotate(180deg);
+}
 
 .badge {
     display: inline-block;

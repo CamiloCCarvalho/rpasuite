@@ -4,15 +4,26 @@
 import inspect
 import os
 import sys
+import threading
 import traceback
 
 # imports standard
+from typing import Callable
 from typing import Optional as Op
 
 # imports third party
 from loguru import logger
 
 from rpa_suite.functions._printer import alert_print, success_print
+
+DEFAULT_MAX_LOG_FILE_SIZE_MIB = 5
+DEFAULT_TRIM_TOP_LINES_RATIO = 0.05
+MEBIBYTE = 1024 * 1024
+
+
+def _mib_to_bytes(mib: int) -> int:
+    """Convert a size in MiB to bytes."""
+    return mib * MEBIBYTE
 
 
 class LogFiltersError(Exception):
@@ -116,6 +127,78 @@ class CustomFormatter:
             raise LogCustomFormatterError(f"Error trying execute: {self.format.__name__}! {str(e)}.") from e
 
 
+class SizeLimitedFileSink:
+    """
+    Append log lines to a file and drop the oldest lines when the size limit is exceeded.
+
+    When trimming, lines are removed from the top and the remaining content is rewritten
+    without leaving blank lines.
+    """
+
+    def __init__(
+        self,
+        file_path: str,
+        *,
+        max_size_bytes: int = _mib_to_bytes(DEFAULT_MAX_LOG_FILE_SIZE_MIB),
+        trim_top_lines_ratio: float = DEFAULT_TRIM_TOP_LINES_RATIO,
+        trim_top_lines: Op[int] = None,
+        encoding: str = "utf-8",
+    ) -> None:
+        if max_size_bytes < 0:
+            raise LogError("max_file_size_bytes must be zero or positive.")
+        if trim_top_lines_ratio <= 0 or trim_top_lines_ratio > 1:
+            raise LogError("trim_top_lines_ratio must be greater than 0 and at most 1.")
+        if trim_top_lines is not None and trim_top_lines < 1:
+            raise LogError("trim_top_lines must be at least 1 when provided.")
+
+        self.file_path = file_path
+        self.max_size_bytes = max_size_bytes
+        self.trim_top_lines_ratio = trim_top_lines_ratio
+        self.trim_top_lines = trim_top_lines
+        self.encoding = encoding
+        self._lock = threading.Lock()
+
+    def __call__(self, message: str) -> None:
+        self.write(message)
+
+    def write(self, message: str) -> None:
+        """Append one formatted log message and trim the file when needed."""
+        with self._lock:
+            with open(self.file_path, "a", encoding=self.encoding) as log_file:
+                log_file.write(message)
+            self.trim_if_oversized()
+
+    def trim_if_oversized(self) -> None:
+        """Remove the oldest lines while the file exceeds ``max_size_bytes``."""
+        if self.max_size_bytes <= 0:
+            return
+        if not os.path.isfile(self.file_path):
+            return
+
+        while os.path.getsize(self.file_path) > self.max_size_bytes:
+            with open(self.file_path, encoding=self.encoding) as log_file:
+                lines = log_file.readlines()
+
+            if not lines:
+                break
+
+            if self.trim_top_lines is not None:
+                remove_count = min(len(lines), self.trim_top_lines)
+            else:
+                remove_count = max(1, int(len(lines) * self.trim_top_lines_ratio))
+
+            if remove_count >= len(lines):
+                lines = []
+            else:
+                lines = lines[remove_count:]
+
+            with open(self.file_path, "w", encoding=self.encoding) as log_file:
+                log_file.writelines(lines)
+
+            if not lines:
+                break
+
+
 class Log:
     """
     Main logging class providing comprehensive logging functionality.
@@ -129,6 +212,10 @@ class Log:
     full_path: str | None = None
     file_handler = None
     enable_traceback: bool = False  # latest feature added
+    max_file_size_mib: int = DEFAULT_MAX_LOG_FILE_SIZE_MIB
+    trim_top_lines_ratio: float = DEFAULT_TRIM_TOP_LINES_RATIO
+    trim_top_lines: Op[int] = None
+    _file_sink: SizeLimitedFileSink | None = None
 
     def __init__(self) -> None:
         """
@@ -151,6 +238,9 @@ class Log:
         filter_words: list[str] = None,  # type: ignore
         verbose: bool = False,
         enable_traceback: bool = False,
+        max_file_size_mib: int = DEFAULT_MAX_LOG_FILE_SIZE_MIB,
+        trim_top_lines_ratio: float = DEFAULT_TRIM_TOP_LINES_RATIO,
+        trim_top_lines: Op[int] = None,
     ) -> str:
         """
         Configure the logger with specified parameters.
@@ -162,11 +252,24 @@ class Log:
             filter_words: List of words to filter from logs
             verbose: Whether to display configuration messages
             enable_traceback: Whether to include traceback in error logs
+            max_file_size_mib: Maximum log file size in MiB before trimming.
+                Examples: ``1``, ``2``, ``3``. Default: ``5``. Use ``0`` to disable.
+            trim_top_lines_ratio: Fraction of the oldest lines removed on each trim
+                when ``trim_top_lines`` is not set. Default: ``0.05`` (5%).
+            trim_top_lines: Fixed number of oldest lines to remove on each trim.
+                When set, overrides ``trim_top_lines_ratio``.
         """
         try:
+            if max_file_size_mib < 0:
+                raise LogError("max_file_size_mib must be zero or positive.")
+
             self.path_dir = path_dir
             self.name_file_log = name_file_log
             self.enable_traceback = enable_traceback  # CONFIGURE THE PROPERTY
+            self.max_file_size_mib = max_file_size_mib
+            max_file_size_bytes = _mib_to_bytes(max_file_size_mib)
+            self.trim_top_lines_ratio = trim_top_lines_ratio
+            self.trim_top_lines = trim_top_lines
 
             if self.path_dir == "default":
                 self.path_dir = os.getcwd()
@@ -204,12 +307,23 @@ class Log:
 
             formatter = CustomFormatter()
 
+            file_sink: Callable[[str], None] | str = file_handler
+            self._file_sink = None
+            if max_file_size_bytes > 0:
+                self._file_sink = SizeLimitedFileSink(
+                    file_handler,
+                    max_size_bytes=max_file_size_bytes,
+                    trim_top_lines_ratio=trim_top_lines_ratio,
+                    trim_top_lines=trim_top_lines,
+                )
+                file_sink = self._file_sink
+
             if new_filter:
                 file_id = self.logger.add(
-                    file_handler, filter=new_filter, level="DEBUG", format=log_format  # type: ignore
+                    file_sink, filter=new_filter, level="DEBUG", format=log_format  # type: ignore
                 )
             else:
-                file_id = self.logger.add(file_handler, level="DEBUG", format=log_format)
+                file_id = self.logger.add(file_sink, level="DEBUG", format=log_format)
             self._own_handler_ids.append(file_id)
 
             stderr_id = self.logger.add(sys.stderr, level="DEBUG", format=formatter.format)
@@ -311,8 +425,11 @@ class Log:
         Log a debug message to start a new run session.
         """
         try:
-            with open(self.file_handler, "a", encoding="utf-8") as log_file:  # type: ignore
-                log_file.write("\n")
+            if self._file_sink is not None:
+                self._file_sink.write("\n")
+            else:
+                with open(self.file_handler, "a", encoding="utf-8") as log_file:  # type: ignore
+                    log_file.write("\n")
             self._log("DEBUG", msg_start_loggin)
         except Exception as e:
             raise LogError(

@@ -1238,20 +1238,3 @@ if __name__ == '__main__':
     main()
 
 ```
-
-<br>
-
-# ***WIP***
-
--  Documentação e ajustes
-    - Módulo Browser
-
-<br>
-
-- Novos módulos previstos
-  -  OCR
-  -  CV (Computer Vision)
-  -  Tables Excel (write/update)
-  -  Logs History with Database
-
-<br>

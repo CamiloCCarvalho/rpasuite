@@ -189,9 +189,38 @@
         } catch (e) { console.warn("top chart failed:", e); }
     }
 
+    function initItems() {
+        document.querySelectorAll(".cell-data-toggle").forEach(function (btn) {
+            btn.addEventListener("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const wrap = btn.closest(".cell-data");
+                if (!wrap) return;
+                const body = wrap.querySelector(".cell-data-body");
+                const fullSource = wrap.querySelector(".cell-data-full-source");
+                const previewSource = wrap.querySelector(".cell-data-preview-source");
+                if (!body) return;
+
+                const expanding = !wrap.classList.contains("is-expanded");
+                wrap.classList.toggle("is-expanded", expanding);
+                btn.setAttribute("aria-expanded", expanding ? "true" : "false");
+                btn.setAttribute("aria-label", expanding ? "Collapse data" : "Expand data");
+                btn.title = expanding ? "Collapse" : "Expand";
+
+                const preview = previewSource ? previewSource.textContent : body.textContent;
+                const full = fullSource ? fullSource.textContent : preview;
+                body.textContent = expanding ? full : preview;
+            });
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         if (window.__DASHBOARD_INIT__ === "overview") {
             initOverview();
+        }
+        if (window.__DASHBOARD_INIT__ === "items") {
+            initItems();
         }
     });
 })();

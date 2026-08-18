@@ -6,4 +6,4 @@ The utils module of the rpa-suite provides a collection of utility functions and
 """
 from .system import Tools
 
-__version__ = "1.6.5"
+__version__ = "1.9.0"

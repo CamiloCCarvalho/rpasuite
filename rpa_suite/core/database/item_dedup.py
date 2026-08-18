@@ -58,6 +58,8 @@ def json_extract_sql(db_type_name: str, column: str, json_key: str) -> str:
         return f"{column}::jsonb ->> '{safe_key}'"
     if db_type_name == "MYSQL":
         return f"JSON_UNQUOTE(JSON_EXTRACT({column}, '$.{safe_key}'))"
+    if db_type_name == "SQLSERVER":
+        return f"JSON_VALUE({column}, '$.{safe_key}')"
     return f"json_extract({column}, '$.{safe_key}')"
 
 

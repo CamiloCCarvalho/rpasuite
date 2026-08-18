@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="rpa_suite",
-    version="1.8.0",
+    version="1.9.0",
     packages=find_packages(),
     description="Comprehensive Python toolkit for RPA automation: email, logging, database tracking, browser automation, OCR, desktop automation, and more. Essential utilities for building robust automation workflows with Selenium, Botcity, and custom solutions.",
     long_description_content_type="text/markdown",

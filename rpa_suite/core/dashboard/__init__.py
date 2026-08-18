@@ -16,6 +16,6 @@ Because Flask is an optional dep, the actual imports happen inside
 `create_app`/`run_dashboard`; importing this module does not require Flask.
 """
 
-from .server import DashboardError, create_app, run_dashboard
+from .server import DashboardError, _dashboard_paths, create_app, run_dashboard
 
-__all__ = ["DashboardError", "create_app", "run_dashboard"]
+__all__ = ["DashboardError", "_dashboard_paths", "create_app", "run_dashboard"]

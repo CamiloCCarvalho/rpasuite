@@ -37,7 +37,12 @@ def _ensure_handlers() -> None:
 
 def _handle_exit() -> None:
     for db in list(_registered):
-        db._on_interrupt_signal()
+        try:
+            if db._current_execution_id:
+                db.detect_and_mark_interrupted_items(scope="current")
+                db.detect_and_mark_interrupted_executions(scope="current")
+        except Exception:
+            pass
 
 
 def _handle_signal(signum, frame) -> None:

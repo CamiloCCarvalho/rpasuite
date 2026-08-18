@@ -6,10 +6,19 @@ from datetime import datetime
 from typing import Any
 
 from ..constants import ITEM_STATUS_FILTER_GROUPS, DatabaseType
+from ..dialect_sql import (
+    limit_one_suffix,
+    limit_suffix,
+    select_top_prefix,
+    supports_returning,
+    uses_mysql_claim_path,
+    uses_sqlserver_output_claim,
+)
 from ..exceptions import DatabaseError
 from ..helpers import (
     build_item_status_filter,
     extract_row_id,
+    normalize_item_row,
     resolve_execution_id,
     row_to_dict,
     rows_to_dicts,
@@ -23,6 +32,19 @@ from ..item_dedup import (
 
 class ItemsMixin:
     """Domain operations — use via the Database class."""
+
+    def _touch_execution_id(self, fallback: int | None = None) -> int | None:
+        """
+        Execution id to stamp as ``last_execution_id`` on item mutations.
+
+        Prefers the active execution; falls back to an explicit id when provided.
+        """
+        current = getattr(self, "_current_execution_id", None)
+        if current is not None:
+            return int(current)
+        if fallback is not None:
+            return int(fallback)
+        return None
 
     def _resolve_item_unique_value(
         self,
@@ -42,12 +64,16 @@ class ItemsMixin:
         unique_value: str,
     ) -> dict[str, Any] | None:
         if self.unique_item_field == "item_identifier":
-            query = f"SELECT * FROM {self.items_table} WHERE item_identifier = ? LIMIT 1"
+            top = select_top_prefix(self.db_type, 1)
+            limit_one = limit_one_suffix(self.db_type)
+            query = f"SELECT {top}* FROM {self.items_table} " f"WHERE item_identifier = ? {limit_one}".strip()
             cursor = self._adapter.execute_query(query, (unique_value,))
         else:
             json_key = self.unique_item_field.split(".", 1)[1]
             expr = json_extract_comparable_sql(self.db_type.name, "item_data", json_key)
-            query = f"SELECT * FROM {self.items_table} WHERE {expr} = ? LIMIT 1"
+            top = select_top_prefix(self.db_type, 1)
+            limit_one = limit_one_suffix(self.db_type)
+            query = f"SELECT {top}* FROM {self.items_table} WHERE {expr} = ? {limit_one}".strip()
             cursor = self._adapter.execute_query(query, (unique_value,))
 
         row = cursor.fetchone()
@@ -155,14 +181,16 @@ class ItemsMixin:
 
             query = f"""
                 INSERT INTO {self.items_table}
-                (execution_id, item_identifier, status, priority, queue_position, 
-                 processing_schema, item_data, max_retries, created_at, updated_at)
-                VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)
+                (execution_id, last_execution_id, item_identifier, status, priority,
+                 queue_position, processing_schema, item_data, max_retries,
+                 created_at, updated_at)
+                VALUES (?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)
             """
 
             cursor = self._adapter.execute_query(
                 query,
                 (
+                    resolved_execution_id,
                     resolved_execution_id,
                     item_identifier,
                     priority,
@@ -299,6 +327,7 @@ class ItemsMixin:
                 params_list.append(
                     (
                         resolved_execution_id,
+                        resolved_execution_id,
                         item_identifier,
                         priority,
                         queue_position,
@@ -313,9 +342,10 @@ class ItemsMixin:
             # Insere todos os itens em batch
             query = f"""
                 INSERT INTO {self.items_table}
-                (execution_id, item_identifier, status, priority, queue_position, 
-                 processing_schema, item_data, max_retries, created_at, updated_at)
-                VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)
+                (execution_id, last_execution_id, item_identifier, status, priority,
+                 queue_position, processing_schema, item_data, max_retries,
+                 created_at, updated_at)
+                VALUES (?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)
             """
 
             self._adapter.execute_many(query, params_list)
@@ -323,12 +353,19 @@ class ItemsMixin:
             # Busca os IDs dos itens recém-inseridos usando queue_position
             # Busca todos os itens inseridos nesta execução com queue_position >= start_position
             id_query = f"""
-                SELECT id FROM {self.items_table}
+                SELECT {select_top_prefix(self.db_type, len(items))} id
+                FROM {self.items_table}
                 WHERE execution_id = ? AND queue_position >= ?
                 ORDER BY queue_position ASC
-                LIMIT ?
             """
-            id_cursor = self._adapter.execute_query(id_query, (resolved_execution_id, start_position, len(items)))
+            if self.db_type != DatabaseType.SQLSERVER:
+                id_query += " LIMIT ?"
+                id_cursor = self._adapter.execute_query(id_query, (resolved_execution_id, start_position, len(items)))
+            else:
+                id_cursor = self._adapter.execute_query(
+                    id_query,
+                    (resolved_execution_id, start_position),
+                )
             id_results = id_cursor.fetchall()
 
             # Extrai IDs dos resultados
@@ -383,11 +420,13 @@ class ItemsMixin:
             if include_interrupted:
                 status_filter = "('pending', 'queued', 'interrupted')"
 
+            top = select_top_prefix(self.db_type, 1)
+            limit_one = limit_one_suffix(self.db_type)
             query = f"""
-                SELECT * FROM {self.items_table}
+                SELECT {top}* FROM {self.items_table}
                 WHERE execution_id = ? AND status IN {status_filter}
                 ORDER BY priority DESC, queue_position ASC
-                LIMIT 1
+                {limit_one}
             """
 
             cursor = self._adapter.execute_query(query, (execution_id,))
@@ -419,13 +458,17 @@ class ItemsMixin:
         """
         try:
             now = datetime.now()
+            touch_id = self._touch_execution_id()
             query = f"""
                 UPDATE {self.items_table}
-                SET status = 'processing', started_at = ?, updated_at = ?
+                SET status = 'processing',
+                    started_at = ?,
+                    updated_at = ?,
+                    last_execution_id = COALESCE(?, last_execution_id)
                 WHERE id = ? AND status IN ('pending', 'queued', 'interrupted')
             """
 
-            cursor = self._adapter.execute_query(query, (now, now, item_id))
+            cursor = self._adapter.execute_query(query, (now, now, touch_id, item_id))
             updated = self._adapter.rowcount(cursor) > 0
             self._adapter.commit()
             return updated
@@ -443,6 +486,8 @@ class ItemsMixin:
         Atomically claim the next queue item (SELECT + UPDATE in one transaction).
 
         Prefer this over get_next_item_from_queue() + start_processing_item().
+        SQLite/PostgreSQL use ``RETURNING``; MySQL uses SELECT + conditional UPDATE;
+        SQL Server uses ``UPDATE ... OUTPUT INSERTED.*``.
         """
         self._ensure_open()
         if include_interrupted is None:
@@ -452,28 +497,111 @@ class ItemsMixin:
 
         try:
             now = datetime.now()
-            update_query = f"""
-                UPDATE {self.items_table}
-                SET status = 'processing', started_at = ?, updated_at = ?
-                WHERE id = (
-                    SELECT id FROM {self.items_table}
-                    WHERE execution_id = ? AND status IN {status_filter}
-                    ORDER BY priority DESC, queue_position ASC
-                    LIMIT 1
-                ) AND status IN {status_filter}
-                RETURNING *
-            """
             with self._adapter._lock:
+                if uses_mysql_claim_path(self.db_type):
+                    top = select_top_prefix(self.db_type, 1)
+                    limit_one = limit_one_suffix(self.db_type)
+                    select_query = self._adapter._prepare_query(
+                        f"""
+                        SELECT {top}id FROM {self.items_table}
+                        WHERE execution_id = ? AND status IN {status_filter}
+                        ORDER BY priority DESC, queue_position ASC
+                        {limit_one}
+                        """
+                    )
+                    cursor = self._adapter._execute_query_impl(
+                        select_query,
+                        (execution_id,),
+                    )
+                    selected = cursor.fetchone()
+                    if not selected:
+                        self._adapter._rollback_impl()
+                        return None
+                    item_id = extract_row_id(selected)
+                    update_query = self._adapter._prepare_query(
+                        f"""
+                        UPDATE {self.items_table}
+                        SET status = 'processing',
+                            started_at = ?,
+                            updated_at = ?,
+                            last_execution_id = ?
+                        WHERE id = ? AND status IN {status_filter}
+                        """
+                    )
+                    cursor = self._adapter._execute_query_impl(
+                        update_query,
+                        (now, now, execution_id, item_id),
+                    )
+                    if self._adapter.rowcount(cursor) <= 0:
+                        self._adapter._rollback_impl()
+                        return None
+                    fetch_query = self._adapter._prepare_query(f"SELECT * FROM {self.items_table} WHERE id = ?")
+                    cursor = self._adapter._execute_query_impl(fetch_query, (item_id,))
+                    row = cursor.fetchone()
+                    if not row:
+                        self._adapter._rollback_impl()
+                        return None
+                    self._adapter._commit_impl()
+                    return normalize_item_row(row_to_dict(row, self.db_type))
+
+                if uses_sqlserver_output_claim(self.db_type):
+                    update_query = self._adapter._prepare_query(
+                        f"""
+                        UPDATE i
+                        SET status = 'processing',
+                            started_at = ?,
+                            updated_at = ?,
+                            last_execution_id = ?
+                        OUTPUT INSERTED.*
+                        FROM {self.items_table} AS i
+                        INNER JOIN (
+                            SELECT TOP (1) id
+                            FROM {self.items_table}
+                            WHERE execution_id = ? AND status IN {status_filter}
+                            ORDER BY priority DESC, queue_position ASC
+                        ) AS picked ON i.id = picked.id
+                        WHERE i.status IN {status_filter}
+                        """
+                    )
+                    cursor = self._adapter._execute_query_impl(
+                        update_query,
+                        (now, now, execution_id, execution_id),
+                    )
+                    row = cursor.fetchone()
+                    if not row:
+                        self._adapter._rollback_impl()
+                        return None
+                    self._adapter._commit_impl()
+                    return normalize_item_row(row_to_dict(row, self.db_type))
+
+                if not supports_returning(self.db_type):
+                    self._adapter._rollback_impl()
+                    raise DatabaseError(f"Queue claim is not supported for database type: {self.db_type}")
+
+                update_query = f"""
+                    UPDATE {self.items_table}
+                    SET status = 'processing',
+                        started_at = ?,
+                        updated_at = ?,
+                        last_execution_id = ?
+                    WHERE id = (
+                        SELECT id FROM {self.items_table}
+                        WHERE execution_id = ? AND status IN {status_filter}
+                        ORDER BY priority DESC, queue_position ASC
+                        LIMIT 1
+                    ) AND status IN {status_filter}
+                    RETURNING *
+                """
                 cursor = self._adapter._execute_query_impl(
                     self._adapter._prepare_query(update_query),
-                    (now, now, execution_id),
+                    (now, now, execution_id, execution_id),
                 )
                 row = cursor.fetchone()
                 if not row:
                     self._adapter._rollback_impl()
                     return None
                 self._adapter._commit_impl()
-                return row_to_dict(row, self.db_type)
+                return normalize_item_row(row_to_dict(row, self.db_type))
 
         except Exception as e:
             self._adapter.rollback()
@@ -498,13 +626,16 @@ class ItemsMixin:
         """
         try:
             now = datetime.now()
+            touch_id = self._touch_execution_id()
             query = f"""
                 UPDATE {self.items_table}
-                SET last_checkpoint = ?, updated_at = ?
+                SET last_checkpoint = ?,
+                    updated_at = ?,
+                    last_execution_id = COALESCE(?, last_execution_id)
                 WHERE id = ?
             """
 
-            self._adapter.execute_query(query, (checkpoint, now, item_id))
+            self._adapter.execute_query(query, (checkpoint, now, touch_id, item_id))
             self._adapter.commit()
             return True
 
@@ -560,6 +691,9 @@ class ItemsMixin:
             if started_at:
                 execution_time = (finished_at - started_at).total_seconds()
 
+            touch_id = self._touch_execution_id(
+                int(item_data["execution_id"]) if item_data.get("execution_id") is not None else None
+            )
             query = f"""
                 UPDATE {self.items_table}
                 SET status = ?,
@@ -567,28 +701,40 @@ class ItemsMixin:
                     execution_time_seconds = ?,
                     error_message = ?,
                     notes = ?,
-                    updated_at = ?
+                    updated_at = ?,
+                    last_execution_id = COALESCE(?, last_execution_id)
                 WHERE id = ?
             """
 
             self._adapter.execute_query(
-                query, (status, finished_at, execution_time, error_message, notes, finished_at, item_id)
+                query,
+                (
+                    status,
+                    finished_at,
+                    execution_time,
+                    error_message,
+                    notes,
+                    finished_at,
+                    touch_id,
+                    item_id,
+                ),
             )
 
-            # Atualiza contadores na execução
+            # Atualiza contadores na execução (scoped to this execution only)
+            exec_id = item_data["execution_id"]
             count_query = f"""
                 UPDATE {self.executions_table}
                 SET successful_items = (
                     SELECT COUNT(*) FROM {self.items_table}
-                    WHERE execution_id = {self.items_table}.execution_id AND status = 'success'
+                    WHERE execution_id = ? AND status = 'success'
                 ),
                 failed_items = (
                     SELECT COUNT(*) FROM {self.items_table}
-                    WHERE execution_id = {self.items_table}.execution_id AND status = 'failed'
+                    WHERE execution_id = ? AND status = 'failed'
                 )
-                WHERE id = (SELECT execution_id FROM {self.items_table} WHERE id = ?)
+                WHERE id = ?
             """
-            self._adapter.execute_query(count_query, (item_id,))
+            self._adapter.execute_query(count_query, (exec_id, exec_id, exec_id))
 
             self._adapter.commit()
             return True
@@ -615,13 +761,9 @@ class ItemsMixin:
             query = f"SELECT * FROM {self.items_table} WHERE id = ?"
             cursor = self._adapter.execute_query(query, (item_id,))
             row = cursor.fetchone()
-
-            if row:
-                if self.db_type == DatabaseType.SQLITE:
-                    return dict(row)
-                else:
-                    return dict(row) if hasattr(row, "keys") else row
-            return None
+            if not row:
+                return None
+            return normalize_item_row(row_to_dict(row, self.db_type))
 
         except Exception as e:
             raise DatabaseError(f"Failed to fetch item: {str(e)}.") from e
@@ -641,10 +783,15 @@ class ItemsMixin:
             Execution id. When provided, takes precedence over ``scope``.
 
         status: Optional[str]
-            Status filter. Default: ``pending`` (queued/pending items).
+            Status filter. Default: ``pending``.
+
+            The library **writes** item status as:
+            ``pending`` → ``processing`` → ``success`` | ``failed`` | ``skipped`` | ``interrupted``.
+            Statuses ``queued`` and ``retrying`` are kept only as **read aliases** for
+            legacy rows; new inserts always use ``pending``.
 
             Groups:
-            - ``pending``: pending + queued
+            - ``pending``: pending + queued (legacy)
             - ``executed``: success + failed + skipped
             - ``interrupted``: interrupted
             - ``backlog``: unfinished work (pending, queued, interrupted, retrying, failed, processing)
@@ -710,7 +857,7 @@ class ItemsMixin:
 
             cursor = self._adapter.execute_query(query, tuple(params))
             rows = cursor.fetchall()
-            return rows_to_dicts(rows, self.db_type)
+            return [normalize_item_row(row) or row for row in rows_to_dicts(rows, self.db_type)]
 
         except DatabaseError:
             raise
@@ -724,6 +871,8 @@ class ItemsMixin:
     ) -> list[int]:
         """
         Detect and mark items that were not finished properly.
+
+        Returns only the ids that were ``processing`` and marked in this call.
 
         Parameters:
         -----------
@@ -739,31 +888,44 @@ class ItemsMixin:
             if target_id is None and scope == "current":
                 return []
 
+            if target_id is not None:
+                select_ids = f"""
+                    SELECT id FROM {self.items_table}
+                    WHERE execution_id = ? AND status = 'processing'
+                """
+                cursor = self._adapter.execute_query(select_ids, (target_id,))
+            else:
+                select_ids = f"""
+                    SELECT id FROM {self.items_table}
+                    WHERE status = 'processing'
+                """
+                cursor = self._adapter.execute_query(select_ids)
+
+            interrupted_ids = [extract_row_id(row) for row in (cursor.fetchall() or [])]
+            if not interrupted_ids:
+                return []
+
             now = datetime.now()
+            touch_id = self._touch_execution_id(target_id)
             if target_id is not None:
                 query = f"""
                     UPDATE {self.items_table}
-                    SET status = 'interrupted', updated_at = ?
+                    SET status = 'interrupted',
+                        updated_at = ?,
+                        last_execution_id = COALESCE(?, last_execution_id)
                     WHERE execution_id = ? AND status = 'processing'
                 """
-                self._adapter.execute_query(query, (now, target_id))
-                query_ids = f"""
-                    SELECT id FROM {self.items_table}
-                    WHERE execution_id = ? AND status = 'interrupted'
-                """
-                cursor = self._adapter.execute_query(query_ids, (target_id,))
+                self._adapter.execute_query(query, (now, touch_id, target_id))
             else:
                 query = f"""
                     UPDATE {self.items_table}
-                    SET status = 'interrupted', updated_at = ?
+                    SET status = 'interrupted',
+                        updated_at = ?,
+                        last_execution_id = COALESCE(?, last_execution_id)
                     WHERE status = 'processing'
                 """
-                self._adapter.execute_query(query, (now,))
-                query_ids = f"SELECT id FROM {self.items_table} WHERE status = 'interrupted'"
-                cursor = self._adapter.execute_query(query_ids)
+                self._adapter.execute_query(query, (now, touch_id))
 
-            rows = cursor.fetchall()
-            interrupted_ids = [extract_row_id(row) for row in rows]
             self._adapter.commit()
             return interrupted_ids
 

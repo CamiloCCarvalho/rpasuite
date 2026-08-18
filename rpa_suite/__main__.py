@@ -89,9 +89,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    version_parser = subparsers.add_parser(
-        "version", help="Show the installed rpa_suite version."
-    )
+    version_parser = subparsers.add_parser("version", help="Show the installed rpa_suite version.")
     version_parser.set_defaults(func=_cmd_version)
 
     stats_parser = subparsers.add_parser(
