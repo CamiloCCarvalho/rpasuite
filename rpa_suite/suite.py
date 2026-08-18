@@ -79,8 +79,8 @@ class Suite:
         ``Browser``: Object Browser automation functions (neeeds Selenium and Webdriver_Manager)
         ``Iris``: Object Iris automation functions to convert documents with OCR + IA based on ``docling``
         ``Artemis``: Object Artemis automation functions to desktopbot similar Botcity with ``pyautogui``
-        ``database``: Class Database for RPA execution tracking (SQLite/PostgreSQL/MySQL).
-            Use ``from rpa_suite.core import Database, DatabaseType`` for the enum.
+        ``database``: Class Database for RPA execution tracking (SQLite/PostgreSQL/MySQL/SQL Server).
+            Use ``from rpa_suite.core import Database, DatabaseType, RetentionPolicy``.
         ``utils``: Utility class for system configuration
 
     """
@@ -201,7 +201,6 @@ class Suite:
             "pyperclip",
             "pywin32",
             "colorama",
-            "colorlog",
             "email_validator",
             "loguru",
             "openpyxl",

@@ -27,7 +27,7 @@ Available modules:
     ``printer``: Functions for formatted output
     ``regex``: Operations with regular expressions
     ``validate``: Data validation functions
-    ``database``: RPA execution tracking (SQLite/PostgreSQL/MySQL)
+    ``database``: RPA execution tracking (SQLite/PostgreSQL/MySQL/SQL Server)
     ``utils``: System utility helpers
     ``ParallelRunner``: Object ParallelRunner functions to run in parallel
     ``AsyncRunner``: Object AsyncRunner functions to run in Assyncronous

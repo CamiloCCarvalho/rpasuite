@@ -92,25 +92,16 @@ rpa.log.log_start_run_debug(f'teste')
 >>> DD.MM.YY.HH:MM DEBUG    teste
 ```
 
-### Form 3: Using variable suite
+### Form 3: Using a core class directly
 
-Opcionalmente pode usar a variavel **suite** que possui as classes disponiveis.
+Importe a classe do submódulo em ``core`` e instancie só o que precisa.
 
 ```python
-# Importando o objeto instanciado 'suite' também te dará acesso aos outros objetos 
-from rpa_suite import suite
+from rpa_suite.core import Log
 
-# Instanciando apenas um obojeto de Log
-my_logger = suite.Log()
-
-# Usando como exemplo o modulo de log, fazendo sua configuração
+my_logger = Log()
 my_logger.config_logger()
-
-# Gerando um log no arquivo
 my_logger.log_start_run_debug(f'teste')
-
-# Este código deve gerar uma pasta 'log' no diretório raiz onde esta sendo executado, com um arquigo 'log.log' e escrever um log inicial no arquivo e no terminal
->>> DD.MM.YY.HH:MM DEBUG    teste
 ```
 
 ### Form 4: Modular use
@@ -158,7 +149,7 @@ Metodos:
 - ``magenta_print``
 - ``blue_print``
 - ``print_call_fn``
-- ``print_return_fn``
+- ``print_retur_fn``
 
 Argumentos:
 
@@ -207,7 +198,7 @@ rpa.blue_print(f'Other blue')
 
 # variações (estas tem apenas objetivo de serem cores distintas para quem quer ser mais direto e sem muitas cores)
 rpa.print_call_fn(f'foo')
-rpa.print_return_fn(f'foo2')
+rpa.print_retur_fn(f'foo2')
 ```
 
 Abaixo variações do uso e possibilidade de mudar as cores a sua vontade:
@@ -1081,7 +1072,7 @@ def main():
     #runner: AsyncRunner = AsyncRunner()
 
     # Instanciando o objeto de execução assíncrona
-    runner: AsyncRunner = rpa.Asyn()
+    runner: AsyncRunner = rpa.asyn()
   
     # Executando a função somar de forma assíncrona
     runner.run(somar, 10, 30)
@@ -1209,7 +1200,7 @@ def main():
     #runner: ParallelRunner = ParallelRunner()
 
     # Instanciando o runner para execução em paralelo a partir do objeto da suite
-    runner: ParallelRunner = rpa.Parallel()
+    runner: ParallelRunner = rpa.parallel()
   
     # Chamada da função principal 'run' que ira disparar a sua função de forma paralela
     runner.run(somar, 10, 30)

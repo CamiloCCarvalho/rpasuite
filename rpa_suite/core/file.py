@@ -72,7 +72,7 @@ class File:
         # proccess
         try:
 
-            try:  # only to check if opencv, pillow allowed and installed
+            try:  # pyautogui (screenshot) and Pillow/pyscreeze
                 import pyautogui  # pylint: disable=import-outside-toplevel
                 import pyscreeze  # pylint: disable=unused-import,import-outside-toplevel
 

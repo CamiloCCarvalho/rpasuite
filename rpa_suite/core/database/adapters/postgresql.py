@@ -34,7 +34,7 @@ class PostgreSQLAdapter(DatabaseAdapter):
     ):
         super().__init__()
         if not POSTGRESQL_AVAILABLE:
-            raise DatabaseError("PostgreSQL is not available. Install: pip install psycopg2-binary")
+            raise DatabaseError("PostgreSQL is not available. Install: pip install rpa-suite[postgres]")
         self.host = host
         self.port = port
         self.database = database

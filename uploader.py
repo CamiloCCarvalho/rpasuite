@@ -10,6 +10,8 @@ import zipfile
 
 BUILD_DIRS = ("dist", "build", "rpa_suite.egg-info")
 
+FORBIDDEN_CORE_REQUIRES = ("typing", "opencv-python", "colorlog")
+LEGACY_WHEEL_PATHS = ("rpa_suite/core/database.py",)
 REQUIRED_WHEEL_ASSETS = (
     "rpa_suite/core/dashboard/templates/overview.html",
     "rpa_suite/core/dashboard/templates/error.html",
@@ -27,6 +29,9 @@ def limpar_pastas(pastas: tuple[str, ...] = BUILD_DIRS) -> None:
     for pasta in pastas:
         if os.path.exists(pasta):
             shutil.rmtree(pasta)
+    for unpacked in glob.glob("rpa_suite-[0-9]*"):
+        if os.path.isdir(unpacked) and os.path.isfile(os.path.join(unpacked, "PKG-INFO")):
+            shutil.rmtree(unpacked)
 
 
 def _dist_artifacts() -> list[str]:
@@ -60,22 +65,32 @@ def verify_wheel(wheel_path: str) -> None:
             print(f"  - {asset}")
         sys.exit(1)
 
-    require_lines = [line.strip() for line in metadata.splitlines() if line.lower().startswith("requires-dist:")]
-    typing_requires = []
-    for line in require_lines:
-        requirement = line.split(":", 1)[1].strip().split(";")[0].strip()
-        name = requirement.split()[0].split("[")[0].strip()
-        if name.lower() == "typing":
-            typing_requires.append(line)
-    if typing_requires:
-        print("O wheel ainda declara a dependencia 'typing' (backport). Remova de install_requires.")
-        for line in typing_requires:
+    leftover_legacy = [path for path in LEGACY_WHEEL_PATHS if path in names]
+    if leftover_legacy:
+        print("O wheel ainda inclui o database.py legado:")
+        for path in leftover_legacy:
+            print(f"  - {path}")
+        sys.exit(1)
+
+    forbidden_core = []
+    for line in metadata.splitlines():
+        if not line.lower().startswith("requires-dist:"):
+            continue
+        rest = line.split(":", 1)[1].strip()
+        name = rest.split()[0].split("[")[0].strip().lower()
+        extra_marker = "extra ==" in rest.lower() or "extra==" in rest.lower()
+        if name in FORBIDDEN_CORE_REQUIRES and not extra_marker:
+            forbidden_core.append(line.strip())
+    if forbidden_core:
+        print("O wheel declara dependencias pesadas/obsoletas no nucleo (deveriam ser extra ou removidas):")
+        for line in forbidden_core:
             print(f"  - {line}")
         sys.exit(1)
 
     print(f"Wheel OK: {os.path.basename(wheel_path)}")
     print("  - templates/static do dashboard presentes")
-    print("  - dependencia 'typing' ausente do METADATA")
+    print("  - database.py legado ausente")
+    print("  - typing/opencv-python/colorlog ausentes do nucleo")
 
 
 def _run(command: list[str], error_message: str) -> None:

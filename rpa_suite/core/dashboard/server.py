@@ -31,7 +31,7 @@ def _require_flask():
     try:
         import flask  # type: ignore[import-not-found]  # noqa: F401
     except ImportError as e:  # pragma: no cover - depends on env
-        raise DashboardError("Flask is required to run the dashboard. Install with: pip install flask") from e
+        raise DashboardError("Flask is required to run the dashboard. Install with: pip install rpa-suite[dashboard]") from e
     return flask
 
 

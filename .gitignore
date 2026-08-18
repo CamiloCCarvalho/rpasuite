@@ -9,6 +9,7 @@ env
 build
 dist
 rpa_suite.egg-info
+rpa_suite-[0-9]*/
 tests
 cred
 tasks.md

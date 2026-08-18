@@ -18,7 +18,7 @@ import importlib.util
 
 from .asyncrun import AsyncRunner
 from .clock import Clock
-from .database import Database, DatabaseType
+from .database import Database, DatabaseError, DatabaseType, RetentionPolicy
 from .date import Date
 from .dir import Directory
 from .email import Email
@@ -39,8 +39,6 @@ if importlib.util.find_spec("selenium") and importlib.util.find_spec("webdriver_
 if importlib.util.find_spec("docling"):
     from .iris import Iris
 
-# from .iris import Artemis
+# from .artemis import Artemis
 if importlib.util.find_spec("pyautogui"):
     from .artemis import Artemis
-
-__version__ = "1.9.0"

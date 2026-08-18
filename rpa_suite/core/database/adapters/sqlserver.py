@@ -53,7 +53,7 @@ class SQLServerAdapter(DatabaseAdapter):
     ) -> None:
         super().__init__()
         if not SQLSERVER_AVAILABLE:
-            raise DatabaseError("SQL Server is not available. Install: pip install pyodbc")
+            raise DatabaseError("SQL Server is not available. Install: pip install rpa-suite[sqlserver]")
         self.host = host
         self.port = port
         self.database = database

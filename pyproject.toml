@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=67.8.0", "wheel"]
+requires = ["setuptools>=77.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,23 +7,113 @@ name = "rpa_suite"
 version = "1.9.0"
 description = "Comprehensive Python toolkit for RPA automation: email, logging, database tracking, browser automation, OCR, desktop automation, and more. Essential utilities for building robust automation workflows with Selenium, Botcity, and custom solutions."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
-    { name = "CamiloCarvalho", email = "camilo.costa1993@gmail.com" }
+    { name = "Camilo Costa de Carvalho", email = "camilo.costa1993@gmail.com" }
 ]
 requires-python = ">=3.11"
+keywords = [
+    "rpa",
+    "automation",
+    "selenium",
+    "logging",
+    "database",
+    "sqlite",
+    "postgresql",
+    "mysql",
+    "sqlserver",
+    "ocr",
+    "pyautogui",
+    "email",
+    "browser-automation",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+    "Topic :: Communications :: Email",
+    "Topic :: Database",
+    "Topic :: Internet :: WWW/HTTP :: Browsers",
+    "Topic :: Multimedia :: Graphics :: Capture :: Screen Capture",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Environment :: Console",
+    "Natural Language :: English",
+    "Natural Language :: Portuguese (Brazilian)",
+]
 dependencies = [
     "colorama",
-    "colorlog",
     "email_validator",
     "loguru",
     "pillow",
     "pyautogui",
     "requests",
+]
+
+[project.optional-dependencies]
+browser = [
+    "selenium>=4.16.0",
+    "webdriver-manager>=4.0.1",
+]
+ocr = [
+    "docling",
+]
+dashboard = [
+    "flask>=3.0.0",
+]
+opencv = [
     "opencv-python",
 ]
+postgres = [
+    "psycopg2-binary",
+]
+mysql = [
+    "mysql-connector-python",
+]
+sqlserver = [
+    "pyodbc",
+]
+dev = [
+    "build",
+    "twine",
+    "pre-commit",
+    "black",
+    "pylint",
+    "bandit",
+    "pyupgrade",
+    "detect-secrets",
+    "flake8",
+    "isort",
+]
+all = [
+    "selenium>=4.16.0",
+    "webdriver-manager>=4.0.1",
+    "docling",
+    "flask>=3.0.0",
+    "opencv-python",
+    "psycopg2-binary",
+    "mysql-connector-python",
+    "pyodbc",
+]
+
+[project.urls]
+Homepage = "https://github.com/CamiloCCarvalho/rpasuite"
+Documentation = "https://github.com/CamiloCCarvalho/rpasuite/wiki"
+Source = "https://github.com/CamiloCCarvalho/rpasuite"
+Tracker = "https://github.com/CamiloCCarvalho/rpasuite/issues"
+LinkedIn = "https://www.linkedin.com/in/camilocostac/"
 
 [tool.setuptools]
 include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["rpa_suite*"]
 
 [tool.setuptools.package-data]
 "rpa_suite.core.dashboard" = ["templates/*.html", "static/*.css", "static/*.js"]

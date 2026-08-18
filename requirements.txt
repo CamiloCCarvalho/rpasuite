@@ -1,31 +1,6 @@
-setuptools>=67.8.0
-wheel
-pyperclip
-pywin32
-colorama>=0.4.6
-colorlog>=6.8.0
-email_validator>=2.1.0
-loguru>=0.7.2
-openpyxl>=3.1.2
-pandas>=2.1.4
-pyautogui>=0.9.54
-selenium>=4.16.0
-webdriver_manager>=4.0.1
-docling
-
-# Linters e formatters
-pre-commit
-black
-pylint
-bandit
-opencv-python
-pillow
-pyupgrade
-detect-secrets
-flake8
-isort
-bandit
-
-# to package
-build
-twine
+# Source of truth: pyproject.toml
+#   [project.dependencies]           — runtime
+#   [project.optional-dependencies]  — extras (browser, opencv, ocr, dashboard, postgres, mysql, sqlserver, dev, all)
+#
+# Editable install with development tools:
+-e ".[dev]"

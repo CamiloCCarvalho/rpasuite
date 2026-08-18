@@ -92,11 +92,11 @@ class LogsMixin:
                     if step_name:
                         formatted_message = f"[{step_name}] {message}"
 
-                    # Captura o frame do arquivo que chamou add_log() (não do database.py)
+                    # Captura o frame do arquivo que chamou add_log() (não deste mixin)
                     caller_frame = None
                     current_file = os.path.normpath(__file__)
 
-                    # Percorre a pilha de chamadas para encontrar o primeiro frame que não é do database.py
+                    # Percorre a pilha de chamadas para encontrar o primeiro frame que não é deste mixin
                     # Começa do frame atual (add_log) e vai para trás
                     frame = inspect.currentframe()
                     # Pula o frame atual (add_log) e vai para quem chamou
@@ -104,7 +104,7 @@ class LogsMixin:
                         frame = frame.f_back
                         if frame:
                             frame_file = os.path.normpath(frame.f_code.co_filename)
-                            # Se encontrou um frame que não é do database.py, usa ele
+                            # Se encontrou um frame que não é deste mixin, usa ele
                             if frame_file != current_file:
                                 caller_frame = frame
                                 break

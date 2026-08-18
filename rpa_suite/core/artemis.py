@@ -1,6 +1,7 @@
 # rpa_suite/core/artemis.py
 
 # imports standard
+import importlib.util
 from pathlib import Path
 from time import sleep, time
 from typing import Optional, Tuple, Union
@@ -11,8 +12,8 @@ import pyautogui as artemis_engine
 # imports internal
 from rpa_suite.functions._printer import alert_print, success_print
 
-# constantes
-OPENCV_AVAILABLE_FROM_ARTEMIS = False
+# Optional extra: pip install rpa-suite[opencv]
+OPENCV_AVAILABLE_FROM_ARTEMIS = importlib.util.find_spec("cv2") is not None
 
 
 class ArtemisError(Exception):
@@ -44,19 +45,6 @@ class Artemis:
         """
         artemis_engine.FAILSAFE = True  # Move mouse to top-left corner to stop
         artemis_engine.PAUSE = 0.1  # Default pause between commands
-        global OPENCV_AVAILABLE_FROM_ARTEMIS  # pylint: disable=global-statement
-        OPENCV_AVAILABLE_FROM_ARTEMIS = self.__check_opencv_availability()
-
-    # pylint: disable=import-outside-toplevel
-    def __check_opencv_availability(self) -> bool:
-        """Checks if OpenCV is available in the system."""
-        try:
-            # pylint: disable=import-outside-toplevel
-            import cv2  # pylint: disable=unused-import
-
-            return True
-        except ImportError:
-            return False
 
     def click_image(  # pylint: disable=too-many-positional-arguments,too-many-locals
         self,
@@ -120,7 +108,7 @@ class Artemis:
             ValueError: If parameters are invalid.
 
         Note:
-            To use the confidence parameter, install OpenCV: pip install opencv-python
+            To use the confidence parameter, install OpenCV: pip install rpa-suite[opencv]
             Without OpenCV, the function will work with exact pixel matching.
 
         Example:
@@ -149,7 +137,7 @@ class Artemis:
         if confidence != 0.8 and not OPENCV_AVAILABLE_FROM_ARTEMIS:
             if verbose:
                 alert_print(
-                    f"Parameter confidence={confidence} will be ignored. " + "Install OpenCV: pip install opencv-python"
+                    f"Parameter confidence={confidence} will be ignored. " + "Install OpenCV: pip install rpa-suite[opencv]"
                 )
 
         if verbose:

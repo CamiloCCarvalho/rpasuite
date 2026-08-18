@@ -4,7 +4,7 @@
 Local HTML dashboard for the RPA Suite Database.
 
 The dashboard is an optional feature that requires Flask. Users install it
-alongside the suite (e.g. `pip install flask`) and launch either via the
+alongside the suite (e.g. `pip install rpa-suite[dashboard]`) and launch either via the
 CLI (`python -m rpa_suite dashboard <db.db>`) or programmatically:
 
     >>> from rpa_suite.core import Database

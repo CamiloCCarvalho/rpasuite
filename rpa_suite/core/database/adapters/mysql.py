@@ -34,7 +34,7 @@ class MySQLAdapter(DatabaseAdapter):
     ):
         super().__init__()
         if not MYSQL_AVAILABLE:
-            raise DatabaseError("MySQL is not available. Install: pip install mysql-connector-python")
+            raise DatabaseError("MySQL is not available. Install: pip install rpa-suite[mysql]")
         self.host = host
         self.port = port
         self.database = database

@@ -1,3 +1,43 @@
+# RPA Suite — Wiki (v1.9.0)
+
+Documentação dos módulos da biblioteca. A API pública recomendada é `from rpa_suite import rpa`.
+
+## Índice
+
+1. [Print](#print)
+2. [Date](#date)
+3. [Clock](#clock)
+4. [Directory](#directory)
+5. [Email](#email)
+6. [File](#file)
+7. [Log](#log)
+8. [Regex](#regex)
+9. [Validate](#validate)
+10. [Asyn](#asyn)
+11. [Parallel](#parallel)
+12. [Retry](#retry)
+13. [Notifier](#notifier)
+14. [Browser](#browser)
+15. [Artemis](#artemis)
+16. [Iris](#iris)
+17. [CLI](#cli)
+18. [Database](#database)
+
+Extras de instalação (além do `pip install rpa-suite`):
+
+```bash
+pip install rpa-suite[browser]      # Selenium
+pip install rpa-suite[opencv]       # Artemis confidence (cv2)
+pip install rpa-suite[ocr]          # Iris / docling
+pip install rpa-suite[dashboard]    # Flask
+pip install rpa-suite[postgres]
+pip install rpa-suite[mysql]
+pip install rpa-suite[sqlserver]
+pip install rpa-suite[all]
+```
+
+---
+
 # Print
 
 **Print** é um submodulo do nosso conjunto.
@@ -16,7 +56,7 @@ Metodos:
 - ``magenta_print``
 - ``blue_print``
 - ``print_call_fn``
-- ``print_return_fn``
+- ``print_retur_fn``
 
 Argumentos:
 
@@ -65,7 +105,7 @@ rpa.blue_print(f'Other blue')
 
 # variações (estas tem apenas objetivo de serem cores distintas para quem quer ser mais direto e sem muitas cores)
 rpa.print_call_fn(f'foo')
-rpa.print_return_fn(f'foo2')
+rpa.print_retur_fn(f'foo2')
 ```
 
 Abaixo variações do uso e possibilidade de mudar as cores a sua vontade:
@@ -935,7 +975,7 @@ def main():
     #runner: AsyncRunner = AsyncRunner()
 
     # Instanciando o objeto de execução assíncrona
-    runner: AsyncRunner = rpa.Asyn()
+    runner: AsyncRunner = rpa.asyn()
   
     # Executando a função somar de forma assíncrona
     runner.run(somar, 10, 30)
@@ -1066,7 +1106,7 @@ def main():
     #runner: ParallelRunner = ParallelRunner()
 
     # Instanciando o runner para execução em paralelo a partir do objeto da suite
-    runner: ParallelRunner = rpa.Parallel()
+    runner: ParallelRunner = rpa.parallel()
   
     # Chamada da função principal 'run' que ira disparar a sua função de forma paralela
     runner.run(somar, 10, 30)
@@ -1098,6 +1138,168 @@ if __name__ == '__main__':
 
 <br>
 
+# Retry
+
+**Retry** é um decorator para repetir uma função em caso de falha, com backoff exponencial. Exposto em `rpa.retry` e também como `from rpa_suite.core import retry, RetryError`.
+
+Parametros de ``retry``:
+
+- ``attempts`` : ``int`` - Número total de tentativas (>= 1). Default: ``3``.
+- ``delay`` : ``float`` - Espera em segundos antes da primeira nova tentativa. Default: ``0.5``.
+- ``backoff`` : ``float`` - Multiplicador do delay entre tentativas. Default: ``2.0``.
+- ``exceptions`` : tipo ou iterável de exceções que disparam retry. Default: ``Exception``.
+- ``max_delay`` : ``float | None`` - Teto do intervalo entre tentativas.
+- ``jitter`` : ``float`` - Jitter aleatório em segundos (``0`` desliga).
+- ``on_retry`` : callback opcional ``fn(attempt_index, exception, sleep_seconds)``.
+
+Se todas as tentativas falharem, é levantado ``RetryError`` (a última exceção fica em ``__cause__`` e em ``last_exception``).
+
+```python
+from rpa_suite import rpa
+
+@rpa.retry(attempts=4, delay=0.2, backoff=2.0, exceptions=TimeoutError)
+def baixar_arquivo():
+    ...
+
+try:
+    baixar_arquivo()
+except rpa.RetryError as exc:
+    rpa.error_print(str(exc))
+```
+
+> Import isolado: `from rpa_suite.core import retry, RetryError`
+
+<br>
+
+# Notifier
+
+**Notifier** envia webhooks HTTP (JSON) para Slack, Microsoft Teams e Telegram. Já vem instanciado em ``rpa.notifier``. Usa ``requests`` (dependência do núcleo).
+
+Métodos:
+
+- ``send_webhook(url, payload, method='POST', headers=None, timeout=None)``
+- ``slack(webhook_url, text, blocks=None, timeout=None)``
+- ``teams(webhook_url, title, text, theme_color='0076D7', timeout=None)``
+- ``telegram(bot_token, chat_id, text, parse_mode=None, disable_web_page_preview=True, timeout=None)``
+
+Retorno: ``dict`` com ``status_code``, ``ok`` e ``body``.
+
+```python
+from rpa_suite import rpa
+
+rpa.notifier.slack("https://hooks.slack.com/services/...", "Robô finalizou com 42 itens")
+rpa.notifier.teams("https://outlook.office.com/webhook/...", "RPA", "Execução concluída")
+rpa.notifier.telegram(bot_token="123:ABC", chat_id="@canal", text="Bot ok")
+```
+
+> Import isolado: `from rpa_suite.core import Notifier, NotifierError`
+
+<br>
+
+# Browser
+
+**Browser** automatiza o Chrome via Selenium + debugging port. É extra opcional: ``pip install rpa-suite[browser]``. Em seguida use ``rpa.browser`` (a classe; instancie com ``rpa.browser()``).
+
+> Implementação atual é voltada a Windows (`chrome.exe` via `cmd.exe`).
+
+Métodos públicos:
+
+- ``start_browser(close_chrome_on_this_port=True, timeout=10, verbose=False)``
+- ``configure_browser()``
+- ``get(url, verbose=False)``
+- ``find_ele(value, by=By.XPATH, timeout=12, verbose=True)``
+- ``close_browser(verbose=False)``
+
+```python
+from rpa_suite import rpa
+from selenium.webdriver.common.by import By
+
+browser = rpa.browser(port=9393)
+browser.start_browser(verbose=True)
+browser.get("https://example.com")
+el = browser.find_ele("//h1", by=By.XPATH)
+browser.close_browser()
+```
+
+Se ``rpa.browser`` for ``None``, o extra ``[browser]`` não está instalado.
+
+> Import isolado (requer selenium): `from rpa_suite.core import Browser`
+
+<br>
+
+# Artemis
+
+**Artemis** faz automação de desktop por visão (PyAutoGUI): localizar imagem na tela e clicar. Já entra no install básico (`pyautogui`). O parâmetro ``confidence`` só funciona com OpenCV: ``pip install rpa-suite[opencv]``. Sem o extra, a busca usa correspondência exata de pixels.
+
+Use ``rpa.artemis`` (classe): ``bot = rpa.artemis()``. Imagens padrão na pasta ``resource``.
+
+Métodos públicos:
+
+- ``click_image(image_label, images_folder='resource', confidence=0.78, timeout=10.0, ...)``
+- ``find_image_position(image_label, images_folder='resource', confidence=0.8, timeout=5.0, ...)``
+- ``wait_and_click(image_label, images_folder='resource', confidence=0.8, timeout=30.0)``
+- ``quick_click(image_label, images_folder='resource')``
+
+Retorno: ``(x, y)`` se encontrou, ou ``False``.
+
+```python
+from rpa_suite import rpa
+
+desktop = rpa.artemis()
+pos = desktop.click_image("botao_salvar.png", timeout=8.0)
+if not pos:
+    rpa.alert_print("Imagem não encontrada")
+
+desktop.wait_and_click("ok_button", timeout=30.0)
+desktop.quick_click("icone_menu")
+```
+
+> Import isolado: `from rpa_suite.core import Artemis`
+
+<br>
+
+# Iris
+
+**Iris** converte documentos (PDF, imagens, texto) com OCR/IA via **docling**. Extra: ``pip install rpa-suite[ocr]``. Use ``rpa.iris`` (classe).
+
+Métodos:
+
+- ``read_document(file_path, result_format=ExportFormats.MARKDOWN, verbose=False)``
+- ``read_documents(list_file_path, result_format=ExportFormats.MARKDOWN, verbose=False)``
+
+Formatos: ``MARKDOWN``, ``DICT``, ``DOCTAGS``, ``HTML``, ``TEXT``, ``INDENTEDTEXT``.
+
+```python
+from rpa_suite import rpa
+from rpa_suite.core.iris import ExportFormats
+
+iris = rpa.iris()
+markdown = iris.read_document("nota.pdf", ExportFormats.MARKDOWN)
+lotes = iris.read_documents(["a.pdf", "b.pdf"], ExportFormats.TEXT)
+```
+
+Se ``rpa.iris`` for ``None``, o extra ``[ocr]`` não está instalado.
+
+> Import isolado (requer docling): `from rpa_suite.core.iris import Iris, ExportFormats`
+
+<br>
+
+# CLI
+
+A lib expõe um CLI via ``python -m rpa_suite``. O dashboard exige ``pip install rpa-suite[dashboard]``.
+
+```bash
+python -m rpa_suite version
+python -m rpa_suite db-stats path/to/file.db
+python -m rpa_suite db-stats path/to/file.db --json
+python -m rpa_suite dashboard path/to/file.db --port 5001
+python -m rpa_suite dashboard path/to/file.db --host 127.0.0.1 --port 5001 --debug
+```
+
+O comando ``dashboard`` abre a UI HTML (execuções, itens, logs) contra um arquivo SQLite gerado pelo módulo Database.
+
+<br>
+
 # Database
 
 **Database** is the RPA Suite module for execution tracking, item queues, structured logs, retention, reprocessing, and observability. It is designed for production RPA workflows: idempotent queues, checkpoints, retries, interruption handling, deduplication, and a built-in HTML dashboard.
@@ -1108,11 +1310,11 @@ You can import it in several ways:
 from rpa_suite.core import Database, DatabaseType, RetentionPolicy
 from rpa_suite import rpa
 
-db = rpa.database(...)          # via Suite (if exposed)
+db = rpa.database(...)          # via Suite
 db = Database(...)              # direct import (recommended)
 ```
 
-> **Optional dependency:** the HTML dashboard requires Flask (`pip install flask`).
+> **Optional dependency:** the HTML dashboard requires Flask (`pip install rpa-suite[dashboard]`).
 
 ---
 
@@ -1304,7 +1506,7 @@ db = Database(
 )
 ```
 
-Requires: `pip install pyodbc` and a system ODBC driver.
+Requires: `pip install rpa-suite[sqlserver]` and a system ODBC driver.
 
 ---
 
@@ -1770,7 +1972,7 @@ run_dashboard(db, host="127.0.0.1", port=5001)
 ### CLI (SQLite file)
 
 ```bash
-pip install flask
+pip install rpa-suite[dashboard]
 python -m rpa_suite dashboard database/rpa_test.db --port 5001
 python -m rpa_suite dashboard database/rpa_test.db --host 127.0.0.1 --port 5001 --debug
 ```
@@ -1843,4 +2045,5 @@ finally:
 
 ## Related
 
-- This harness validates the installed package under `.venv/Lib/site-packages/rpa_suite/`
+- PyPI: `pip install rpa-suite`
+- Extras: `[browser]`, `[opencv]`, `[ocr]`, `[dashboard]`, `[postgres]`, `[mysql]`, `[sqlserver]`, `[all]`

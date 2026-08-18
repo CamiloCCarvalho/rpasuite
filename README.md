@@ -9,7 +9,7 @@
 [![PyPI Downloads](https://static.pepy.tech/badge/rpa-suite/month)](https://pepy.tech/projects/rpa_suite)
 [![PyPI version](https://img.shields.io/pypi/v/rpa-suite)](https://pypi.org/project/rpa-suite/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/rpa-suite)](https://pypi.org/project/rpa-suite/)
-[![License MIT](https://img.shields.io/github/license/docling-project/docling)](https://opensource.org/licenses/MIT)
+[![License MIT](https://img.shields.io/pypi/l/rpa-suite)](https://opensource.org/licenses/MIT)
 
 [Documentation](#documentation) • [Installation](#installation) • [Quick Start](#quick-start) • [Features](#features) • [Contributing](#contributing)
 
@@ -35,7 +35,7 @@ Whether you're working with Selenium, Botcity, or building custom automation sol
 - **⚡ Parallel & Async Execution** - Run processes in parallel or asynchronously
 - **🤖 Desktop Automation** - PyAutoGUI-based desktop automation (Artemis module)
 - **📄 OCR with AI** - Document conversion with OCR capabilities (Iris module - optional)
-- **💾 Database Tracking** - Complete execution tracking and management system with multi-database support (SQLite, PostgreSQL, MySQL)
+- **💾 Database Tracking** - Complete execution tracking and management system with multi-database support (SQLite, PostgreSQL, MySQL, SQL Server)
 - **🎨 Colored Console Output** - Beautiful terminal output with color-coded messages
 - **✅ Data Validation** - Email validation and pattern checking utilities
 
@@ -57,18 +57,31 @@ conda install -c conda-forge rpa-suite
 
 ### Optional Dependencies
 
-For advanced features, install additional dependencies:
+Install only the extras you need:
 
 ```bash
 # Browser automation (Selenium)
-pip install selenium webdriver-manager
+pip install rpa-suite[browser]
+
+# Fuzzy image matching for Artemis (confidence)
+pip install rpa-suite[opencv]
 
 # OCR with AI (Iris module)
-pip install docling
+pip install rpa-suite[ocr]
 
-# Desktop automation (Artemis - included by default)
-# pyautogui is already included
+# HTML dashboard (Flask)
+pip install rpa-suite[dashboard]
+
+# Database backends (SQLite is built-in)
+pip install rpa-suite[postgres]
+pip install rpa-suite[mysql]
+pip install rpa-suite[sqlserver]
+
+# All optional features
+pip install rpa-suite[all]
 ```
+
+Desktop automation (Artemis) is included in the base install (`pyautogui`). Fuzzy matching via `confidence` needs the optional extra `rpa-suite[opencv]`.
 
 ## Quick Start
 
@@ -102,7 +115,7 @@ rpa.error_print("An error occurred!")
 
 ### Database Module Example
 
-Track your automation executions with the Database module:
+Track your automation executions with the Database module. Prefer `process_queue()` (or `claim_next_item_from_queue()`) over a manual peek + start — claim is atomic.
 
 ```python
 from rpa_suite import rpa
@@ -119,17 +132,12 @@ db.add_items(execution_id=exec_id, items=[
     {"item_identifier": "invoice_002", "item_data": {"value": 320.50}},
 ])
 
-# Process the queue
-while item := db.get_next_item_from_queue(execution_id=exec_id):
-    db.start_processing_item(item["id"])
-    try:
-        # ... your processing logic here ...
-        db.finish_item(item["id"], status="success")
-    except Exception as e:
-        db.finish_item(item["id"], status="failed", error_message=str(e))
+def handle_item(item: dict) -> str:
+    # ... your processing logic here ...
+    return f"Processed {item['item_identifier']}"
 
-# Log and finish the execution
-db.add_log_info("All items processed", execution_id=exec_id)
+stats = db.process_queue(exec_id, handler=handle_item)
+db.add_log_info(f"Queue done: {stats}", execution_id=exec_id)
 db.finish_execution(exec_id, status="completed")
 
 # Check the results
@@ -142,21 +150,21 @@ stats = db.get_statistics(execution_id=exec_id)
 
 - Python 3.11+
 - colorama
-- colorlog
 - email-validator
 - loguru
 - pillow
 - pyautogui
 - requests
-- opencv-python
 
 ### Optional Dependencies
 
-- selenium (for browser automation)
-- webdriver-manager (for browser automation)
-- docling (for OCR/AI features)
-- psycopg2-binary (for PostgreSQL support)
-- mysql-connector-python (for MySQL support)
+- `rpa-suite[browser]` — selenium, webdriver-manager
+- `rpa-suite[opencv]` — opencv-python (Artemis `confidence`)
+- `rpa-suite[ocr]` — docling (Iris)
+- `rpa-suite[dashboard]` — flask
+- `rpa-suite[postgres]` — psycopg2-binary
+- `rpa-suite[mysql]` — mysql-connector-python
+- `rpa-suite[sqlserver]` — pyodbc (plus a system ODBC driver)
 
 ## Features in Detail
 
@@ -198,9 +206,9 @@ File and screenshot management:
 
 Complete execution lifecycle management:
 
-- Multi-database support (SQLite, PostgreSQL, MySQL)
+- Multi-database support (SQLite, PostgreSQL, MySQL, SQL Server)
 - Execution tracking with status management
-- Item queue processing
+- Atomic item queue (`claim_next_item_from_queue`, `process_queue`)
 - Automatic interruption detection
 - Reprocessing capabilities
 - Comprehensive statistics and reporting
@@ -219,15 +227,17 @@ Complete execution lifecycle management:
 - **printer** - Colored console output
 - **regex** - Pattern matching and regex operations
 - **validate** - Data validation utilities
+- **notifier** - Slack / Teams / Telegram webhooks
+- **retry** - Retry decorator with backoff
 
 ### Advanced Modules
 
-- **database** - Execution tracking and database management
-- **browser** - Selenium-based browser automation (optional)
-- **parallel** - Parallel process execution
-- **async** - Asynchronous execution
-- **artemis** - Desktop automation with PyAutoGUI
-- **iris** - OCR and document conversion (optional)
+- **database** - Execution tracking and database management (SQLite, PostgreSQL, MySQL, SQL Server)
+- **browser** - Selenium-based browser automation (`pip install rpa-suite[browser]`)
+- **parallel** - Parallel process execution (`rpa.parallel`)
+- **asyn** - Asynchronous execution (`rpa.asyn`)
+- **artemis** - Desktop automation with PyAutoGUI (`pip install rpa-suite[opencv]` for `confidence`)
+- **iris** - OCR and document conversion (`pip install rpa-suite[ocr]`)
 
 ### Database Module Methods
 
@@ -241,8 +251,10 @@ Complete execution lifecycle management:
 **Item Processing:**
 - `add_item()` - Add item to processing queue
 - `add_items()` - Batch add items
-- `get_next_item_from_queue()` - Get next item to process
-- `start_processing_item()` - Mark item as processing
+- `claim_next_item_from_queue()` - Atomically claim the next item (preferred)
+- `process_queue()` - Claim → handler → finish loop
+- `get_next_item_from_queue()` - Read-only peek; does not change status
+- `start_processing_item()` - Mark item as processing (non-atomic alternative)
 - `update_checkpoint()` - Update processing checkpoint
 - `finish_item()` - Complete item processing
 - `get_item()` - Get item details
